@@ -6,5 +6,6 @@ namespace Darik
 {
     public class Enemy : MonoBehaviour
     {
+        
     }
 }
