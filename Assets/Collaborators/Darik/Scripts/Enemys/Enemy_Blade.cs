@@ -14,6 +14,7 @@ namespace Darik
         {
             base.Awake();
 
+            stateMachine = new StateMachine<State, Enemy_Blade>(this);
             stateMachine.AddState(State.Appear, new AppearState(this, stateMachine));
             stateMachine.AddState(State.Idle, new IdleState(this, stateMachine));
             stateMachine.AddState(State.Attack, new AttackState(this, stateMachine));
