@@ -1,20 +1,25 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Park_Woo_Young
 {
-    public class DisruptorState : MonoBehaviour
+    public class DisruptorState : MonoBehaviourPunCallbacks
     {
         // 교란기 상호작용시 -> 교란기가 데이터 매니저에 신호를 주고
         // 교란기 피격 -> 게임매니저에 보내서 처리하게 함
         [SerializeField] GameObject hologram;   // 교란기 위의 홀로그램의 회전을 주기 위함
+        [SerializeField] Slider repairGauge;
+        [SerializeField] Slider hpGauge;
 
-        [SerializeField] float fixTurnSpeed;        // 고정 회전속도
+        [SerializeField] float fixTurnSpeed;    // 고정 회전속도
         [SerializeField] float turnSpeed;       // 회전속도
         [SerializeField] int fixHP;             // 고정시킬 체력
         [SerializeField] int currentHP;         // 현재 HP
+
         [SerializeField] int repair;            // 수리상태
         [SerializeField] int maxRepair;         // 클리어를 위한 수리목표
 
@@ -26,6 +31,9 @@ namespace Park_Woo_Young
 
         public bool testRepair;                  // 테스트하기위해 수리중이라고 판단
         public float testRepairTime;             // 수리시간
+
+        public bool re;
+        public bool hp;
 
 
         public enum State { Disabled, Activate, Stop, Destroyed, RepairCompleted }
@@ -41,6 +49,7 @@ namespace Park_Woo_Young
         }
         private void Start()
         {
+            turnSpeed = fixTurnSpeed;
             // 임시로 시작시 바로 실행
             // GameMamager.Data.GameStart();
             //pos = this.gameObject.transform.position;
@@ -51,7 +60,7 @@ namespace Park_Woo_Young
         public void Interacter()
         {
             // 상호작용
-            // photonView.RPC("GameStart",RpcTarget.MasterClient);
+            photonView.RPC("GameStart", RpcTarget.MasterClient);
             // photonView 게임 오브젝트가 자기를 서버에 알림
         }
         [PunRPC]
@@ -59,23 +68,50 @@ namespace Park_Woo_Young
         {
 
         }
-
+        [PunRPC]
         public void TakeDamage(int damage)
         {
-            //photonView.RPC("Hit", RpcTarget.MasterClient);
+            photonView.RPC("Hit", RpcTarget.MasterClient, damage);
+            photonView.RPC("HIT", RpcTarget.All, currentHP);
+            photonView.RPC("HIT", RpcTarget.All, repair);
         }
         [PunRPC]
         private void Hit(int damage)
         {
-            currentHP -= damage; // 
+
+            if (repair > 0)                 // 수리진행도가 0보다 크면
+            {
+                repair -= damage;           // 받은 데미지에서 수리 진행도가 깍임
+            }
+            else if (repair <= 0)           // 수리진행도가 0보다 작거나 같으면
+            {
+                currentHP -= damage;        // 체력이 깍임
+            }
             hit = true;
             //GameManager.Data.ChangeHp(currentHP);
 
         }
-
+        [PunRPC]
+        private void RepairGauge()
+        {
+            repairGauge.value = repair;
+        }
+        [PunRPC]
+        private void HpGauge()
+        {
+            hpGauge.value = currentHP;
+        }
+        
+        private void Test()
+        {
+            //if ()
+        }
 
         private void Update()
         {
+            RepairGauge();
+            HpGauge();
+
             switch (state)
             {
                 case State.Disabled:
@@ -102,6 +138,7 @@ namespace Park_Woo_Young
             // repairTime = 0f;    // 델타타임 0으로 고정
             if (Input.GetKeyDown(KeyCode.F))
             {
+                turnSpeed = fixTurnSpeed;
                 state = State.Activate;
             }
         }
@@ -110,7 +147,7 @@ namespace Park_Woo_Young
         {
             // 활성화 후 & 재가동
             Rotate();
-
+            
             Debug.Log("활성화");
             repairTime += Time.deltaTime;
             if (currentHP >= fixHP)     // 현재체력이 최대체력보다 큰 경우
