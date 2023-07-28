@@ -5,25 +5,31 @@ namespace LDW
 {
     public class LevelButtons : MonoBehaviourPunCallbacks
     {
-        public Status status;
+        public Status[] statusList;
 
-        public void LevelButton(int level)
+        private void Start()
         {
-            status.Init(level);
+            for (int id = 0; id < statusList.Length; id++)
+                statusList[id].Init(id);
         }
 
-        public void DecreaseHP(int level)
+        public void LevelButton(int id)
         {
-            photonView.RPC("PunDecreaseHP", RpcTarget.All, level);
+            statusList[id].Init(id);
+        }
+
+        public void DecreaseHP(int id)
+        {
+            photonView.RPC("PunDecreaseHP", RpcTarget.All, id);
         }
 
         [PunRPC]
-        public void PunDecreaseHP(int level)
+        public void PunDecreaseHP(int id)
         {
-            if (photonView.IsMine)
-                GameManager.Data.StatDict[level].hp--;
+            //if (photonView.IsMine)
+                GameManager.Data.MonsterStatDict[id].hp--;
 
-            status.Init(level);
+            statusList[id].Init(id);
         }
     }
 }

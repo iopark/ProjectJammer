@@ -1,6 +1,7 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,6 +17,7 @@ namespace LDW
         private void Start()
         {
             ConnectDataBase();
+            Init();
         }
 
         private void ConnectDataBase()
@@ -35,12 +37,7 @@ namespace LDW
             }
         }
 
-        public Dictionary<int, Stat> StatDict { get; private set; } = new Dictionary<int, Stat>();
-
-        public void Init()
-        {
-            StatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
-        }
+        public Dictionary<int, Stat> MonsterStatDict { get; private set; } = new Dictionary<int, Stat>();
 
         Loader LoadJson<Loader, Key, Value>(string path) where Loader : ILoader<Key, Value>
         {
@@ -53,9 +50,9 @@ namespace LDW
             OnChangedProgress?.Invoke(progress);
         }
 
-        public void MonsterStatInit()
+        public void Init()
         {
-
+            MonsterStatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
         }
     }
 }

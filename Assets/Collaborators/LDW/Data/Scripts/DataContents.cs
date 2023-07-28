@@ -9,7 +9,7 @@ namespace LDW
     [Serializable]
     public class Stat
     {
-        public int level; // ID
+        public int id; // ID
         public int hp;
         public int attack;
     }
@@ -23,7 +23,7 @@ namespace LDW
         {
             Dictionary<int, Stat> dict = new Dictionary<int, Stat>();
             foreach (Stat stat in stats)    // 리스트에서 Dictionary로 옮기는 작업. ToDictionary는 추천하지 않음
-                dict.Add(stat.level, stat); // level을 ID(Key)로 
+                dict.Add(stat.id, stat); // level을 ID(Key)로 
             return dict;
         }
     }
