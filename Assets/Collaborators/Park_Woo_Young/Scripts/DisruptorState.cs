@@ -34,6 +34,7 @@ namespace Park_Woo_Young
 
         public bool re;
         public bool hp;
+        public float ti;
 
 
         public enum State { Disabled, Activate, Stop, Destroyed, RepairCompleted }
@@ -104,13 +105,38 @@ namespace Park_Woo_Young
         
         private void Test()
         {
-            //if ()
+            ti += Time.deltaTime;
+            if (re)
+            {
+                if (ti > 1)
+                {
+                    if (repair >= 0)
+                    {
+                        hit = true;
+                        repair -= 1;
+                        ti = 0;
+                    }
+                }
+            }
+            else if (hp)
+            {
+                if (ti > 1)
+                {
+                    if (currentHP >= 0)
+                    {
+                        hit = true;
+                        currentHP -= 1;
+                        ti = 0;
+                    }
+                }
+            }
         }
 
         private void Update()
         {
             RepairGauge();
             HpGauge();
+            Test();
 
             switch (state)
             {
