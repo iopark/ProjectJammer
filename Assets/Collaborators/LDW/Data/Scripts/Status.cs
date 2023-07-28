@@ -17,7 +17,7 @@ namespace LDW
         public int hp;
         public int attack;
 
-        public Dictionary<int, Stat> statDict { get; private set; } = new Dictionary<int, Stat>();
+        public Dictionary<int, Stat> statDict;
 
         public void Init(int id)
         {
