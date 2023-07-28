@@ -7,10 +7,11 @@ namespace Darik
 {
     public class Enemy : MonoBehaviourPun, IHittable
     {
-        protected Transform target = null;
         protected Rigidbody rb;
         protected Animator anim;
         protected new Collider collider;
+
+        protected Transform target = null;
         protected int curHp;
         protected bool isDie = false;
 
