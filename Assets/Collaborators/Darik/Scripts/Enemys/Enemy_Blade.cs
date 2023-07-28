@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Darik
@@ -9,6 +10,9 @@ namespace Darik
     {
         public enum State { Appear, Idle, Attack, Walk, Die }
         StateMachine<State, Enemy_Blade> stateMachine;
+
+        [SerializeField] private TMP_Text stateText;
+        [SerializeField] float moveSpeed = 5f;
 
         protected override void Awake()
         {
@@ -30,6 +34,14 @@ namespace Darik
         private void Update()
         {
             stateMachine.Update();
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+
+            if (isDie)
+                stateMachine.ChangeState(State.Appear);
         }
 
         protected override void Hit(int damage, Vector3 hitPoint, Vector3 normal)
@@ -59,6 +71,8 @@ namespace Darik
 
         private class AppearState : Enemy_BladeState
         {
+            private float curTIme;
+
             public AppearState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
@@ -70,17 +84,19 @@ namespace Darik
 
             public override void Enter()
             {
-
+                curTIme = 0f;
+                owner.stateText.text = "Appear";
             }
 
             public override void Update()
             {
-
+                curTIme += Time.deltaTime;
             }
 
             public override void Transition()
             {
-
+                if (curTIme > 5f)
+                    stateMachine.ChangeState(State.Idle);
             }
 
             public override void Exit()
@@ -102,17 +118,18 @@ namespace Darik
 
             public override void Enter()
             {
-
+                owner.stateText.text = "Idle";
             }
 
             public override void Update()
             {
-
+                //owner.target = GameManager.Data.disruptor;
             }
 
             public override void Transition()
             {
-
+                if (owner.target != null)
+                    stateMachine.ChangeState(State.Walk);
             }
 
             public override void Exit()
@@ -134,7 +151,7 @@ namespace Darik
 
             public override void Enter()
             {
-
+                owner.stateText.text = "Attack";
             }
 
             public override void Update()
@@ -155,6 +172,8 @@ namespace Darik
 
         private class WalkState : Enemy_BladeState
         {
+            private Vector3 moveDir;
+
             public WalkState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
@@ -166,17 +185,22 @@ namespace Darik
 
             public override void Enter()
             {
-
+                owner.stateText.text = "Walk";
             }
 
             public override void Update()
             {
-
+                if (owner.target != null)
+                {
+                    moveDir = (owner.target.transform.position - transform.position).normalized;
+                    transform.Translate(moveDir * owner.moveSpeed * Time.deltaTime, Space.World);
+                }
             }
 
             public override void Transition()
             {
-
+                if (owner.target == null)
+                    stateMachine.ChangeState(State.Idle);
             }
 
             public override void Exit()
@@ -198,7 +222,7 @@ namespace Darik
 
             public override void Enter()
             {
-
+                owner.stateText.text = "Die";
             }
 
             public override void Update()
