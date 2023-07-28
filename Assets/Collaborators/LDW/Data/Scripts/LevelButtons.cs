@@ -1,5 +1,6 @@
 using Photon.Pun;
 using System;
+using System.Diagnostics;
 
 namespace LDW
 {
@@ -26,8 +27,7 @@ namespace LDW
         [PunRPC]
         public void PunDecreaseHP(int id)
         {
-            //if (photonView.IsMine)
-                GameManager.Data.MonsterStatDict[id].hp--;
+            GameManager.Data.MonsterStatDict[id].hp--;
 
             statusList[id].Init(id);
         }
