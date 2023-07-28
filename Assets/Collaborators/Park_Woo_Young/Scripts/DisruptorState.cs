@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,7 @@ namespace Park_Woo_Young
     {
         // 교란기 상호작용시 -> 교란기가 데이터 매니저에 신호를 주고
         // 교란기 피격 -> 게임매니저에 보내서 처리하게 함
+        [SerializeField] Transform disruptor;
         [SerializeField] GameObject hologram;   // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] Slider repairGauge;
         [SerializeField] Slider hpGauge;
@@ -26,15 +28,15 @@ namespace Park_Woo_Young
         public Transform player;
         //Vector3 pos;
 
+        public float testRepairTime;             // 수리시간
         public float repairTime;                 // 수리시간
         public bool hit;
 
-        public bool testRepair;                  // 테스트하기위해 수리중이라고 판단
-        public float testRepairTime;             // 수리시간
-
-        public bool re;
-        public bool hp;
-        public float ti;
+        // 테스트용 변수
+        public bool testRepair;                  // 테스트하기위해 수리중이라고 판단 (hp가 100아래인경우)
+        // public bool re;                       // 수리진행률 감소
+        // public bool hp;                       // 체력 감소
+        // public float ti;                      // 시간마다 감소하게하기 위함
 
 
         public enum State { Disabled, Activate, Stop, Destroyed, RepairCompleted }
@@ -44,38 +46,49 @@ namespace Park_Woo_Young
 
         private void Awake()
         {
-            currentHP = fixHP;
+            //currentHP = fixHP;
             //repair = 0;
             //repairTime = 0;
         }
         private void Start()
         {
-            turnSpeed = fixTurnSpeed;
+            //turnSpeed = fixTurnSpeed;
             // 임시로 시작시 바로 실행
-            // GameMamager.Data.GameStart();
+            // GameManager.Data.GameStart();
             //pos = this.gameObject.transform.position;
             //Debug.Log(pos);
             //Debug.Log(pos.y);
+            GameStart();
 
         }
+
+        public void SetDisruptor(Transform disruptor)
+        {
+            this.transform.position = disruptor.transform.position;
+        }
+
         public void Interacter()
         {
             // 상호작용
             photonView.RPC("GameStart", RpcTarget.MasterClient);
             // photonView 게임 오브젝트가 자기를 서버에 알림
         }
-        [PunRPC]
-        private void GameStart()
-        {
 
+        [PunRPC]
+        public void GameStart()
+        {
+            turnSpeed = fixTurnSpeed;
+            currentHP = fixHP;
         }
+
         [PunRPC]
         public void TakeDamage(int damage)
         {
-            photonView.RPC("Hit", RpcTarget.MasterClient, damage);
-            photonView.RPC("HIT", RpcTarget.All, currentHP);
-            photonView.RPC("HIT", RpcTarget.All, repair);
+            photonView.RPC("Hit", RpcTarget.MasterClient, damage); //
+            photonView.RPC("Hit", RpcTarget.All, currentHP);
+            photonView.RPC("Hit", RpcTarget.All, repair);
         }
+
         [PunRPC]
         private void Hit(int damage)
         {
@@ -89,7 +102,7 @@ namespace Park_Woo_Young
                 currentHP -= damage;        // 체력이 깍임
             }
             hit = true;
-            //GameManager.Data.ChangeHp(currentHP);
+            //GameManager.Data.hp(currentHP);
 
         }
         [PunRPC]
@@ -103,7 +116,8 @@ namespace Park_Woo_Young
             hpGauge.value = currentHP;
         }
         
-        private void Test()
+        // 수리진행도 감소, 진행도 감소 후 체력감소테스트용
+        /*private void Test()
         {
             ti += Time.deltaTime;
             if (re)
@@ -130,13 +144,13 @@ namespace Park_Woo_Young
                     }
                 }
             }
-        }
+        }*/
 
         private void Update()
         {
-            RepairGauge();
-            HpGauge();
-            Test();
+            RepairGauge(); // 수리게이지
+            HpGauge();     // 체력게이지
+            // Test();
 
             switch (state)
             {
