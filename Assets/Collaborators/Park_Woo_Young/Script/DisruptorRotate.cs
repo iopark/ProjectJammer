@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ro : MonoBehaviour
+public class DisruptorRotate : MonoBehaviour
 {
     [SerializeField] float turnSpeed;
     private void Update()
