@@ -16,14 +16,14 @@ namespace ildoo
         private void Awake() 
         {
             playerInput = GetComponent<PlayerInput>();
-            SetPlayerColor();
-            if (!photonView.IsMine)
-                Destroy(playerInput);
+            //SetPlayerColor();
+            //if (!photonView.IsMine)
+            //    Destroy(playerInput);
         } 
     
         private void SetPlayerColor()
         {
-            int playerNumber = photonView.Owner.GetPlayerNumber();
+            int playerNumber = PhotonNetwork.LocalPlayer.ActorNumber;
             if (playerColorList == null || playerColorList.Count <= playerNumber)
                 return; 
             playerRender.material.color = playerColorList[playerNumber];

@@ -30,6 +30,11 @@ namespace ildoo
             //cameraRoot = GetComponent<Transform>(); 
         }
 
+        private void Start()
+        {
+
+        }
+
         private void OnEnable()
         {
             Cursor.lockState = CursorLockMode.Locked;
