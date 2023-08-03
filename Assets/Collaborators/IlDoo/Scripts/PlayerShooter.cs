@@ -37,16 +37,15 @@ namespace ildoo
 
         void Update()
         {
-            if (!photonView.IsMine)
-                return;
+            //if (!photonView.IsMine)
+            //    return;
             //Shot timing is controlled by LocalClient themselves 
             //Shot Contest is done by the masterClient, 
             //Shot effect is done alltogether on sync. 
-            if (isShooting && Time.time > nextFire)
-            {
-                Fire(); 
-                
-            }
+            //if (isShooting && Time.time > nextFire)
+            //{
+            //    Fire(); 
+            //}
         }
         private void OnFire(InputValue input)
         {
@@ -56,9 +55,9 @@ namespace ildoo
             if (currentGun.CurrentAmmo <= 0)
                 //TODO: Out of Ammo Interaction? 
                 return;
-            //TODO: 
+            //TODO: Make Auto Firing Rifle 
             Fire();
-            isShooting = input.isPressed;
+            //isShooting = input.isPressed;
         }
         public void Fire()
         {
@@ -67,21 +66,22 @@ namespace ildoo
             anim.SetTrigger("Fire");
         }
 
+        Coroutine reloading; 
         private void OnReload(InputValue input)
         {
-            if (isReloading || currentGun.CurrentAmmo == currentGun.maxAmmo)
-                return;
-            StartCoroutine(Reload());
+            //if (isReloading || currentGun.CurrentAmmo == currentGun.maxAmmo)
+            //    return;
+            reloading  = StartCoroutine(Reload());
             currentGun.Reloaded(); 
         }
 
         IEnumerator Reload()
         {
             //This is synced through Photon view Animator 
+            animRig.weight = 0f;
             anim.SetTrigger("Reload");
             isReloading = true;
             //재장전 시작시 weight 재설정 
-            animRig.weight = 0f; 
             yield return reloadInterval;
             isReloading = false;
             animRig.weight = 1f;

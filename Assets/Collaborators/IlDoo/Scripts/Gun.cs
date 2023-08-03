@@ -12,14 +12,13 @@ namespace ildoo
     {
         // Computes and Executes all the gun functioning related activities
         [SerializeField] private Transform muzzlePoint;
-        Camera _camera; 
+        Camera _camera;
+        [SerializeField] LayerMask targetMask; 
 
         //AMMO
         public int maxAmmo { get; private set; }
         public int maxDistance { get; private set; }
         private int currentAmmo;
-
-        UnityAction<int> ammoChange; 
         public int CurrentAmmo
         {
             get
@@ -48,10 +47,7 @@ namespace ildoo
         private void Awake()
         {
             _camera = Camera.main;
-            defaultGunInfo = GetComponent<GunData>();
-        }
-        private void Start()
-        {
+            //defaultGunInfo = GetComponent<GunData>();
             reloadInterval = defaultGunInfo.ReloadRate;
             bulletTrailTime = new WaitForSeconds(trailLastingTime);
             maxDistance = defaultGunInfo.MaxDistance;
@@ -59,6 +55,10 @@ namespace ildoo
             fireRate = defaultGunInfo.FireRate;
             gunDamage = defaultGunInfo.Damage;
             currentAmmo = maxAmmo;
+        }
+        private void Start()
+        {
+            
         }
         private void OnEnable()
         {
@@ -79,12 +79,10 @@ namespace ildoo
         [PunRPC]
         public void PlayerShotCalculation()
         {
-            currentAmmo--;
-            Debug.Log(currentAmmo); 
             //MasterClient calculation for shots 
             centrePoint = _camera.ViewportToWorldPoint(middlePoint); 
             RaycastHit hit;
-            if (Physics.Raycast(centrePoint, _camera.transform.forward, out hit, maxDistance))
+            if (Physics.Raycast(centrePoint, _camera.transform.forward, out hit, maxDistance, targetMask))
             {
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>(); // Interface도 Componenent처럼 취급이 가능하다: how crazy is that;
@@ -97,7 +95,6 @@ namespace ildoo
                 endPoint = centrePoint +(_camera.transform.forward * maxDistance);
                 photonView.RPC("PostShotWork", RpcTarget.AllViaServer, muzzlePoint.position, endPoint);
             }
-            
         }
 
         Coroutine shotEffect;
