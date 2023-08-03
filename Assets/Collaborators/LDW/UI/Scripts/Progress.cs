@@ -4,37 +4,33 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class Progress : MonoBehaviourPunCallbacks, IPunObservable
+namespace LDW
 {
-    public TMP_Text progressText;
-
-    public float progress;
-
-    public void GameStart()
+    public class Progress : MonoBehaviourPunCallbacks, IPunObservable
     {
-        StartCoroutine(ProgressStartRoutine());
-    }
+        public TMP_Text progressText;
+        public float progress;
 
-    IEnumerator ProgressStartRoutine()
-    {
-        while (true)
+        public Dictionary<int, JammerStat> JammerStatDict;
+
+        public void StartProgress(int id)
         {
-            progress += Time.deltaTime;
-            progressText.text = $"{progress}";
+            JammerStatDict = GameManager.Data.JammerStatDict;
 
-            yield return null;
+            progress = JammerStatDict[id].progress;
+            progressText.text = $"{progress} / 100";
         }
-    }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            stream.SendNext(progress);
-        }
-        else
-        {
-            progress = (int)stream.ReceiveNext();
+            if (stream.IsWriting)
+            {
+                stream.SendNext(progress);
+            }
+            else
+            {
+                progress = (float)stream.ReceiveNext();
+            }
         }
     }
 }
