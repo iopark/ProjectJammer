@@ -2,19 +2,37 @@ using Photon.Pun;
 using UnityEngine;
 using System;
 using System.Collections;
+using Darik;
+using UnityEngine.Events;
+using LDW;
 
 namespace ildoo
 {
-    public class Gun : MonoBehaviourPun, IPunObservable
+    public class Gun : MonoBehaviourPun
     {
         // Computes and Executes all the gun functioning related activities
-        private Transform muzzlePoint;
+        [SerializeField] private Transform muzzlePoint;
         Camera _camera; 
 
         //AMMO
         public int maxAmmo { get; private set; }
         public int maxDistance { get; private set; }
-        public int currentAmmo { get; private set; }
+        private int currentAmmo;
+
+        UnityAction<int> ammoChange; 
+        public int CurrentAmmo
+        {
+            get
+            {
+                return currentAmmo;
+            }
+            private set
+            {
+                currentAmmo = value;
+                //Event Trigger for the UI 
+            }
+        }
+        
         public float fireRate { get; private set; }
         public float reloadInterval { get; private set; }
         public int gunDamage { get; private set; }
@@ -40,6 +58,7 @@ namespace ildoo
             maxAmmo = defaultGunInfo.MaxAmmo;
             fireRate = defaultGunInfo.FireRate;
             gunDamage = defaultGunInfo.Damage;
+            currentAmmo = maxAmmo;
         }
         private void OnEnable()
         {
@@ -49,6 +68,7 @@ namespace ildoo
         #region Shooting
         public void Fire()
         {
+
             //animation? 
             photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
         }
@@ -59,6 +79,8 @@ namespace ildoo
         [PunRPC]
         public void PlayerShotCalculation()
         {
+            currentAmmo--;
+            Debug.Log(currentAmmo); 
             //MasterClient calculation for shots 
             centrePoint = _camera.ViewportToWorldPoint(middlePoint); 
             RaycastHit hit;
@@ -78,9 +100,11 @@ namespace ildoo
             
         }
 
-        Coroutine shotEffect; 
+        Coroutine shotEffect;
+        [PunRPC]
         public void PostShotWork(Vector3 startPos, Vector3 endPos)
         {
+            currentAmmo--; 
             shotEffect = StartCoroutine(ShotEffect(startPos, endPos)); 
         }
 
@@ -98,16 +122,16 @@ namespace ildoo
             currentAmmo = maxAmmo; 
         }
 
-        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-        {
-            if (stream.IsWriting)
-            {
-                stream.SendNext(currentAmmo);
-            }
-            else
-            {
-                currentAmmo = (int)stream.ReceiveNext();
-            }
-        }
+        //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        //{
+        //    if (stream.IsWriting)
+        //    {
+        //        stream.SendNext(currentAmmo);
+        //    }
+        //    else // if Reading 
+        //    {
+        //        CurrentAmmo = (int)stream.ReceiveNext();
+        //    }
+        //}
     }
 }
