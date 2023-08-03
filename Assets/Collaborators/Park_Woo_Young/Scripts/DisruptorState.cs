@@ -13,7 +13,7 @@ namespace Park_Woo_Young
         // 교란기 상호작용시 -> 교란기가 데이터 매니저에 신호를 주고
         // 교란기 피격 -> 게임매니저에 보내서 처리하게 함
         // 교란기가 생길 위치를 저장하고 그걸 데이터매니저에 보낸다음 위치를 가져오기
-        // 0단계 파괴되는 조건만
+        // 0단계 파괴되는 조건만1
         [SerializeField] GameObject hologram;   // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] Slider hpGauge;        // 체력게이지
         [SerializeField] float fixTurnSpeed;    // 고정 회전속도
