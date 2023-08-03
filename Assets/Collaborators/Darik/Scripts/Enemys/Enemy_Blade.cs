@@ -3,13 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 namespace Darik
 {
     public class Enemy_Blade : Enemy
     {
-        public enum State { Appear, Idle, Attack, Walk, Die }
+        public enum State { Appear, Idle, Attack, Move, Die }
         StateMachine<State, Enemy_Blade> stateMachine;
 
         [SerializeField] private bool debug;
@@ -29,7 +28,7 @@ namespace Darik
             stateMachine.AddState(State.Appear, new AppearState(this, stateMachine));
             stateMachine.AddState(State.Idle, new IdleState(this, stateMachine));
             stateMachine.AddState(State.Attack, new AttackState(this, stateMachine));
-            stateMachine.AddState(State.Walk, new WalkState(this, stateMachine));
+            stateMachine.AddState(State.Move, new MoveState(this, stateMachine));
             stateMachine.AddState(State.Die, new DieState(this, stateMachine));
         }
 
@@ -158,7 +157,7 @@ namespace Darik
             public override void Transition()
             {
                 if (owner.target != null)
-                    stateMachine.ChangeState(State.Walk);
+                    stateMachine.ChangeState(State.Move);
             }
 
             public override void Exit()
@@ -195,7 +194,7 @@ namespace Darik
             public override void Transition()
             {
                 if (owner.squareDistanceToTarget > owner.attackRange)
-                    stateMachine.ChangeState(State.Walk);
+                    stateMachine.ChangeState(State.Move);
             }
 
             public override void Exit()
@@ -204,9 +203,9 @@ namespace Darik
             }
         }
 
-        private class WalkState : Enemy_BladeState
+        private class MoveState : Enemy_BladeState
         {
-            public WalkState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
+            public MoveState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
 
