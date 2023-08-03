@@ -1,20 +1,17 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Darik
 {
     public class SpawnManager : MonoBehaviour
     {
-        private void Start()
-        {
-            StartSpawnEnemy();
-        }
-
         public void StartSpawnEnemy()
         {
-            Enemy_Blade enemy_blade = GameManager.Resource.Load<Enemy_Blade>("Prefabs/Enemys/Enemy_Blade");
-            GameManager.Resource.Instantiate(enemy_blade, new Vector3(0, 0, 0), Quaternion.identity);
+            //GameObject enemy_blade = GameManager.Resource.Load<GameObject>("Prefabs/Enemys/Enemy_Blade");
+            PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(5, 0, 5), Quaternion.identity, 0);
         }
     }
 }
