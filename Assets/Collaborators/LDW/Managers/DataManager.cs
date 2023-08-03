@@ -1,21 +1,21 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace LDW
 {
     public class DataManager : MonoBehaviour
     {
+        public Transform Disruptor;
+
         public MySqlConnection con;
         public MySqlDataReader reader;
 
         private void Start()
         {
             ConnectDataBase();
-            Init();
+            DataInit();
         }
 
         private void ConnectDataBase()
@@ -44,17 +44,20 @@ namespace LDW
             return JsonUtility.FromJson<Loader>(textAsset.text);
         }
 
-        public void Init()
+        public void DataInit()
         {
             MonsterStatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
             JammerStatDict = LoadJson<JammerStatData, int, JammerStat>("JammerData").MakeDict();
+        }
 
-            for(int id = 0; id < JammerStatDict.Count; id++)
-            {
-                Debug.Log(JammerStatDict[id].id);
-                Debug.Log(JammerStatDict[id].progress);
-                Debug.Log(JammerStatDict[id].InitProgress);
-            }
+        public void SetDisruptor()
+        {
+            
+        }
+
+        public void DataSync()
+        {
+
         }
     }
 }
