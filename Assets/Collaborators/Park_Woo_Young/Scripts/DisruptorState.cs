@@ -13,7 +13,6 @@ namespace Park_Woo_Young
         // 교란기 상호작용시 -> 교란기가 데이터 매니저에 신호를 주고
         // 교란기 피격 -> 게임매니저에 보내서 처리하게 함
         // 피격받을 시 임시로 레이어마스크변경해서 타겟에서 벗어나게 하기 - 계속 피격받아야하기 때문에 필요없음
-        [SerializeField] Transform disruptor;
         [SerializeField] GameObject hologram;   // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] Slider repairGauge;
         [SerializeField] Slider hpGauge;
@@ -80,7 +79,7 @@ namespace Park_Woo_Young
 
         private void SetDisruptor()
         {
-            //GameManager.Data.Disruptor = disruptor;
+            GameManager.Data.Disruptor = this.transform;
         }
 
         public void Interacter()
