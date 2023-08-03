@@ -115,3 +115,7 @@ crashlytics-build.properties
 *.meta
 /Assets/Collaborators/IlDoo/Animation/Player.controller
 /Assets/Collaborators/IlDoo/Animation/Player.controller
+/Assets/Collaborators/IlDoo/Animation/Player.controller
+/Assets/Collaborators/IlDoo/Animation/Player.controller
+/ProjectSettings/Packages/com.unity.probuilder
+/Assets/Collaborators/Park_Woo_Young/Scripts/aggro.cs
