@@ -14,11 +14,15 @@ namespace Darik
         [SerializeField] private bool debug;
         [SerializeField] private TMP_Text stateText;
         [SerializeField] LayerMask layerMask;
-        [SerializeField] float moveSpeed = 5f;
+        [SerializeField] private float appearTime = 3f;
+        [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private int attackRange;
+        [SerializeField] private float attackCoolTime = 3f;
 
         private Vector3 moveDir;
+        private bool isMove = false;
         private int squareDistanceToTarget;
+        private bool reload = true;
 
         protected override void Awake()
         {
@@ -80,6 +84,21 @@ namespace Darik
                 isDie = true;
                 stateMachine.ChangeState(State.Die);
             }
+
+            if (!isMove)
+                anim.SetTrigger("OnHit");
+        }
+
+        IEnumerator AttackCoroutine()
+        {
+            while (reload)
+            {
+                reload = false;
+                // TODO : Attack To Target
+                anim.SetTrigger("OnAttack");
+                yield return new WaitForSeconds(attackCoolTime);
+                reload = true;
+            }
         }
 
         #region State
@@ -122,7 +141,7 @@ namespace Darik
 
             public override void Transition()
             {
-                if (curTIme > 5f)
+                if (curTIme > owner.appearTime)
                     stateMachine.ChangeState(State.Idle);
             }
 
@@ -179,6 +198,8 @@ namespace Darik
 
             public override void Enter()
             {
+                owner.reload = true;
+                owner.StartCoroutine(owner.AttackCoroutine());
                 owner.stateText.text = "Attack";
             }
 
@@ -199,7 +220,7 @@ namespace Darik
 
             public override void Exit()
             {
-
+                owner.StopAllCoroutines();
             }
         }
 
@@ -216,6 +237,7 @@ namespace Darik
 
             public override void Enter()
             {
+                owner.isMove = true;
                 anim.SetBool("IsWalk", true);
                 owner.stateText.text = "Walk";
             }
@@ -229,7 +251,7 @@ namespace Darik
 
                     owner.moveDir.Normalize();
                     transform.Translate(owner.moveDir * owner.moveSpeed * Time.deltaTime, Space.World);
-                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(owner.moveDir), 0.1f);
+                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(owner.moveDir.x, 0, owner.moveDir.z)), 0.1f);
                 }
             }
 
@@ -243,6 +265,7 @@ namespace Darik
 
             public override void Exit()
             {
+                owner.isMove = false;
                 anim.SetBool("IsWalk", false);
             }
         }
