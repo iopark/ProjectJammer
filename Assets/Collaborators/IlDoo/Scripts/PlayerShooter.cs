@@ -16,12 +16,11 @@ namespace ildoo
         public bool isReloading;
         WaitForSeconds reloadInterval;
         Animator anim;
-        Rig animRig; 
+        [SerializeField]Rig animRig; 
 
         private void Awake()
         {
             anim = GetComponent<Animator>();
-            animRig = GetComponent<Rig>(); 
         }
 
         private void Start()
@@ -30,8 +29,9 @@ namespace ildoo
         }
         private void OnEnable()
         {
-            nextFire = 0f;
+            isReloading = false;
             isShooting = false;
+            nextFire = 0f;
             fireRate = currentGun.fireRate;
         }
 
@@ -50,12 +50,10 @@ namespace ildoo
         }
         private void OnFire(InputValue input)
         {
-            if (!photonView.IsMine)
-                return;
             //either player is firing 
             if (isReloading)
                 return;
-            if (currentGun.currentAmmo <= 0)
+            if (currentGun.CurrentAmmo <= 0)
                 //TODO: Out of Ammo Interaction? 
                 return;
             //TODO: 
@@ -71,7 +69,7 @@ namespace ildoo
 
         private void OnReload(InputValue input)
         {
-            if (isReloading || currentGun.currentAmmo == currentGun.maxAmmo)
+            if (isReloading || currentGun.CurrentAmmo == currentGun.maxAmmo)
                 return;
             StartCoroutine(Reload());
             currentGun.Reloaded(); 
