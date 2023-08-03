@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using PhotonHashtable = ExitGames.Client.Photon.Hashtable;
 using TMPro;
-using Unity.VisualScripting;
 
 namespace Darik
 {
@@ -112,7 +111,16 @@ namespace Darik
         private void DebugGameStart()
         {
             Debug.Log("Debug Mode Game Started");
-            GameManager.Spawn.StartSpawnEnemy();
+            float angularStart = (360.0f / 8f) * PhotonNetwork.LocalPlayer.GetPlayerNumber();
+            float x = 5.0f * Mathf.Sin(angularStart * Mathf.Deg2Rad);
+            float z = 5.0f * Mathf.Cos(angularStart * Mathf.Deg2Rad);
+            Vector3 position = GameManager.Data.Disruptor.position + new Vector3(x, 0.0f, z);
+            Quaternion rotation = Quaternion.Euler(0.0f, angularStart, 0.0f);
+
+            PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
+
+            if (PhotonNetwork.IsMasterClient)
+                GameManager.Spawn.StartSpawnEnemy();
         }
 
         private void GameStart()
