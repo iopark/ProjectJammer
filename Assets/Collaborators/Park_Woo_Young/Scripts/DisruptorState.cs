@@ -46,7 +46,6 @@ namespace Park_Woo_Young
         [PunRPC]
         private void Hit(int damage)
         {
-            currentHP -= damage;
         }
 
         [PunRPC]
