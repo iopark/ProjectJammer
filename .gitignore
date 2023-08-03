@@ -107,3 +107,9 @@ crashlytics-build.properties
 /Assets/Collaborators/Park_Woo_Young/Scene
 /Assets/Collaborators/Park_Woo_Young/Resources.meta
 /Assets/Collaborators/Park_Woo_Young/Scene.meta
+/Assets/Collaborators/IlDoo/Imports
+/Assets/Collaborators/IlDoo/Scenes
+/Assets/Plugins
+/Assets/Plugins.meta
+/Assets/Collaborators/IlDoo/Debugging
+*.meta
