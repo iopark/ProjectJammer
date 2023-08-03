@@ -94,6 +94,7 @@ namespace Park_Woo_Young
         {
             turnSpeed = fixTurnSpeed;
             currentHP = fixHP;
+            SetDisruptor();
         }
 
         [PunRPC]
