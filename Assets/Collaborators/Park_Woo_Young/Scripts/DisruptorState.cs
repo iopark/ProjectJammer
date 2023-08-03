@@ -8,10 +8,11 @@ using UnityEngine.UI;
 
 namespace Park_Woo_Young
 {
-    public class DisruptorState : MonoBehaviourPunCallbacks
+    public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable
     {
         // 교란기 상호작용시 -> 교란기가 데이터 매니저에 신호를 주고
         // 교란기 피격 -> 게임매니저에 보내서 처리하게 함
+        // 피격받을 시 임시로 레이어마스크변경해서 타겟에서 벗어나게 하기 - 계속 피격받아야하기 때문에 필요없음
         [SerializeField] Transform disruptor;
         [SerializeField] GameObject hologram;   // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] Slider repairGauge;
@@ -34,9 +35,11 @@ namespace Park_Woo_Young
 
         // 테스트용 변수
         public bool testRepair;                  // 테스트하기위해 수리중이라고 판단 (hp가 100아래인경우)
-        // public bool re;                       // 수리진행률 감소
-        // public bool hp;                       // 체력 감소
-        // public float ti;                      // 시간마다 감소하게하기 위함
+                                                 // public bool re;                       // 수리진행률 감소
+                                                 // public bool hp;                       // 체력 감소
+                                                 // public float ti;                      // 시간마다 감소하게하기 위함
+                                                 // public bool attack;
+
 
 
         public enum State { Disabled, Activate, Stop, Destroyed, RepairCompleted }
@@ -62,9 +65,22 @@ namespace Park_Woo_Young
 
         }
 
-        public void SetDisruptor(Transform disruptor)
+        /* 계속 피격받아야 하기 때문에 필요없음 필요시 상태에다가 구현
+        public void Aa()
         {
-            this.transform.position = disruptor.transform.position;
+            if (attack)
+            {
+                gameObject.layer = LayerMask.NameToLayer("Default");
+            }
+            else
+            {
+                gameObject.layer = LayerMask.NameToLayer("Disruptor");
+            }
+        }*/
+
+        private void SetDisruptor()
+        {
+            //GameManager.Data.Disruptor = disruptor;
         }
 
         public void Interacter()
@@ -79,14 +95,6 @@ namespace Park_Woo_Young
         {
             turnSpeed = fixTurnSpeed;
             currentHP = fixHP;
-        }
-
-        [PunRPC]
-        public void TakeDamage(int damage)
-        {
-            photonView.RPC("Hit", RpcTarget.MasterClient, damage); //
-            photonView.RPC("Hit", RpcTarget.All, currentHP);
-            photonView.RPC("Hit", RpcTarget.All, repair);
         }
 
         [PunRPC]
@@ -115,7 +123,7 @@ namespace Park_Woo_Young
         {
             hpGauge.value = currentHP;
         }
-        
+
         // 수리진행도 감소, 진행도 감소 후 체력감소테스트용
         /*private void Test()
         {
@@ -148,6 +156,7 @@ namespace Park_Woo_Young
 
         private void Update()
         {
+            //Aa();          // 레이어마스크변경테스트
             RepairGauge(); // 수리게이지
             HpGauge();     // 체력게이지
             // Test();
@@ -187,7 +196,7 @@ namespace Park_Woo_Young
         {
             // 활성화 후 & 재가동
             Rotate();
-            
+
             Debug.Log("활성화");
             repairTime += Time.deltaTime;
             if (currentHP >= fixHP)     // 현재체력이 최대체력보다 큰 경우
@@ -284,15 +293,13 @@ namespace Park_Woo_Young
             //transform.Rotate(Vector3.back, turnSpeed * Time.deltaTime);
             hologram.transform.Rotate(Vector3.back, turnSpeed * Time.deltaTime);
         }
-        private void OnTriggerStay(Collider other)
-        {
-            if (other.name == "Player")
-            {
-                if (Input.GetKeyDown(KeyCode.F))
-                {
 
-                }
-            }
+        public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
+        {
+            photonView.RPC("Hit", RpcTarget.MasterClient, damage); //
+            photonView.RPC("Hit", RpcTarget.All, currentHP);
+            photonView.RPC("Hit", RpcTarget.All, repair);
         }
     }
+    
 }
