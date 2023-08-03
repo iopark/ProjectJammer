@@ -18,6 +18,8 @@ namespace Darik
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private int attackRange;
         [SerializeField] private float attackCoolTime = 3f;
+        [SerializeField] private float attackTiming = 0.2f;
+        [SerializeField] private int damage = 1;
 
         private Vector3 moveDir;
         private bool isMove = false;
@@ -54,22 +56,6 @@ namespace Darik
                 stateMachine.ChangeState(State.Appear);
         }
 
-        private void SearchTarget()
-        {
-            Collider[] targets = Physics.OverlapSphere(transform.position, 5f, layerMask);
-            if (targets.Length != 0)
-            {
-                if (debug)
-                    Debug.Log("Target On");
-                target = targets[0].gameObject.transform;
-            }
-            else
-            {
-                if (debug)
-                    Debug.Log("Target null");
-            }
-        }
-
         private int SquareDistanceToTarget(Vector3 toTarget)
         {
             return (int)(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
@@ -94,9 +80,12 @@ namespace Darik
             while (reload)
             {
                 reload = false;
-                // TODO : Attack To Target
                 anim.SetTrigger("OnAttack");
-                yield return new WaitForSeconds(attackCoolTime);
+
+                yield return new WaitForSeconds(attackTiming);
+                target.gameObject.GetComponent<IHittable>().TakeDamage(damage, Vector3.zero, Vector3.zero);
+
+                yield return new WaitForSeconds(attackCoolTime - attackTiming);
                 reload = true;
             }
         }
@@ -169,8 +158,7 @@ namespace Darik
 
             public override void Update()
             {
-                //owner.target = GameManager.Data.disruptor;
-                owner.SearchTarget();
+                owner.target = GameManager.Data.Disruptor;
             }
 
             public override void Transition()
