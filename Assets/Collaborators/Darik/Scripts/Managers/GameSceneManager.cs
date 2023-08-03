@@ -93,11 +93,6 @@ namespace Darik
             DebugGameStart();
         }
 
-        private void DebugGameStart()
-        {
-            Debug.Log("Debug Mode Game Started");
-        }
-
         IEnumerator GameStartCoroutine()
         {
             int loadTime = PhotonNetwork.CurrentRoom.GetLoadTime();
@@ -114,9 +109,16 @@ namespace Darik
             infoText.text = "";
         }
 
+        private void DebugGameStart()
+        {
+            Debug.Log("Debug Mode Game Started");
+            GameManager.Spawn.StartSpawnEnemy();
+        }
+
         private void GameStart()
         {
             Debug.Log("Normal Game Mode Started");
+            GameManager.Spawn.StartSpawnEnemy();
         }
 
         private int PlayerLoadCount()
