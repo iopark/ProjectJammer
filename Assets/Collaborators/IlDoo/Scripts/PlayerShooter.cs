@@ -1,78 +1,92 @@
 using Photon.Pun;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 
-public class PlayerShooter: MonoBehaviourPun 
-{ 
-    public Gun currentGun; 
-
-    private float nextFire; 
-    public float fireRate {get;private set;}
-    public bool isShooting; 
-    Animator anim; 
-
-    private void Awake() 
+namespace ildoo
+{
+    public class PlayerShooter : MonoBehaviourPun
     {
-        anim = GetComponent<Animator>(); 
-    }
+        public Gun currentGun;
 
-    private void OnEnable() 
-    {
-        nextFire = 0f; 
-        isShooting = false;
-        fireRate = currentGun.fireRate;
-    }
+        private float nextFire;
+        public float fireRate { get; private set; }
+        public bool isShooting;
+        public bool isReloading;
+        WaitForSeconds reloadInterval;
+        Animator anim;
+        Rig animRig; 
 
-    void Update() 
-    { 
-        if (!photonView.IsMine)
-            return; 
-        //Shot timing is controlled by LocalClient themselves 
-        //Shot Contest is done by the masterClient, 
-        //Shot effect is done alltogether on sync. 
-        if (isShooting && Time.time > nextFire) 
-        { 
-            currentGun.Fire(); 
-            nextFire = Time.time + fireRate; 
+        private void Awake()
+        {
+            anim = GetComponent<Animator>();
+            animRig = GetComponent<Rig>(); 
         }
-    }
-    private void OnFire(InputValue input)
-    {
-        if (!photonView.IsMine)
-            return;
-        //either player is firing 
-        else if (currentGun.isReloading)
-            return;
-        else if (currentGun.currentAmmo <= 0) 
-            return;
-        
-        isShooting = input.isPressed();
-        Fire(FireAnimation); 
-    }
-    public void Fire()
-    {
-        currentGun.Fire();
-        anim.SetTrigger("Fire");
-    }
 
-    public void FireAnimation() 
-    { 
-        
-    }
+        private void Start()
+        {
+            reloadInterval = new WaitForSeconds(currentGun.reloadInterval); 
+        }
+        private void OnEnable()
+        {
+            nextFire = 0f;
+            isShooting = false;
+            fireRate = currentGun.fireRate;
+        }
 
-    private void OnReload(InputValue input)
-    {
-        if (reloading)
-            return;
-        
-        else if (currentGun.MaxAmmo == currentGun.CurrentAmmo)
-            return; 
-        StartCoroutine(ReloadRoutine()); 
-    }
+        void Update()
+        {
+            if (!photonView.IsMine)
+                return;
+            //Shot timing is controlled by LocalClient themselves 
+            //Shot Contest is done by the masterClient, 
+            //Shot effect is done alltogether on sync. 
+            if (isShooting && Time.time > nextFire)
+            {
+                Fire(); 
+                
+            }
+        }
+        private void OnFire(InputValue input)
+        {
+            if (!photonView.IsMine)
+                return;
+            //either player is firing 
+            if (isReloading)
+                return;
+            if (currentGun.currentAmmo <= 0)
+                //TODO: Out of Ammo Interaction? 
+                return;
+            //TODO: 
+            Fire();
+            isShooting = input.isPressed;
+        }
+        public void Fire()
+        {
+            nextFire = Time.time + fireRate;
+            currentGun.Fire();
+            anim.SetTrigger("Fire");
+        }
 
-    IEnumerator Reload() 
-    {
-        //This is synced through Photon view Animator 
+        private void OnReload(InputValue input)
+        {
+            if (isReloading || currentGun.currentAmmo == currentGun.maxAmmo)
+                return;
+            StartCoroutine(Reload());
+            currentGun.Reloaded(); 
+        }
 
+        IEnumerator Reload()
+        {
+            //This is synced through Photon view Animator 
+            anim.SetTrigger("Reload");
+            isReloading = true;
+            //재장전 시작시 weight 재설정 
+            animRig.weight = 0f; 
+            yield return reloadInterval;
+            isReloading = false;
+            animRig.weight = 1f;
+        }
     }
 }
