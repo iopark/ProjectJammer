@@ -113,3 +113,5 @@ crashlytics-build.properties
 /Assets/Plugins.meta
 /Assets/Collaborators/IlDoo/Debugging
 *.meta
+/Assets/Collaborators/IlDoo/Animation/Player.controller
+/Assets/Collaborators/IlDoo/Animation/Player.controller
