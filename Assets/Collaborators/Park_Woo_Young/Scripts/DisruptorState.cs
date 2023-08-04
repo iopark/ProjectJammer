@@ -35,7 +35,6 @@ namespace Park_Woo_Young
             GameManager.Data.Disruptor = this.transform;
         }
 
-        [PunRPC]
         public void GameStart()
         {
             turnSpeed = fixTurnSpeed;
@@ -43,12 +42,11 @@ namespace Park_Woo_Young
             SetDisruptor();
         }
 
-        [PunRPC]
         private void Hit(int damage)
         {
+            currentHP -= damage;
         }
 
-        [PunRPC]
         private void HpGauge()
         {
             hpGauge.value = currentHP;
@@ -90,7 +88,7 @@ namespace Park_Woo_Young
 
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
         {
-            photonView.RPC("Hit", RpcTarget.MasterClient, damage); //
+            Hit(damage);
         }
     }
     
