@@ -125,7 +125,6 @@ namespace Park_Woo_Young
             Gizmos.DrawWireSphere(transform.position, interaction);
         }
 
-        //[PunRPC]
         private void OnTriggerStay(Collider other)
         {
             // GameManager.Dat
@@ -135,15 +134,19 @@ namespace Park_Woo_Young
                 float ToPlayer = Vector3.Distance(transform.position, other.transform.position); // 플레이어와 교란기 사이의 위치 구하기
                 if (Player != null && ToPlayer < interaction)        // 플레이어면서 수리가능한 범위안에 들어왔을 때
                 {
-                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // 교란기가 피격당한 상태에서만 F키를 눌러 고칠 수 있음
+                    if (other.CompareTag("Player"))
                     {
-                        disruptorHit = false;
-                        //if (photonView.IsMine)
-                        //{
+                        if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // 교란기가 피격당한 상태에서만 F키를 눌러 고칠 수 있음
+                        {
+                            RepairInteraction();
+                            //disruptorHit = false;
+                            //if (photonView.IsMine)
+                            //{
 
-                        // photonView.RPC("Repair", RpcTarget.All);
+                            // photonView.RPC("Repair", RpcTarget.All);
 
-                        //}
+                            //}
+                        }
                     }
                 }
                 else if (Player != null && ToPlayer > interaction)
@@ -153,7 +156,12 @@ namespace Park_Woo_Young
             }
         }
 
-        //[PunRPC]
+        public void RepairInteraction()
+        {
+            photonView.RPC("Repair", RpcTarget.All);
+            
+        }
+        [PunRPC]
         public void Repair()
         {
             disruptorHit = false;
