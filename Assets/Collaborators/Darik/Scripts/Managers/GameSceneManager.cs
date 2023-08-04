@@ -51,34 +51,36 @@ namespace Darik
 
         private void ChangeTarget(bool isDisruptor)
         {
-            if (PhotonNetwork.IsMasterClient)
+            if (isDisruptor)
             {
-                if (isDisruptor)
-                {
-                    foreach (Player player in PhotonNetwork.PlayerList)
-                    {
-                        if (player.GetPlayerID() == PhotonNetwork.MasterClient.ActorNumber)
-                        {
-                            PhotonView pv = PhotonView.Find(player.GetPlayerID());
-                            target = pv.transform;
-                            break;
-                        }
-                    }
+                target = GameManager.Data.Disruptor;
 
-                    foreach (GameObject enemy in enemyList)
-                    {
-                        enemy.GetComponent<Enemy>().Target = target;
-                    }
-                }
-                else
+                foreach (GameObject enemy in enemyList)
                 {
-                    foreach (GameObject enemy in enemyList)
+                    enemy.GetComponent<Enemy>().Target = GameManager.Data.Disruptor;
+                }
+            }   
+            /*
+            else
+            {
+                
+                foreach (Player player in PhotonNetwork.PlayerList)
+                {
+                    if (player.GetPlayerID() == PhotonNetwork.MasterClient.ActorNumber)
                     {
-                        enemy.GetComponent<Enemy>().Target = GameManager.Data.Disruptor;
+                        PhotonView pv = PhotonView.Find(player.GetPlayerID());
+                        target = pv.transform;
+                        break;
                     }
                 }
-            }
-                
+
+                target = GameObject.Find("PlayerHolder(Clone)").transform;
+
+                foreach (GameObject enemy in enemyList)
+                {
+                    enemy.GetComponent<Enemy>().Target = target;
+                }
+            }*/
         }
 
         public override void OnConnectedToMaster()
@@ -185,7 +187,7 @@ namespace Darik
             Quaternion rotation = Quaternion.Euler(0.0f, angularStart, 0.0f);
 
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
-
+            
             if (PhotonNetwork.IsMasterClient)
                 GenerateEnemy();
         }

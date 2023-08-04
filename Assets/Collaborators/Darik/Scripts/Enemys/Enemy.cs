@@ -15,7 +15,7 @@ namespace Darik
         protected int curHp;
         protected bool isDie = false;
 
-        public Transform Target { get { return target; } set { target = value; } }
+        public Transform Target { get { return target; } set { target = value; Debug.Log(target); } }
 
         protected virtual void Awake()
         {
