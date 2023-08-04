@@ -10,20 +10,36 @@ namespace ildoo
     {
        //Manages 1.Player Color      3.PlayerInput
         private PlayerInput playerInput;
+
+        //=============Non Player Settings 
+        [SerializeField] GunData nonPlayerGun; 
         [SerializeField] List<Color> playerColorList;
         [SerializeField] Renderer playerRender; 
        
         private void Awake() 
         {
             playerInput = GetComponent<PlayerInput>();
-            //SetPlayerColor();
-            //if (!photonView.IsMine)
-            //    Destroy(playerInput);
-        } 
-    
+            SetPlayerColor();
+            if (!photonView.IsMine)
+            {
+                int nonOwnerMask = LayerMask.NameToLayer("Default"); 
+                Destroy(playerInput);
+                SetGameLayerRecursive(gameObject, nonOwnerMask);
+            }
+        }
+
+        private void SetGameLayerRecursive(GameObject gameObject, int layer)
+        {
+            gameObject.layer = layer;
+            foreach (Transform child in gameObject.transform)
+            {
+                SetGameLayerRecursive(child.gameObject, layer);
+            }
+        }
+
         private void SetPlayerColor()
         {
-            int playerNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+            int playerNumber = photonView.OwnerActorNr; 
             if (playerColorList == null || playerColorList.Count <= playerNumber)
                 return; 
             playerRender.material.color = playerColorList[playerNumber];

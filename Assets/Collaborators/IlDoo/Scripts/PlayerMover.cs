@@ -30,9 +30,7 @@ namespace ildoo
         }
         private void OnEnable()
         {
-            //moveSpeed = 3f; 
-            jumpSpeed = 3f;
-            moveSpeed = 3;
+            
         }
 
         private void OnDisable()
@@ -114,7 +112,7 @@ namespace ildoo
         RaycastHit groundHit;
         private bool GroundCheck()
         {
-            isGround = Physics.SphereCast(transform.position + Vector3.up * 1, 0.5f, Vector3.down, out groundHit, 0.7f);
+            isGround = Physics.SphereCast(transform.position + Vector3.up * 1, 0.5f, Vector3.down, out groundHit, 0.5f);
             return isGround;
         }
         private void OnRun(InputValue value)
