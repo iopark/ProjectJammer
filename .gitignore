@@ -112,8 +112,14 @@ crashlytics-build.properties
 /Assets/Plugins
 /Assets/Plugins.meta
 /Assets/Collaborators/IlDoo/Debugging
-*.meta
 /Assets/Collaborators/IlDoo/Animation/Player.controller
 /Assets/Collaborators/IlDoo/Animation/Player.controller
 /Assets/Collaborators/IlDoo/Animation/Player.controller
 /Assets/Collaborators/IlDoo/Animation/Player.controller
+/Assets/Collaborators/IlDoo/Resources/Prefabs/Enemys
+/Assets/Collaborators/IlDoo/Animation
+/Assets/Collaborators/IlDoo/Resources
+/Assets/Collaborators/IlDoo/Animation.meta
+/Assets/Collaborators/IlDoo/Debugging.meta
+/Assets/Collaborators/IlDoo/Resources.meta
+/Assets/Collaborators/IlDoo/Scenes.meta
