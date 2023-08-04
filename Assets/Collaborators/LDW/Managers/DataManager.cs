@@ -12,6 +12,8 @@ namespace LDW
         public MySqlConnection con;
         public MySqlDataReader reader;
 
+        public int disruptorHP;
+
         private void Start()
         {
             ConnectDataBase();
@@ -58,6 +60,11 @@ namespace LDW
         public void DataSync()
         {
 
+        }
+
+        public void SetDisruptorHP(int hp)
+        {
+            disruptorHP = hp;
         }
     }
 }
