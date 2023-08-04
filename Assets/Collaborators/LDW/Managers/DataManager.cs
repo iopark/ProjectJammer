@@ -2,6 +2,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace LDW
 {
@@ -12,12 +13,19 @@ namespace LDW
         public MySqlConnection con;
         public MySqlDataReader reader;
 
+        public UnityAction<bool> OnChangedTarget;
+
         public int disruptorHP;
 
         private void Start()
         {
             ConnectDataBase();
             DataInit();
+        }
+
+        public void ChangeTarget(bool isDisruptor)
+        {
+            OnChangedTarget?.Invoke(isDisruptor);
         }
 
         private void ConnectDataBase()
@@ -50,6 +58,8 @@ namespace LDW
         {
             MonsterStatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
             JammerStatDict = LoadJson<JammerStatData, int, JammerStat>("JammerData").MakeDict();
+
+            disruptorHP = 100;
         }
 
         public void SetDisruptor()
