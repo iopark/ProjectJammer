@@ -5,6 +5,7 @@ using System.Collections;
 using Darik;
 using UnityEngine.Events;
 using LDW;
+using UnityEngine.Animations.Rigging;
 
 namespace ildoo
 {
@@ -12,14 +13,13 @@ namespace ildoo
     {
         // Computes and Executes all the gun functioning related activities
         [SerializeField] private Transform muzzlePoint;
-        Camera _camera; 
+        Camera _camera;
+        [SerializeField] LayerMask targetMask; 
 
         //AMMO
         public int maxAmmo { get; private set; }
         public int maxDistance { get; private set; }
         private int currentAmmo;
-
-        UnityAction<int> ammoChange; 
         public int CurrentAmmo
         {
             get
@@ -39,20 +39,23 @@ namespace ildoo
 
         //EFFECTS 
         private ParticleSystem muzzleEffect;
-        private TrailRenderer bulletTrail;
+        [SerializeField] private TrailRenderer bulletTrail;
         [SerializeField] float trailLastingTime;
         WaitForSeconds bulletTrailTime;
 
-
+        //ANIMATIONS
+        Animator anim;
+        [SerializeField] Rig animRig;
+        public bool isReloading;
+        WaitForSeconds reloadYieldInterval;
         [SerializeField] GunData defaultGunInfo;
         private void Awake()
         {
             _camera = Camera.main;
-            defaultGunInfo = GetComponent<GunData>();
-        }
-        private void Start()
-        {
+            anim = GetComponent<Animator>();
+            //defaultGunInfo = GetComponent<GunData>();
             reloadInterval = defaultGunInfo.ReloadRate;
+            reloadYieldInterval = new WaitForSeconds(reloadInterval); 
             bulletTrailTime = new WaitForSeconds(trailLastingTime);
             maxDistance = defaultGunInfo.MaxDistance;
             maxAmmo = defaultGunInfo.MaxAmmo;
@@ -68,7 +71,6 @@ namespace ildoo
         #region Shooting
         public void Fire()
         {
-
             //animation? 
             photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
         }
@@ -79,12 +81,10 @@ namespace ildoo
         [PunRPC]
         public void PlayerShotCalculation()
         {
-            currentAmmo--;
-            Debug.Log(currentAmmo); 
             //MasterClient calculation for shots 
             centrePoint = _camera.ViewportToWorldPoint(middlePoint); 
             RaycastHit hit;
-            if (Physics.Raycast(centrePoint, _camera.transform.forward, out hit, maxDistance))
+            if (Physics.Raycast(centrePoint, _camera.transform.forward, out hit, maxDistance, targetMask))
             {
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>(); // Interface도 Componenent처럼 취급이 가능하다: how crazy is that;
@@ -97,41 +97,53 @@ namespace ildoo
                 endPoint = centrePoint +(_camera.transform.forward * maxDistance);
                 photonView.RPC("PostShotWork", RpcTarget.AllViaServer, muzzlePoint.position, endPoint);
             }
-            
         }
 
         Coroutine shotEffect;
         [PunRPC]
         public void PostShotWork(Vector3 startPos, Vector3 endPos)
         {
-            currentAmmo--; 
-            shotEffect = StartCoroutine(ShotEffect(startPos, endPos)); 
+            anim.SetTrigger("Fire"); 
+            currentAmmo--;
+            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("BulletTrailTemp", muzzlePoint.position, Quaternion.identity, true);
+            GameManager.Resource.Destroy(trail.gameObject, 3f);
+            shotEffect = StartCoroutine(ShotEffect(trail,startPos, endPos)); 
         }
 
-        IEnumerator ShotEffect(Vector3 startPos, Vector3 endPos)
+        IEnumerator ShotEffect(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
-            //TODO: Adding Sound
-            //TODO: Adding Trail 
-            yield return null; 
+            float totalTime = Vector2.Distance(startPos, endPos) / maxDistance;
+
+            float time = 0;
+            while (time < 1)
+            {
+                trail.transform.position = Vector3.Lerp(startPos, endPos, time);
+                time += Time.deltaTime / totalTime;
+
+                yield return null;
+            }
         }
         #endregion
 
-        public void Reloaded()
+        Coroutine reloadEffect; 
+        public void Reload()
         {
-            //called on by the shooter 
-            currentAmmo = maxAmmo; 
+            photonView.RPC("ReloadEffect", RpcTarget.All); 
         }
 
-        //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-        //{
-        //    if (stream.IsWriting)
-        //    {
-        //        stream.SendNext(currentAmmo);
-        //    }
-        //    else // if Reading 
-        //    {
-        //        CurrentAmmo = (int)stream.ReceiveNext();
-        //    }
-        //}
+        [PunRPC]
+        public void ReloadEffect()
+        {
+            reloadEffect = StartCoroutine(Reloading());
+        }
+        IEnumerator Reloading()
+        {
+            //재장전 시작시 weight 재설정 
+            animRig.weight = 0f;
+            anim.SetTrigger("Reload");
+            yield return reloadInterval;
+            animRig.weight = 1f;
+            currentAmmo = maxAmmo;
+        }
     }
 }

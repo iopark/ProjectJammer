@@ -45,6 +45,7 @@ namespace ildoo {
         {
             this.health = health; 
         }
+
         [PunRPC]
         private void Death() 
         { 
