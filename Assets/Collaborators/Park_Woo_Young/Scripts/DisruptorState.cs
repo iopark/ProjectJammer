@@ -1,5 +1,8 @@
 using Photon.Pun;
+using System.Diagnostics;
+using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Park_Woo_Young
@@ -10,15 +13,21 @@ namespace Park_Woo_Young
         // 교란기 피격 -> 게임매니저에 보내서 처리하게 함
         // 교란기가 생길 위치를 저장하고 그걸 데이터매니저에 보낸다음 위치를 가져오기
         // 0단계 파괴되는 조건만1
+        public bool deBug;
+        public float interaction;               // 상호작용 거리
         [SerializeField] GameObject hologram;   // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] Slider hpGauge;        // 체력게이지
         [SerializeField] float fixTurnSpeed;    // 고정 회전속도
         [SerializeField] float turnSpeed;       // 회전속도
         [SerializeField] int fixHP;             // 고정시킬 체력
         [SerializeField] int currentHP;         // 현재 HP
+        public bool disruptorHit;
+        public float TT;
 
-        public enum State { Activate, Destroyed }
-        State state = State.Activate;       // 활성화
+        public Transform Player;
+
+        public enum State { Activate, Destroyed, Stop }
+        State state = State.Activate;
 
         private void Start()
         {
@@ -41,21 +50,25 @@ namespace Park_Woo_Young
         private void Hit(int damage)
         {
             currentHP -= damage;
+            disruptorHit = true;
         }
-
+        
         private void HpGauge()
         {
+            
             hpGauge.value = currentHP;
         }
 
         private void Update()
         {
             HpGauge();     // 체력게이지
-            
             switch (state)
             {
                 case State.Activate:
                     ActivateUpdate();
+                    break;
+                case State.Stop:
+                    StopDisruptor();
                     break;
                 case State.Destroyed:
                     DestroyedUpdate();
@@ -68,13 +81,28 @@ namespace Park_Woo_Young
             Rotate();
             if (currentHP <= 0)
             {
+                // SceneManager.LoadScene(""); // 교란기 파괴시 여기에서 신을 불러와주기
                 state = State.Destroyed;
-            }    
+            }
+            if (disruptorHit)
+            {
+                turnSpeed = 0;
+                state = State.Stop;
+            }
+        }
+        // 교란기 재가동
+        private void StopDisruptor()
+        {
+            if(!disruptorHit)
+            {
+                turnSpeed = fixTurnSpeed;
+                state = State.Activate;
+            }
         }
 
         public void DestroyedUpdate()
         {
-            Debug.Log("교란기 파괴");
+            print("교란기 파괴");
         }
 
         private void Rotate()
@@ -86,6 +114,37 @@ namespace Park_Woo_Young
         {
             Hit(damage);
         }
+
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!deBug)
+                return;
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, interaction);
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            // GameManager.Dat
+            if (other.name == "Player")     
+            {
+                Player = other.transform;   
+                float ToPlayer = Vector3.Distance(transform.position, other.transform.position); // 플레이어와 교란기 사이의 위치 구하기
+                if (Player != null && ToPlayer < interaction)        // 플레이어면서 수리가능한 범위안에 들어왔을 때
+                {
+                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // 교란기가 피격당한 상태에서만 F키를 눌러 고칠 수 있음
+                    {
+                        disruptorHit = false;               
+                    }
+                }
+                else if (Player != null && ToPlayer > interaction)
+                {
+                    Player = null;
+                }
+            }
+        }
     }
-    
 }
+
