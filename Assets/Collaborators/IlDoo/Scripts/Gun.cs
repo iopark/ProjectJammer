@@ -14,6 +14,7 @@ namespace ildoo
         // Computes and Executes all the gun functioning related activities
         [SerializeField] private Transform muzzlePoint;
         Camera _camera;
+        Camera _gunCamera; 
         [SerializeField] LayerMask targetMask; 
 
         //AMMO
@@ -52,6 +53,7 @@ namespace ildoo
         private void Awake()
         {
             _camera = Camera.main;
+            _gunCamera = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
             anim = GetComponent<Animator>();
             //defaultGunInfo = GetComponent<GunData>();
             reloadInterval = defaultGunInfo.ReloadRate;
@@ -77,11 +79,14 @@ namespace ildoo
 
         Vector3 centrePoint;
         Vector3 middlePoint = new Vector3(0.5f, 0.5f, 0);
+        Vector3 localEndPoint; 
         Vector3 endPoint; 
+
         [PunRPC]
         public void PlayerShotCalculation()
         {
             //MasterClient calculation for shots 
+            //Shot dependency's on Camera Main
             centrePoint = _camera.ViewportToWorldPoint(middlePoint); 
             RaycastHit hit;
             if (Physics.Raycast(centrePoint, _camera.transform.forward, out hit, maxDistance, targetMask))
@@ -89,28 +94,57 @@ namespace ildoo
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>(); // Interface도 Componenent처럼 취급이 가능하다: how crazy is that;
                 hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal); // if ain't null, proceed with Hit, else, return; 
-                photonView.RPC("PostShotWork", RpcTarget.AllViaServer, muzzlePoint.position, hit.point);
+                localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
+                PostShotWorkLocal(muzzlePoint.position, localEndPoint); 
+                photonView.RPC("PostShotWorkSync", RpcTarget.Others, muzzlePoint.position, hit.point);
             }
             else
             {
+                localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
+                PostShotWorkLocal(muzzlePoint.position, localEndPoint);
                 //Where Quaternion.identity means no rotation value at all 
                 endPoint = centrePoint +(_camera.transform.forward * maxDistance);
-                photonView.RPC("PostShotWork", RpcTarget.AllViaServer, muzzlePoint.position, endPoint);
+                photonView.RPC("PostShotWorkSync", RpcTarget.Others, muzzlePoint.position, endPoint);
             }
         }
 
         Coroutine shotEffect;
-        [PunRPC]
-        public void PostShotWork(Vector3 startPos, Vector3 endPos)
+        public void PostShotWorkLocal(Vector3 startPos, Vector3 endPos)
         {
             anim.SetTrigger("Fire"); 
             currentAmmo--;
-            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("BulletTrailTemp", muzzlePoint.position, Quaternion.identity, true);
+            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("BulletTrailLocal", muzzlePoint.position, Quaternion.identity, true);
             GameManager.Resource.Destroy(trail.gameObject, 3f);
-            shotEffect = StartCoroutine(ShotEffect(trail,startPos, endPos)); 
+            shotEffect = StartCoroutine(ShotEffectLocal(trail,startPos, endPos)); 
         }
 
-        IEnumerator ShotEffect(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
+        Coroutine shotEffectSync; 
+        [PunRPC]
+        public void PostShotWorkSync(Vector3 startPos, Vector3 endPos)
+        {
+            anim.SetTrigger("Fire");
+            currentAmmo--;
+            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
+            GameManager.Resource.Destroy(trail.gameObject, 3f);
+            shotEffectSync = StartCoroutine(ShotEffectSync(trail, startPos, endPos));
+        }
+
+
+        IEnumerator ShotEffectLocal(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
+        {
+            float totalTime = Vector2.Distance(startPos, endPos) / maxDistance;
+
+            float time = 0;
+            while (time < 1)
+            {
+                trail.transform.position = Vector3.Lerp(startPos, endPos, time);
+                time += Time.deltaTime / totalTime;
+
+                yield return null;
+            }
+        }
+
+        IEnumerator ShotEffectSync(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
             float totalTime = Vector2.Distance(startPos, endPos) / maxDistance;
 
@@ -141,7 +175,7 @@ namespace ildoo
             //재장전 시작시 weight 재설정 
             animRig.weight = 0f;
             anim.SetTrigger("Reload");
-            yield return reloadInterval;
+            yield return reloadYieldInterval;
             animRig.weight = 1f;
             currentAmmo = maxAmmo;
         }
