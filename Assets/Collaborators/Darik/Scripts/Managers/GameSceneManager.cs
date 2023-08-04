@@ -15,17 +15,72 @@ namespace Darik
         [SerializeField] TMP_Text infoText;
         [SerializeField] float countDownTimer = 5;
 
+        private List<GameObject> enemyList;
+        private Transform target;
+
+        private void Awake()
+        {
+            enemyList = new List<GameObject>();
+        }
+
         private void Start()
         {
             // normal game mode
             if (PhotonNetwork.InRoom)
                 PhotonNetwork.LocalPlayer.SetLoad(true);
+            // debug game mode
             else
             {
                 infoText.text = "Debug Mode";
                 PhotonNetwork.LocalPlayer.NickName = $"DebugPlayer {Random.Range(1000, 10000)}";
                 PhotonNetwork.ConnectUsingSettings();
             }
+        }
+
+        public override void OnEnable()
+        {
+            base.OnEnable();
+            GameManager.Data.OnChangedTarget += ChangeTarget;
+        }
+
+        public override void OnDisable()
+        {
+            base.OnDisable();
+            GameManager.Data.OnChangedTarget -= ChangeTarget;
+        }
+
+        private void ChangeTarget(bool isDisruptor)
+        {
+            if (isDisruptor)
+            {
+                target = GameManager.Data.Disruptor;
+
+                foreach (GameObject enemy in enemyList)
+                {
+                    enemy.GetComponent<Enemy>().Target = GameManager.Data.Disruptor;
+                }
+            }   
+            /*
+            else
+            {
+                
+                foreach (Player player in PhotonNetwork.PlayerList)
+                {
+                    if (player.GetPlayerID() == PhotonNetwork.MasterClient.ActorNumber)
+                    {
+                        PhotonView pv = PhotonView.Find(player.GetPlayerID());
+                        target = pv.transform;
+                        break;
+                    }
+                }
+
+                target = GameObject.Find("PlayerHolder(Clone)").transform;
+
+                foreach (GameObject enemy in enemyList)
+                {
+                    enemy.GetComponent<Enemy>().Target = target;
+                }
+            }*/
         }
 
         public override void OnConnectedToMaster()
@@ -36,6 +91,18 @@ namespace Darik
 
         public override void OnJoinedRoom()
         {
+            int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+            Player[] sortedPlayers = PhotonNetwork.PlayerList;
+
+            for (int i = 0; i < sortedPlayers.Length; i += 1)
+            {
+                if (sortedPlayers[i].ActorNumber == actorNumber)
+                {
+                    sortedPlayers[i].SetPlayerID(sortedPlayers[i].ActorNumber);
+                    break;
+                }
+            }
+
             StartCoroutine(DebugGameSetupDelay());
         }
 
@@ -56,6 +123,7 @@ namespace Darik
             if (PhotonNetwork.IsMasterClient)
             {
                 // TODO : 방장이 이어서 해야 할 일
+                GenerateEnemy();
             }
         }
 
@@ -111,6 +179,23 @@ namespace Darik
         private void DebugGameStart()
         {
             Debug.Log("Debug Mode Game Started");
+
+            float angularStart = (360.0f / 8f) * PhotonNetwork.LocalPlayer.GetPlayerNumber();
+            float x = 5.0f * Mathf.Sin(angularStart * Mathf.Deg2Rad);
+            float z = 5.0f * Mathf.Cos(angularStart * Mathf.Deg2Rad);
+            Vector3 position = GameManager.Data.Disruptor.position + new Vector3(x, 0.0f, z);
+            Quaternion rotation = Quaternion.Euler(0.0f, angularStart, 0.0f);
+
+            PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
+            
+            if (PhotonNetwork.IsMasterClient)
+                GenerateEnemy();
+        }
+
+        private void GameStart()
+        {
+            Debug.Log("Normal Game Mode Started");
+
             float angularStart = (360.0f / 8f) * PhotonNetwork.LocalPlayer.GetPlayerNumber();
             float x = 5.0f * Mathf.Sin(angularStart * Mathf.Deg2Rad);
             float z = 5.0f * Mathf.Cos(angularStart * Mathf.Deg2Rad);
@@ -120,13 +205,7 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
 
             if (PhotonNetwork.IsMasterClient)
-                GameManager.Spawn.StartSpawnEnemy();
-        }
-
-        private void GameStart()
-        {
-            Debug.Log("Normal Game Mode Started");
-            GameManager.Spawn.StartSpawnEnemy();
+                GenerateEnemy();
         }
 
         private int PlayerLoadCount()
@@ -138,6 +217,13 @@ namespace Darik
                     loadCount++;
             }
             return loadCount;
+        }
+
+        private void GenerateEnemy()
+        {
+            GameObject enemy = PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(5, 0, 5), Quaternion.identity, 0);
+            enemyList.Add(enemy);
+            enemy.GetComponent<Enemy>().Target = target;
         }
     }
 }
