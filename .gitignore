@@ -116,5 +116,11 @@ crashlytics-build.properties
 /Assets/Collaborators/IlDoo/Resources
 /Assets/Collaborators/IlDoo/Animation.meta
 /Assets/Collaborators/IlDoo/Resources.meta
+/Assets/Collaborators/IlDoo/Scenes.meta
+/Assets/Collaborators/IlDoo/Resources/DefaultRifle.prefab
 /Assets/Collaborators/IlDoo/Resources/PlayerHolder.prefab
-/Assets/Collaborators/IlDoo/Animation/Player.controller
+/Assets/Collaborators/IlDoo/Resources/PlayerHolder.pref
+/Assets/Collaborators/IlDoo/Resources/PlayerHolder.prefab
+/ProjectSettings/EditorBuildSettings.asset
+/Assets/Collaborators/IlDoo/Scenes.meta
+/Test
