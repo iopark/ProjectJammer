@@ -15,6 +15,8 @@ namespace Darik
         protected int curHp;
         protected bool isDie = false;
 
+        public Transform Target { get { return target; } set { target = value; } }
+
         protected virtual void Awake()
         {
             rb = GetComponent<Rigidbody>();
