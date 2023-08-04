@@ -30,10 +30,11 @@ namespace Park_Woo_Young
             // 임시로 시작시 바로 실행
             GameStart();
         }
-
+        
         private void SetDisruptor()
         {
             GameManager.Data.Disruptor = this.transform;
+            GameManager.Data.ChangeTarget(true);
         }
 
         public void GameStart()
@@ -77,13 +78,15 @@ namespace Park_Woo_Young
             Rotate();
             if (currentHP <= 0)
             {
-                // SceneManager.LoadScene(""); // 교란기 파괴시 여기에서 신을 불러와주기.
+                //SceneManager.LoadScene(""); // 교란기 파괴시 여기에서 신을 불러와주기.
                 state = State.Destroyed;
+                print("교란기 파괴");
             }
             if (disruptorHit)
             {
                 turnSpeed = 0;
                 state = State.Stop;
+                GameManager.Data.ChangeTarget(false);
             }
         }
         // 교란기 재가동
@@ -91,6 +94,7 @@ namespace Park_Woo_Young
         {
             if(!disruptorHit)
             {
+                GameManager.Data.ChangeTarget(true);
                 turnSpeed = fixTurnSpeed;
                 state = State.Activate;
             }
@@ -98,7 +102,7 @@ namespace Park_Woo_Young
 
         public void DestroyedUpdate()
         {
-            print("교란기 파괴");
+            
         }
 
         private void Rotate()
