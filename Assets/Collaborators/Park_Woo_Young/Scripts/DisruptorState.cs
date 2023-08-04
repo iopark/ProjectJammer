@@ -81,7 +81,7 @@ namespace Park_Woo_Young
             Rotate();
             if (currentHP <= 0)
             {
-                // SceneManager.LoadScene(""); // 교란기 파괴시 여기에서 신을 불러와주기
+                // SceneManager.LoadScene(""); // 교란기 파괴시 여기에서 신을 불러와주기.
                 state = State.Destroyed;
             }
             if (disruptorHit)
