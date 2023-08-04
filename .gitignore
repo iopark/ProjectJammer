@@ -116,3 +116,5 @@ crashlytics-build.properties
 /Assets/Collaborators/IlDoo/Resources
 /Assets/Collaborators/IlDoo/Animation.meta
 /Assets/Collaborators/IlDoo/Resources.meta
+/Assets/Collaborators/IlDoo/Resources/PlayerHolder.prefab
+/Assets/Collaborators/IlDoo/Animation/Player.controller
