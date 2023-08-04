@@ -45,10 +45,13 @@ namespace ildoo
         {
             //freeroaming camera 
             //temporailty disable camera stacking 
+            Cursor.lockState = CursorLockMode.None;
         }
 
         private void LateUpdate()
         {
+            if (!photonView.IsMine)
+                return;
             Look();
         }
 
