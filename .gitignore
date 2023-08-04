@@ -112,12 +112,7 @@ crashlytics-build.properties
 /Assets/Plugins
 /Assets/Plugins.meta
 /Assets/Collaborators/IlDoo/Debugging
-*.meta
-/Assets/Collaborators/IlDoo/Animation/Player.controller
-/Assets/Collaborators/IlDoo/Animation/Player.controller
-/Assets/Collaborators/IlDoo/Animation/Player.controller
-/Assets/Collaborators/IlDoo/Animation/Player.controller
-/ProjectSettings/Packages/com.unity.probuilder
-/Assets/Collaborators/Park_Woo_Young/Scripts/aggro.cs
-/Packages/manifest.json
-/Packages/packages-lock.json
+/Assets/Collaborators/IlDoo/Animation
+/Assets/Collaborators/IlDoo/Resources
+/Assets/Collaborators/IlDoo/Animation.meta
+/Assets/Collaborators/IlDoo/Resources.meta
