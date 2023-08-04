@@ -1,8 +1,5 @@
 using Photon.Pun;
-using System.Diagnostics;
-using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Park_Woo_Young
@@ -21,8 +18,7 @@ namespace Park_Woo_Young
         [SerializeField] float turnSpeed;       // 회전속도
         [SerializeField] int fixHP;             // 고정시킬 체력
         [SerializeField] int currentHP;         // 현재 HP
-        public bool disruptorHit;
-        public float TT;
+        public bool disruptorHit;               // 피격당했을 때 멈추는 상태로 넘어가게 하기
 
         public Transform Player;
 
@@ -58,7 +54,7 @@ namespace Park_Woo_Young
             
             hpGauge.value = currentHP;
         }
-
+        
         private void Update()
         {
             HpGauge();     // 체력게이지
@@ -125,6 +121,7 @@ namespace Park_Woo_Young
             Gizmos.DrawWireSphere(transform.position, interaction);
         }
 
+        //[PunRPC]
         private void OnTriggerStay(Collider other)
         {
             // GameManager.Dat
@@ -136,7 +133,13 @@ namespace Park_Woo_Young
                 {
                     if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // 교란기가 피격당한 상태에서만 F키를 눌러 고칠 수 있음
                     {
-                        disruptorHit = false;               
+                        disruptorHit = false;
+                        //if (photonView.IsMine)
+                        //{
+
+                        // photonView.RPC("Repair", RpcTarget.All);
+
+                        //}
                     }
                 }
                 else if (Player != null && ToPlayer > interaction)
@@ -144,6 +147,12 @@ namespace Park_Woo_Young
                     Player = null;
                 }
             }
+        }
+
+        //[PunRPC]
+        public void Repair()
+        {
+            disruptorHit = false;
         }
     }
 }
