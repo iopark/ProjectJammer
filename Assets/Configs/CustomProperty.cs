@@ -52,4 +52,20 @@ public static class CustomProperty
         property["LoadTime"] = loadTime;
         room.SetCustomProperties(property);
     }
+
+    public static int GetPlayerID(this Player player)
+    {
+        PhotonHashtable property = player.CustomProperties;
+        if (property.ContainsKey("PlayerID"))
+            return (int)property["PlayerID"];
+        else
+            return -1;
+    }
+
+    public static void SetPlayerID(this Player player, int playerID)
+    {
+        PhotonHashtable property = player.CustomProperties;
+        property["PlayerID"] = playerID;
+        player.SetCustomProperties(property);
+    }
 }

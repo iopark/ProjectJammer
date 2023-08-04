@@ -158,7 +158,7 @@ namespace Darik
 
             public override void Update()
             {
-                owner.target = GameManager.Data.Disruptor;
+
             }
 
             public override void Transition()
