@@ -9,11 +9,11 @@ namespace Darik
 {
     public class Enemy_Blade : Enemy
     {
-        public enum State { Appear, Idle, Attack, Move, Die }
+        public enum State { Appear, Idle, Move, Attack, Die }
         StateMachine<State, Enemy_Blade> stateMachine;
 
         [SerializeField] private TMP_Text stateText;
-        [SerializeField] LayerMask layerMask;
+        [SerializeField] private LayerMask layerMask;
         [SerializeField] private float appearTime = 3f;
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private int attackRange;
@@ -33,8 +33,8 @@ namespace Darik
             stateMachine = new StateMachine<State, Enemy_Blade>(this);
             stateMachine.AddState(State.Appear, new AppearState(this, stateMachine));
             stateMachine.AddState(State.Idle, new IdleState(this, stateMachine));
-            stateMachine.AddState(State.Attack, new AttackState(this, stateMachine));
             stateMachine.AddState(State.Move, new MoveState(this, stateMachine));
+            stateMachine.AddState(State.Attack, new AttackState(this, stateMachine));
             stateMachine.AddState(State.Die, new DieState(this, stateMachine));
         }
 
@@ -88,7 +88,7 @@ namespace Darik
                 photonView.RPC("SetTriggetAttack", RpcTarget.AllViaServer);
 
                 yield return new WaitForSeconds(attackTiming);
-                target.gameObject.GetComponent<IHittable>().TakeDamage(damage, Vector3.zero, Vector3.zero);
+                GameManager.Enemy.FindTarget().gameObject.GetComponent<IHittable>()?.TakeDamage(damage, Vector3.zero, Vector3.zero);
 
                 yield return new WaitForSeconds(attackCoolTime - attackTiming);
                 reload = true;
@@ -174,52 +174,13 @@ namespace Darik
 
             public override void Transition()
             {
-                if (owner.target != null)
+                if (GameManager.Enemy.FindTarget() != null)
                     stateMachine.ChangeState(State.Move);
             }
 
             public override void Exit()
             {
 
-            }
-        }
-
-        private class AttackState : Enemy_BladeState
-        {
-            public AttackState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
-            {
-            }
-
-            public override void Setup()
-            {
-
-            }
-
-            public override void Enter()
-            {
-                owner.reload = true;
-                owner.StartCoroutine(owner.AttackCoroutine());
-                owner.stateText.text = "Attack";
-            }
-
-            public override void Update()
-            {
-                if (owner.target != null)
-                {
-                    owner.moveDir = owner.target.transform.position - transform.position;
-                    owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
-                }
-            }
-
-            public override void Transition()
-            {
-                if (owner.squareDistanceToTarget > owner.attackRange)
-                    stateMachine.ChangeState(State.Move);
-            }
-
-            public override void Exit()
-            {
-                owner.StopAllCoroutines();
             }
         }
 
@@ -243,9 +204,9 @@ namespace Darik
 
             public override void Update()
             {
-                if (owner.target != null)
+                if (GameManager.Enemy.FindTarget() != null)
                 {
-                    owner.moveDir = owner.target.transform.position - transform.position;
+                    owner.moveDir = GameManager.Enemy.FindTarget().transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
 
                     owner.moveDir.Normalize();
@@ -256,9 +217,10 @@ namespace Darik
 
             public override void Transition()
             {
-                if (owner.target == null)
+                if (GameManager.Enemy.FindTarget() == null)
                     stateMachine.ChangeState(State.Idle);
-                else if (owner.squareDistanceToTarget <= owner.attackRange)
+
+                if (owner.squareDistanceToTarget <= owner.attackRange)
                     stateMachine.ChangeState(State.Attack);
             }
 
@@ -266,6 +228,48 @@ namespace Darik
             {
                 owner.isMove = false;
                 anim.SetBool("IsWalk", false);
+            }
+        }
+
+        private class AttackState : Enemy_BladeState
+        {
+            public AttackState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
+            {
+            }
+
+            public override void Setup()
+            {
+
+            }
+
+            public override void Enter()
+            {
+                owner.reload = true;
+                owner.StartCoroutine(owner.AttackCoroutine());
+                owner.stateText.text = "Attack";
+            }
+
+            public override void Update()
+            {
+                if (GameManager.Enemy.FindTarget() != null)
+                {
+                    owner.moveDir = GameManager.Enemy.FindTarget().transform.position - transform.position;
+                    owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
+                }
+            }
+
+            public override void Transition()
+            {
+                if (GameManager.Enemy.FindTarget() == null)
+                    stateMachine.ChangeState(State.Idle);
+
+                if (owner.squareDistanceToTarget > owner.attackRange)
+                    stateMachine.ChangeState(State.Move);
+            }
+
+            public override void Exit()
+            {
+                owner.StopAllCoroutines();
             }
         }
 
