@@ -9,12 +9,14 @@ public class GameManager : MonoBehaviour
     private static PoolManager poolManager;
     private static LDW.DataManager dataManager;
     private static LDW.UIManager UIManager;
+    private static Darik.EnemyManager enemyManager;
 
     public static GameManager Instance { get { return instance; } }
     public static ResourceManager Resource { get { return resourceManager; } }
     public static PoolManager Pool { get { return poolManager; } }
     public static LDW.DataManager Data { get { return dataManager; } }
     public static LDW.UIManager UI { get { return UIManager; } }
+    public static Darik.EnemyManager Enemy { get { return enemyManager; } }
 
     private void Awake()
     {
@@ -51,6 +53,8 @@ public class GameManager : MonoBehaviour
 
         GameObject UIObj = new GameObject() { name = "UIManager" };
         UIObj.transform.SetParent(transform);
-        UIManager = dataObj.AddComponent<LDW.UIManager>();
+        UIManager = UIObj.AddComponent<LDW.UIManager>();
+
+        enemyManager = resourceManager.Instantiate<Darik.EnemyManager>("Managers/EnemyManager", transform);
     }
 }
