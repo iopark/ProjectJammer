@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 
@@ -11,7 +12,6 @@ namespace Darik
         public enum State { Appear, Idle, Attack, Move, Die }
         StateMachine<State, Enemy_Blade> stateMachine;
 
-        [SerializeField] private bool debug;
         [SerializeField] private TMP_Text stateText;
         [SerializeField] LayerMask layerMask;
         [SerializeField] private float appearTime = 3f;
@@ -54,6 +54,7 @@ namespace Darik
 
             if (isDie)
                 stateMachine.ChangeState(State.Appear);
+            isDie = false;
         }
 
         private int SquareDistanceToTarget(Vector3 toTarget)
@@ -61,9 +62,13 @@ namespace Darik
             return (int)(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
         }
 
-        protected override void Hit(int damage, Vector3 hitPoint, Vector3 normal)
+        [PunRPC]
+        public override void Hit(int damage, Vector3 hitPoint, Vector3 normal)
         {
             base.Hit(damage, hitPoint, normal);
+
+            if (debug)
+                Debug.Log($"hitted, current Hp : {curHp} / {maxHp}");
 
             if (curHp <= 0)
             {
@@ -80,7 +85,7 @@ namespace Darik
             while (reload)
             {
                 reload = false;
-                anim.SetTrigger("OnAttack");
+                photonView.RPC("SetTriggetAttack", RpcTarget.AllViaServer);
 
                 yield return new WaitForSeconds(attackTiming);
                 target.gameObject.GetComponent<IHittable>().TakeDamage(damage, Vector3.zero, Vector3.zero);
@@ -88,6 +93,12 @@ namespace Darik
                 yield return new WaitForSeconds(attackCoolTime - attackTiming);
                 reload = true;
             }
+        }
+
+        [PunRPC]
+        public void SetTriggetAttack()
+        {
+            anim.SetTrigger("OnAttack");
         }
 
         #region State
@@ -106,7 +117,7 @@ namespace Darik
 
         private class AppearState : Enemy_BladeState
         {
-            private float curTIme;
+            private float curTime;
 
             public AppearState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
@@ -119,18 +130,18 @@ namespace Darik
 
             public override void Enter()
             {
-                curTIme = 0f;
+                curTime = 0f;
                 owner.stateText.text = "Appear";
             }
 
             public override void Update()
             {
-                curTIme += Time.deltaTime;
+                curTime += Time.deltaTime;
             }
 
             public override void Transition()
             {
-                if (curTIme > owner.appearTime)
+                if (curTime > owner.appearTime)
                     stateMachine.ChangeState(State.Idle);
             }
 
@@ -260,6 +271,8 @@ namespace Darik
 
         private class DieState : Enemy_BladeState
         {
+            private float curTime;
+
             public DieState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
@@ -271,13 +284,16 @@ namespace Darik
 
             public override void Enter()
             {
+                curTime = 0f;
                 anim.SetBool("IsDie", true);
                 owner.stateText.text = "Die";
             }
 
             public override void Update()
             {
-
+                curTime += Time.deltaTime;
+                if (curTime > 3f)
+                    PhotonNetwork.Destroy(gameObject);
             }
 
             public override void Transition()

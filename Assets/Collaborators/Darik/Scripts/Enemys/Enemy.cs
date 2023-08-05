@@ -7,6 +7,9 @@ namespace Darik
 {
     public class Enemy : MonoBehaviourPun, IHittable
     {
+        [SerializeField] protected bool debug;
+        [SerializeField] protected int maxHp = 10;
+
         protected Rigidbody rb;
         protected Animator anim;
         protected new Collider collider;
@@ -26,16 +29,19 @@ namespace Darik
 
         protected virtual void OnEnable()
         {
-            isDie = false;
+            curHp = maxHp;
         }
 
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
         {
-            photonView.RPC("Hit", RpcTarget.All, damage, hitPoint, normal);
+            if (debug)
+                Debug.Log("Hitted");
+
+            photonView.RPC("Hit", RpcTarget.AllViaServer, damage, hitPoint, normal);
         }
 
         [PunRPC]
-        protected virtual void Hit(int damage, Vector3 hitPoint, Vector3 normal)
+        public virtual void Hit(int damage, Vector3 hitPoint, Vector3 normal)
         {
             curHp -= damage;
 
