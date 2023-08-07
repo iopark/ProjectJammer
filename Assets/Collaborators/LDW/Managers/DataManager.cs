@@ -13,19 +13,12 @@ namespace LDW
         public MySqlConnection con;
         public MySqlDataReader reader;
 
-        public UnityAction<bool> OnChangedTarget;
-
         public int disruptorHP;
 
         private void Start()
         {
             ConnectDataBase();
             DataInit();
-        }
-
-        public void ChangeTarget(bool isDisruptor)
-        {
-            OnChangedTarget?.Invoke(isDisruptor);
         }
 
         private void ConnectDataBase()
