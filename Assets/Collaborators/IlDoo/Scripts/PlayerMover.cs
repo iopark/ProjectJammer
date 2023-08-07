@@ -1,12 +1,14 @@
+using Photon.Pun;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 
 namespace ildoo
 {
-    public class PlayerMover : MonoBehaviour
+    public class PlayerMover : MonoBehaviourPun
     {
         //Distinguishing each client 
-        private CharacterController controller;
+        private Rigidbody rigid;
         private Animator anim;
 
         [Header("Movement Status")]
@@ -26,7 +28,7 @@ namespace ildoo
         {
             //PlayerInput managed through Player Class 
             anim = GetComponent<Animator>();
-            controller = GetComponent<CharacterController>();
+            rigid = GetComponent<Rigidbody>();
         }
         private void OnEnable()
         {
@@ -41,7 +43,7 @@ namespace ildoo
         private void Update()
         {
             Move();
-            Jump();
+            //Jump();
         }
         private void FixedUpdate()
         {
@@ -56,28 +58,28 @@ namespace ildoo
             //로컬 기준 움직임 
             if (moveDir.magnitude <= 0) // 안움직임 
             {
-                moveSpeed = Mathf.Lerp(moveSpeed, 0, 0.5f);
                 if (moveSpeed <= 0.1)
                     moveSpeed = 0;
+                moveSpeed = Mathf.Lerp(moveSpeed, 0, 0.5f);
             }
+
             else if (isRunning)
             {
                 delta = Mathf.Abs(moveSpeed - runSpeed);
-                moveSpeed = Mathf.Lerp(moveSpeed, runSpeed, 0.5f);
                 if (delta <= deltaThreshhold)
                     moveSpeed = runSpeed;
+                moveSpeed = Mathf.Lerp(moveSpeed, runSpeed, 0.5f);
             }
+
             else
             {
-                //default movement
                 delta = Mathf.Abs(moveSpeed - walkSpeed);
-                moveSpeed = Mathf.Lerp(moveSpeed, walkSpeed, 0.5f);
                 if (delta <= deltaThreshhold)
                     moveSpeed = runSpeed;
+                //default movement
+                moveSpeed = Mathf.Lerp(moveSpeed, walkSpeed, 0.5f);
             }
-            controller.Move(transform.forward * moveDir.z * moveSpeed * Time.deltaTime);
-            controller.Move(transform.right * moveDir.x * moveSpeed * Time.deltaTime);
-
+            rigid.MovePosition(rigid.position + transform.TransformDirection(moveDir) * moveSpeed * Time.deltaTime);
             anim.SetFloat("ZSpeed", moveDir.z, 0.1f, Time.deltaTime);
             anim.SetFloat("XSpeed", moveDir.x, 0.1f, Time.deltaTime);
             anim.SetFloat("Speed", moveSpeed);
@@ -91,23 +93,21 @@ namespace ildoo
             moveDir = new Vector3(input.x, 0, input.y);
         }
 
-        private void Jump()
-        {
-            ySpeed += Physics.gravity.y * Time.deltaTime;
-            if (GroundCheck() && ySpeed < 0)
-            {
-                ySpeed = 0;
-            }
-            // 2. if accerlation == gravity 
-            if (ySpeed <= Physics.gravity.y)
-                ySpeed = Physics.gravity.y;
+        
 
-            controller.Move(Vector3.up * ySpeed * Time.deltaTime);
+        private void RigidJump()
+        {
+            rigid.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
         }
+
         private void OnJump(InputValue value)
         {
             if (GroundCheck())
-                ySpeed = jumpSpeed;
+            {
+                //ySpeed = jumpSpeed;
+                RigidJump(); 
+            }
+
         }
         RaycastHit groundHit;
         private bool GroundCheck()
@@ -120,6 +120,40 @@ namespace ildoo
             isRunning = value.isPressed;
         }
 
+
+
         //===================================================================
+        #region Deprecated
+        //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        //{
+        //    if (stream.IsWriting)
+        //    {
+        //        stream.SendNext(rigid.position);
+        //        stream.SendNext(rigid.rotation);
+        //        stream.SendNext(rigid.velocity);
+        //    }
+        //    else
+        //    {
+        //        rigid.position = (Vector3)stream.ReceiveNext();
+        //        rigid.rotation = (Quaternion)stream.ReceiveNext();
+        //        rigid.velocity = (Vector3)stream.ReceiveNext();
+        //        float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+        //        rigid.position += rigid.velocity * lag;
+        //    }
+        //}
+        //private void Jump()
+        //{
+        //    ySpeed += Physics.gravity.y * Time.deltaTime;
+        //    if (GroundCheck() && ySpeed < 0)
+        //    {
+        //        ySpeed = 0;
+        //    }
+        //    // 2. if accerlation == gravity 
+        //    if (ySpeed <= Physics.gravity.y)
+        //        ySpeed = Physics.gravity.y;
+
+        //    rigid.AddForce(Vector3.up * ySpeed, ForceMode.VelocityChange);
+        //}
+        #endregion
     }
 }

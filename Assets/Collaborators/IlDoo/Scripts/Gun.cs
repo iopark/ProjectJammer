@@ -39,7 +39,7 @@ namespace ildoo
         public int gunDamage { get; private set; }
 
         //EFFECTS 
-        private ParticleSystem muzzleEffect;
+        [SerializeField] private ParticleSystem muzzleEffect;
         [SerializeField] private TrailRenderer bulletTrail;
         [SerializeField] float trailLastingTime;
         WaitForSeconds bulletTrailTime;
@@ -73,7 +73,8 @@ namespace ildoo
         #region Shooting
         public void Fire()
         {
-            //animation? 
+            //animation?
+            muzzleEffect.Play();
             photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
         }
 
@@ -113,7 +114,7 @@ namespace ildoo
         {
             anim.SetTrigger("Fire"); 
             currentAmmo--;
-            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("BulletTrailLocal", muzzlePoint.position, Quaternion.identity, true);
+            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailLocal", muzzlePoint.position, Quaternion.identity, true);
             GameManager.Resource.Destroy(trail.gameObject, 3f);
             shotEffect = StartCoroutine(ShotEffectLocal(trail,startPos, endPos)); 
         }
@@ -124,7 +125,7 @@ namespace ildoo
         {
             anim.SetTrigger("Fire");
             currentAmmo--;
-            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
+            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
             GameManager.Resource.Destroy(trail.gameObject, 3f);
             shotEffectSync = StartCoroutine(ShotEffectSync(trail, startPos, endPos));
         }
