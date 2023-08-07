@@ -14,7 +14,6 @@ namespace Darik
         [SerializeField] private TMP_Text stateText;
         [SerializeField] private LayerMask layerMask;
         [SerializeField] private float appearTime = 3f;
-        [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private int attackRange;
         [SerializeField] private float attackCoolTime = 3f;
         [SerializeField] private float attackTiming = 0.2f;
@@ -63,9 +62,13 @@ namespace Darik
 
         IEnumerator NavDestinationCoroutine()
         {
+            agent.isStopped = false;
             while (true)
             {
-                agent.destination = GameManager.Enemy.FindTarget().position;
+                SearchTarget();
+                if (target != null)
+                    agent.destination = target.position;
+
                 yield return new WaitForSeconds(0.2f);
             }
         }
@@ -93,10 +96,10 @@ namespace Darik
             while (reload)
             {
                 reload = false;
-                photonView.RPC("SetTriggetAttack", RpcTarget.AllViaServer);
-
+                photonView.RPC("SetTriggerAttack", RpcTarget.AllViaServer);
                 yield return new WaitForSeconds(attackTiming);
-                GameManager.Enemy.FindTarget().gameObject.GetComponent<IHittable>()?.TakeDamage(damage, Vector3.zero, Vector3.zero);
+
+                target.gameObject.GetComponent<IHittable>()?.TakeDamage(damage, Vector3.zero, Vector3.zero);
 
                 yield return new WaitForSeconds(attackCoolTime - attackTiming);
                 reload = true;
@@ -183,12 +186,12 @@ namespace Darik
 
             public override void Update()
             {
-
+                owner.SearchTarget();
             }
 
             public override void Transition()
             {
-                if (GameManager.Enemy.FindTarget() != null)
+                if (owner.target != null)
                     stateMachine.ChangeState(State.Move);
             }
 
@@ -211,29 +214,24 @@ namespace Darik
 
             public override void Enter()
             {
-                //owner.StartCoroutine(owner.NavDestinationCoroutine());
+                owner.StartCoroutine(owner.NavDestinationCoroutine());
                 owner.isMove = true;
-                //owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, true);
-                anim.SetBool("IsWalk", true);
+                owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, true);
                 owner.stateText.text = "Walk";
             }
 
             public override void Update()
             {
-                if (GameManager.Enemy.FindTarget() != null)
+                if (owner.target != null)
                 {
-                    owner.moveDir = GameManager.Enemy.FindTarget().transform.position - transform.position;
+                    owner.moveDir = owner.target.transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
-                    
-                    owner.moveDir.Normalize();
-                    transform.Translate(owner.moveDir * owner.moveSpeed * Time.deltaTime, Space.World);
-                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(owner.moveDir.x, 0, owner.moveDir.z)), 0.1f);
                 }
             }
 
             public override void Transition()
             {
-                if (GameManager.Enemy.FindTarget() == null)
+                if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
                 if (owner.squareDistanceToTarget <= owner.attackRange)
@@ -242,10 +240,10 @@ namespace Darik
 
             public override void Exit()
             {
-                //owner.StopAllCoroutines();
+                owner.agent.isStopped = true;
+                owner.StopAllCoroutines();
                 owner.isMove = false;
-                //owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, false);
-                anim.SetBool("IsWalk", false);
+                owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, false);
             }
         }
 
@@ -269,16 +267,17 @@ namespace Darik
 
             public override void Update()
             {
-                if (GameManager.Enemy.FindTarget() != null)
+                owner.SearchTarget();
+                if (owner.target != null)
                 {
-                    owner.moveDir = GameManager.Enemy.FindTarget().transform.position - transform.position;
+                    owner.moveDir = owner.target.transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
                 }
             }
 
             public override void Transition()
             {
-                if (GameManager.Enemy.FindTarget() == null)
+                if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
                 if (owner.squareDistanceToTarget > owner.attackRange)
