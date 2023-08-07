@@ -24,7 +24,7 @@ namespace Park_Woo_Young
         public bool disruptorHit;               // 피격당했을 때 멈추는 상태로 넘어가게 하기
         [SerializeField] Material mat1;         // 활성화시 홀로그램 색상(파랑)
         [SerializeField] Material mat2;         // 멈출시 홀로그램 색상9빨강)
-        [SerializeField] Renderer renderer;
+        [SerializeField] new Renderer renderer;
         public Transform Player;
 
         public enum State { Activate, Destroyed, Stop }
@@ -40,7 +40,8 @@ namespace Park_Woo_Young
         private void SetDisruptor()
         {
             GameManager.Data.Disruptor = this.transform;
-            GameManager.Data.ChangeTarget(true);
+            GameManager.Enemy.ChangeTarget(true);
+
         }
 
         public void GameStart()
@@ -94,7 +95,7 @@ namespace Park_Woo_Young
             {
                 turnSpeed = 0;
                 state = State.Stop;
-                GameManager.Data.ChangeTarget(false);
+                GameManager.Enemy.ChangeTarget(false);
                 renderer.sharedMaterial = mat2;
                 
             }
@@ -104,7 +105,7 @@ namespace Park_Woo_Young
         {
             if(!disruptorHit)
             {
-                GameManager.Data.ChangeTarget(true);
+                GameManager.Enemy.ChangeTarget(true);
                 turnSpeed = fixTurnSpeed;
                 state = State.Activate;
                 renderer.sharedMaterial = mat1;
