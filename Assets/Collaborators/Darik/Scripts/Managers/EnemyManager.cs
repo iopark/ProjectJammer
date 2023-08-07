@@ -17,17 +17,7 @@ namespace Darik
             enemyList = new List<Enemy>();
         }
 
-        private void OnEnable()
-        {
-            GameManager.Data.OnChangedTarget += ChangeTarget;
-        }
-
-        private void OnDisable()
-        {
-            GameManager.Data.OnChangedTarget -= ChangeTarget;
-        }
-
-        private void ChangeTarget(bool isDisruptorActivated)
+        public void ChangeTarget(bool isDisruptorActivated)
         {
             this.isDisruptorActivated = isDisruptorActivated;
             if (!isDisruptorActivated)
