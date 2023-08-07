@@ -110,6 +110,7 @@ crashlytics-build.properties
 /Assets/Plugins
 /Assets/Plugins.meta
 /Assets/Collaborators/IlDoo/Debugging
+/Assets/Collaborators/IlDoo/Debugging.meta
 /Assets/Collaborators/IlDoo/Animation
 /Assets/Collaborators/IlDoo/Resources
 /Assets/Collaborators/IlDoo/Animation.meta
@@ -126,3 +127,7 @@ crashlytics-build.properties
 /Assets/Collaborators/LDW/Lobby/Scenes.meta
 /Assets/Collaborators/LDW/Lobby/Resources
 /Assets/Collaborators/LDW/Lobby/Scenes
+/Assets/Collaborators/IlDoo/Materials
+/Assets/Collaborators/IlDoo/Materials.meta
+/Assets/Collaborators/IlDoo/Resources/BulletTrailTemp.prefab
+/Assets/Collaborators/IlDoo/Resources/BulletTrailTemp.prefab.meta

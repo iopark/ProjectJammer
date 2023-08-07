@@ -11,7 +11,7 @@ namespace Park_Woo_Young
         // 교란기가 생길 위치를 저장하고 그걸 데이터매니저에 보낸다음 위치를 가져오기
         // 0단계 파괴되는 조건만1
         public bool deBug;
-        public float interaction;               // 상호작용 거리
+        public float interaction = 4;           // 상호작용 거리(기본 4)
         [SerializeField] GameObject hologram;   // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] Slider hpGauge;        // 체력게이지
         [SerializeField] float fixTurnSpeed;    // 고정 회전속도
@@ -19,7 +19,9 @@ namespace Park_Woo_Young
         [SerializeField] int fixHP;             // 고정시킬 체력
         [SerializeField] int currentHP;         // 현재 HP
         public bool disruptorHit;               // 피격당했을 때 멈추는 상태로 넘어가게 하기
-
+        [SerializeField] Material mat1;         // 활성화시 홀로그램 색상(파랑)
+        [SerializeField] Material mat2;         // 멈출시 홀로그램 색상9빨강)
+        [SerializeField] new Renderer renderer;
         public Transform Player;
 
         public enum State { Activate, Destroyed, Stop }
@@ -29,16 +31,19 @@ namespace Park_Woo_Young
         {
             // 임시로 시작시 바로 실행
             GameStart();
+
         }
         
         private void SetDisruptor()
         {
             GameManager.Data.Disruptor = this.transform;
-            GameManager.Data.ChangeTarget(true);
+            GameManager.Enemy.ChangeTarget(true);
+
         }
 
         public void GameStart()
         {
+            renderer.sharedMaterial = mat1;
             turnSpeed = fixTurnSpeed;
             currentHP = fixHP;
             SetDisruptor();
@@ -76,6 +81,7 @@ namespace Park_Woo_Young
         public void ActivateUpdate()
         {
             Rotate();
+
             if (currentHP <= 0)
             {
                 //SceneManager.LoadScene(""); // 교란기 파괴시 여기에서 신을 불러와주기.
@@ -86,7 +92,9 @@ namespace Park_Woo_Young
             {
                 turnSpeed = 0;
                 state = State.Stop;
-                GameManager.Data.ChangeTarget(false);
+                GameManager.Enemy.ChangeTarget(false);
+                renderer.sharedMaterial = mat2;
+                
             }
         }
         // 교란기 재가동
@@ -94,9 +102,10 @@ namespace Park_Woo_Young
         {
             if(!disruptorHit)
             {
-                GameManager.Data.ChangeTarget(true);
+                GameManager.Enemy.ChangeTarget(true);
                 turnSpeed = fixTurnSpeed;
                 state = State.Activate;
+                renderer.sharedMaterial = mat1;
             }
         }
 
@@ -127,27 +136,14 @@ namespace Park_Woo_Young
 
         private void OnTriggerStay(Collider other)
         {
-            // GameManager.Dat
-            if (other.name == "Player")     
+            if (other.tag == "Player")     
             {
                 Player = other.transform;   
                 float ToPlayer = Vector3.Distance(transform.position, other.transform.position); // 플레이어와 교란기 사이의 위치 구하기
                 if (Player != null && ToPlayer < interaction)        // 플레이어면서 수리가능한 범위안에 들어왔을 때
                 {
-                    if (other.CompareTag("Player"))
-                    {
-                        if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // 교란기가 피격당한 상태에서만 F키를 눌러 고칠 수 있음
-                        {
-                            RepairInteraction();
-                            //disruptorHit = false;
-                            //if (photonView.IsMine)
-                            //{
-
-                            // photonView.RPC("Repair", RpcTarget.All);
-
-                            //}
-                        }
-                    }
+                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // 교란기가 피격당한 상태에서만 F키를 눌러 고칠 수 있음
+                        disruptorHit = false;
                 }
                 else if (Player != null && ToPlayer > interaction)
                 {
@@ -156,15 +152,16 @@ namespace Park_Woo_Young
             }
         }
 
-        public void RepairInteraction()
+        public void DisruptorActivate()
         {
-            photonView.RPC("Repair", RpcTarget.All);
-            
-        }
-        [PunRPC]
-        public void Repair()
-        {
-            disruptorHit = false;
+            if (disruptorHit)
+            {
+                disruptorHit = false;
+            }
+            else
+            {
+                return;
+            }
         }
     }
 }
