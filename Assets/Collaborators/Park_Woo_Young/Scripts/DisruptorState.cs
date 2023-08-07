@@ -9,15 +9,15 @@ namespace Park_Woo_Young
 
         public bool deBug;
         public float interaction = 4;         
-        [SerializeField] GameObject hologram; 
-        [SerializeField] Slider hpGauge;      
-        [SerializeField] Slider repairGauge;
-        [SerializeField] float fixTurnSpeed;  
-        [SerializeField] float turnSpeed;     
-        [SerializeField] float repair;
-        [SerializeField] float maxRepair;
-        public float repairTime;
-        [SerializeField] int testRepair;
+        [SerializeField] GameObject hologram; // 홀로그램을 돌리기 위함
+        [SerializeField] Slider hpGauge;      // 체력게이지
+        [SerializeField] Slider repairGauge;  // 수리진행도
+        [SerializeField] float fixTurnSpeed;  // 고정스피드(100)
+        [SerializeField] float turnSpeed;     // 멈췄을때와 돌아갈때 스피드(0)
+        [SerializeField] float repair;        // 수리진행도(0)
+        [SerializeField] float maxRepair;     // 클리어하기위한 수리진행도(100)
+        public float repairTime;              // 수리진행도가 올라가기 위한 시간(1)
+        [SerializeField] int testRepair;      
         [SerializeField] int testCur;
         [SerializeField] int fixHP;           
         [SerializeField] int currentHP;       
@@ -34,13 +34,6 @@ namespace Park_Woo_Young
         private void Start()
         {
             GameStart();
-        }
-        private void dam(int damage)
-        {
-            if (Input.GetKeyDown(KeyCode.Space)) 
-            {
-                Hit(damage);
-            }
         }
         
         private void SetDisruptor()
@@ -83,7 +76,6 @@ namespace Park_Woo_Young
 
         private void Update()
         {
-            dam(10);
             HpGauge();     
             RepairGauge();
             switch (state)
@@ -124,13 +116,13 @@ namespace Park_Woo_Young
             {
                 //SceneManager.LoadScene("");
                 state = State.Destroyed;
-                print("������ �ı�");
+                print("교란기 파괴됨");
             }
             if (repair >= maxRepair)
             {
                 //SceneManager.LoadScene("");
                 state = State.Success;
-                print("������ ��������");
+                print("교란기가 완벽하게 수리됨");
             }
             if (disruptorHit)
             {
