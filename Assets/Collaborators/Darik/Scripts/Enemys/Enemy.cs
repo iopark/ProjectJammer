@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Darik
 {
@@ -13,6 +14,8 @@ namespace Darik
         protected Rigidbody rb;
         protected Animator anim;
         protected new Collider collider;
+        protected NavMeshAgent agent;
+        protected Transform target;
 
         protected int curHp;
         protected bool isDie = false;
@@ -22,11 +25,17 @@ namespace Darik
             rb = GetComponent<Rigidbody>();
             anim = GetComponentInChildren<Animator>();
             collider = GetComponent<Collider>();
+            agent = GetComponent<NavMeshAgent>();
         }
 
         protected virtual void OnEnable()
         {
             curHp = maxHp;
+        }
+
+        protected void SearchTarget()
+        {
+            target = GameManager.Enemy.FindTarget();
         }
 
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
@@ -45,8 +54,7 @@ namespace Darik
         {
             curHp -= damage;
 
-            ParticleSystem hitEffect = GameManager.Resource.Load<ParticleSystem>("Prefabs/Effects/HitEffect");
-            GameManager.Resource.Instantiate(hitEffect, hitPoint, Quaternion.LookRotation(normal), true);
+            PhotonNetwork.Instantiate("HitEffect", hitPoint, Quaternion.LookRotation(normal));
         }
     }
 }

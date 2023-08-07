@@ -1,46 +1,46 @@
 using Photon.Pun;
-using UnityEditor;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace Park_Woo_Young
 {
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable
     {
-        // ±³¶õ±â »óÈ£ÀÛ¿ë½Ã -> ±³¶õ±â°¡ µ¥ÀÌÅÍ ¸Å´ÏÀú¿¡ ½ÅÈ£¸¦ ÁÖ°í
-        // ±³¶õ±â ÇÇ°İ -> °ÔÀÓ¸Å´ÏÀú¿¡ º¸³»¼­ Ã³¸®ÇÏ°Ô ÇÔ
-        // ±³¶õ±â°¡ »ı±æ À§Ä¡¸¦ ÀúÀåÇÏ°í ±×°É µ¥ÀÌÅÍ¸Å´ÏÀú¿¡ º¸³½´ÙÀ½ À§Ä¡¸¦ °¡Á®¿À±â
-        // 0´Ü°è ÆÄ±«µÇ´Â Á¶°Ç¸¸1
+
         public bool deBug;
-        public float interaction = 4;           // »óÈ£ÀÛ¿ë °Å¸®(±âº» 4)
-        [SerializeField] GameObject hologram;   // ±³¶õ±â À§ÀÇ È¦·Î±×·¥ÀÇ È¸ÀüÀ» ÁÖ±â À§ÇÔ
-        [SerializeField] Slider hpGauge;        // Ã¼·Â°ÔÀÌÁö
-        [SerializeField] float fixTurnSpeed;    // °íÁ¤ È¸Àü¼Óµµ
-        [SerializeField] float turnSpeed;       // È¸Àü¼Óµµ
-        [SerializeField] int fixHP;             // °íÁ¤½ÃÅ³ Ã¼·Â
-        [SerializeField] int currentHP;         // ÇöÀç HP
-        public bool disruptorHit;               // ÇÇ°İ´çÇßÀ» ¶§ ¸ØÃß´Â »óÅÂ·Î ³Ñ¾î°¡°Ô ÇÏ±â
-        [SerializeField] Material mat1;         // È°¼ºÈ­½Ã È¦·Î±×·¥ »ö»ó(ÆÄ¶û)
-        [SerializeField] Material mat2;         // ¸ØÃâ½Ã È¦·Î±×·¥ »ö»ó9»¡°­)
-        [SerializeField] Renderer renderer;
+        public float interaction = 4;         
+        [SerializeField] GameObject hologram; // í™€ë¡œê·¸ë¨ì„ ëŒë¦¬ê¸° ìœ„í•¨
+        [SerializeField] Slider hpGauge;      // ì²´ë ¥ê²Œì´ì§€
+        [SerializeField] Slider repairGauge;  // ìˆ˜ë¦¬ì§„í–‰ë„
+        [SerializeField] float fixTurnSpeed;  // ê³ ì •ìŠ¤í”¼ë“œ(100)
+        [SerializeField] float turnSpeed;     // ë©ˆì·„ì„ë•Œì™€ ëŒì•„ê°ˆë•Œ ìŠ¤í”¼ë“œ(0)
+        [SerializeField] float repair;        // ìˆ˜ë¦¬ì§„í–‰ë„(0)
+        [SerializeField] float maxRepair;     // í´ë¦¬ì–´í•˜ê¸°ìœ„í•œ ìˆ˜ë¦¬ì§„í–‰ë„(100)
+        public float repairTime;              // ìˆ˜ë¦¬ì§„í–‰ë„ê°€ ì˜¬ë¼ê°€ê¸° ìœ„í•œ ì‹œê°„(1)
+        [SerializeField] int testRepair;      
+        [SerializeField] int testCur;
+        [SerializeField] int fixHP;           
+        [SerializeField] int currentHP;       
+        public bool disruptorHit;             
+        [SerializeField] Material mat1;       
+        [SerializeField] Material mat2;       
+        [SerializeField] new Renderer renderer;
+
         public Transform Player;
 
-        public enum State { Activate, Destroyed, Stop }
+        public enum State { Activate, Stop, Success, Destroyed }
         State state = State.Activate;
 
         private void Start()
         {
-            // ÀÓ½Ã·Î ½ÃÀÛ½Ã ¹Ù·Î ½ÇÇà
             GameStart();
-
         }
         
         private void SetDisruptor()
         {
             GameManager.Data.Disruptor = this.transform;
-            GameManager.Data.ChangeTarget(true);
+            GameManager.Enemy.ChangeTarget(true);
+
         }
 
         public void GameStart()
@@ -48,24 +48,36 @@ namespace Park_Woo_Young
             renderer.sharedMaterial = mat1;
             turnSpeed = fixTurnSpeed;
             currentHP = fixHP;
+            repair = 0;
             SetDisruptor();
         }
 
         private void Hit(int damage)
         {
-            currentHP -= damage;
             disruptorHit = true;
+            if (repair > 0)
+            {
+                repair -= damage;
+            }
+            else
+            {
+                currentHP -= damage;
+            }
         }
         
         private void HpGauge()
         {
-            
             hpGauge.value = currentHP;
         }
-        
+        private void RepairGauge()
+        {
+            repairGauge.value = repair;
+        }
+
         private void Update()
         {
-            HpGauge();     // Ã¼·Â°ÔÀÌÁö
+            HpGauge();     
+            RepairGauge();
             switch (state)
             {
                 case State.Activate:
@@ -73,6 +85,9 @@ namespace Park_Woo_Young
                     break;
                 case State.Stop:
                     StopDisruptor();
+                    break;
+                case State.Success:
+                    SuccessUpdate();
                     break;
                 case State.Destroyed:
                     DestroyedUpdate();
@@ -83,32 +98,57 @@ namespace Park_Woo_Young
         public void ActivateUpdate()
         {
             Rotate();
-
+            repairTime += Time.deltaTime;
+            if (repairTime > 1)
+            {
+                if (currentHP < fixHP)
+                {
+                    repairTime = 0;
+                    currentHP += testCur;
+                }
+                else if (currentHP == fixHP) 
+                {
+                    repairTime = 0;
+                    repair += testRepair;
+                }
+            }
             if (currentHP <= 0)
             {
-                //SceneManager.LoadScene(""); // ±³¶õ±â ÆÄ±«½Ã ¿©±â¿¡¼­ ½ÅÀ» ºÒ·¯¿ÍÁÖ±â.
+                //SceneManager.LoadScene("");
                 state = State.Destroyed;
-                print("±³¶õ±â ÆÄ±«");
+                print("êµë€ê¸° íŒŒê´´ë¨");
+            }
+            if (repair >= maxRepair)
+            {
+                //SceneManager.LoadScene("");
+                state = State.Success;
+                print("êµë€ê¸°ê°€ ì™„ë²½í•˜ê²Œ ìˆ˜ë¦¬ë¨");
             }
             if (disruptorHit)
             {
                 turnSpeed = 0;
                 state = State.Stop;
-                GameManager.Data.ChangeTarget(false);
+                GameManager.Enemy.ChangeTarget(false);
                 renderer.sharedMaterial = mat2;
                 
             }
         }
-        // ±³¶õ±â Àç°¡µ¿
+ 
         private void StopDisruptor()
         {
+            print("1");
             if(!disruptorHit)
             {
-                GameManager.Data.ChangeTarget(true);
+                GameManager.Enemy.ChangeTarget(true);
                 turnSpeed = fixTurnSpeed;
                 state = State.Activate;
                 renderer.sharedMaterial = mat1;
             }
+        }
+
+        private void SuccessUpdate()
+        {
+
         }
 
         public void DestroyedUpdate()
@@ -141,10 +181,10 @@ namespace Park_Woo_Young
             if (other.tag == "Player")     
             {
                 Player = other.transform;   
-                float ToPlayer = Vector3.Distance(transform.position, other.transform.position); // ÇÃ·¹ÀÌ¾î¿Í ±³¶õ±â »çÀÌÀÇ À§Ä¡ ±¸ÇÏ±â
-                if (Player != null && ToPlayer < interaction)        // ÇÃ·¹ÀÌ¾î¸é¼­ ¼ö¸®°¡´ÉÇÑ ¹üÀ§¾È¿¡ µé¾î¿ÔÀ» ¶§
+                float ToPlayer = Vector3.Distance(transform.position, other.transform.position);
+                if (Player != null && ToPlayer < interaction)        
                 {
-                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // ±³¶õ±â°¡ ÇÇ°İ´çÇÑ »óÅÂ¿¡¼­¸¸ FÅ°¸¦ ´­·¯ °íÄ¥ ¼ö ÀÖÀ½
+                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) 
                         disruptorHit = false;
                 }
                 else if (Player != null && ToPlayer > interaction)
