@@ -75,7 +75,9 @@ namespace ildoo
         {
             //animation?
             muzzleEffect.Play();
-            photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
+            localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
+            PostShotWorkLocal(muzzlePoint.position, localEndPoint);
+            photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient, photonView.ViewID);
         }
 
         Vector3 centrePoint;
@@ -84,7 +86,7 @@ namespace ildoo
         Vector3 endPoint; 
 
         [PunRPC]
-        public void PlayerShotCalculation()
+        public void PlayerShotCalculation(int viewID)
         {
             //MasterClient calculation for shots 
             //Shot dependency's on Camera Main
@@ -95,17 +97,13 @@ namespace ildoo
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>();
                 hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
-                localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
-                PostShotWorkLocal(muzzlePoint.position, localEndPoint); 
-                photonView.RPC("PostShotWorkSync", RpcTarget.Others, muzzlePoint.position, hit.point);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, hit.point, viewID);
             }
             else
             {
-                localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
-                PostShotWorkLocal(muzzlePoint.position, localEndPoint);
                 //Where Quaternion.identity means no rotation value at all 
                 endPoint = centrePoint +(muzzlePoint.transform.forward * maxDistance);
-                photonView.RPC("PostShotWorkSync", RpcTarget.Others, muzzlePoint.position, endPoint);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, endPoint, viewID);
 
                 //Problem with this => in other's clients, bullet trail should be released from the muzzlepoint => *maxDistance. 
             }
@@ -123,8 +121,10 @@ namespace ildoo
 
         Coroutine shotEffectSync; 
         [PunRPC]
-        public void PostShotWorkSync(Vector3 startPos, Vector3 endPos)
+        public void PostShotWorkSync(Vector3 startPos, Vector3 endPos, int viewID)
         {
+            if (viewID == photonView.ViewID)
+                return; 
             anim.SetTrigger("Fire");
             currentAmmo--;
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
