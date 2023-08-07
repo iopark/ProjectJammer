@@ -1,5 +1,8 @@
 using Photon.Pun;
+using UnityEditor;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace Park_Woo_Young
@@ -20,7 +23,7 @@ namespace Park_Woo_Young
         [SerializeField] int currentHP;         // 현재 HP
         public bool disruptorHit;               // 피격당했을 때 멈추는 상태로 넘어가게 하기
         [SerializeField] Material mat1;         // 활성화시 홀로그램 색상(파랑)
-        [SerializeField] Material mat2;         // 멈출시 홀로그램 색상(빨강)
+        [SerializeField] Material mat2;         // 멈출시 홀로그램 색상9빨강)
         [SerializeField] new Renderer renderer;
         public Transform Player;
 
@@ -152,7 +155,7 @@ namespace Park_Woo_Young
             }
         }
 
-        public void DisruptorActivate() // 플레이어가 상호작용시 맞았다는 판정을 되돌려서 교란기 재가동
+        public void DisruptorActivate()
         {
             if (disruptorHit)
             {
