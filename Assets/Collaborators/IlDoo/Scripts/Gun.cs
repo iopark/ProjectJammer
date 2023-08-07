@@ -77,7 +77,7 @@ namespace ildoo
             muzzleEffect.Play();
             localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
             PostShotWorkLocal(muzzlePoint.position, localEndPoint);
-            photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient, photonView.ViewID);
+            photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
         }
 
         Vector3 centrePoint;
@@ -86,7 +86,7 @@ namespace ildoo
         Vector3 endPoint; 
 
         [PunRPC]
-        public void PlayerShotCalculation(int viewID)
+        public void PlayerShotCalculation()
         {
             //MasterClient calculation for shots 
             //Shot dependency's on Camera Main
@@ -97,13 +97,13 @@ namespace ildoo
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>();
                 hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
-                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, hit.point, viewID);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, hit.point);
             }
             else
             {
                 //Where Quaternion.identity means no rotation value at all 
                 endPoint = centrePoint +(muzzlePoint.transform.forward * maxDistance);
-                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, endPoint, viewID);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, endPoint);
 
                 //Problem with this => in other's clients, bullet trail should be released from the muzzlepoint => *maxDistance. 
             }
@@ -121,10 +121,12 @@ namespace ildoo
 
         Coroutine shotEffectSync; 
         [PunRPC]
-        public void PostShotWorkSync(Vector3 startPos, Vector3 endPos, int viewID)
+        public void PostShotWorkSync(Vector3 startPos, Vector3 endPos)
         {
-            if (viewID == photonView.ViewID)
+            if (photonView.IsMine)
+            {
                 return; 
+            }
             anim.SetTrigger("Fire");
             currentAmmo--;
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
