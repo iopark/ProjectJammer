@@ -14,7 +14,7 @@ namespace ildoo
         // Computes and Executes all the gun functioning related activities
         [SerializeField] private Transform muzzlePoint;
         Camera _camera;
-        Camera _gunCamera; 
+        Camera _gunCamera;
         [SerializeField] LayerMask targetMask; 
 
         //AMMO
@@ -93,8 +93,8 @@ namespace ildoo
             if (Physics.Raycast(centrePoint, _camera.transform.forward, out hit, maxDistance, targetMask))
             {
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
-                IHittable hittableObj = hit.transform.GetComponent<IHittable>(); // Interface도 Componenent처럼 취급이 가능하다: how crazy is that;
-                hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal); // if ain't null, proceed with Hit, else, return; 
+                IHittable hittableObj = hit.transform.GetComponent<IHittable>();
+                hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
                 localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
                 PostShotWorkLocal(muzzlePoint.position, localEndPoint); 
                 photonView.RPC("PostShotWorkSync", RpcTarget.Others, muzzlePoint.position, hit.point);
@@ -104,8 +104,10 @@ namespace ildoo
                 localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
                 PostShotWorkLocal(muzzlePoint.position, localEndPoint);
                 //Where Quaternion.identity means no rotation value at all 
-                endPoint = centrePoint +(_camera.transform.forward * maxDistance);
+                endPoint = centrePoint +(muzzlePoint.transform.forward * maxDistance);
                 photonView.RPC("PostShotWorkSync", RpcTarget.Others, muzzlePoint.position, endPoint);
+
+                //Problem with this => in other's clients, bullet trail should be released from the muzzlepoint => *maxDistance. 
             }
         }
 
