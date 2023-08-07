@@ -13,8 +13,6 @@ namespace LDW
         public MySqlConnection con;
         public MySqlDataReader reader;
 
-        public UnityAction<bool> OnChangedTarget;
-
         public int disruptorHP;
 
         private void Start()
@@ -23,16 +21,11 @@ namespace LDW
             DataInit();
         }
 
-        public void ChangeTarget(bool isDisruptor)
-        {
-            OnChangedTarget?.Invoke(isDisruptor);
-        }
-
         private void ConnectDataBase()
         {
             try
             {
-                string serverInfo = "Server=192.168.0.231; DataBase=userdata; Uid=root; Pwd=1234; Port=3306; CharSet=utf8; ";
+                string serverInfo = "Server=15.164.251.21; DataBase=userdata; Uid=root; Pwd=1234; Port=3306; CharSet=utf8; ";
                 con = new MySqlConnection(serverInfo);
                 con.Open();
 

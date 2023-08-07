@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Darik
 {
@@ -13,6 +14,7 @@ namespace Darik
         protected Rigidbody rb;
         protected Animator anim;
         protected new Collider collider;
+        protected NavMeshAgent agent;
 
         protected int curHp;
         protected bool isDie = false;
@@ -22,6 +24,7 @@ namespace Darik
             rb = GetComponent<Rigidbody>();
             anim = GetComponentInChildren<Animator>();
             collider = GetComponent<Collider>();
+            agent = GetComponent<NavMeshAgent>();
         }
 
         protected virtual void OnEnable()
