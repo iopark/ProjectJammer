@@ -8,12 +8,16 @@ namespace ildoo
     {
         [SerializeField] int maxAmmo;
         public int MaxAmmo => maxAmmo;
+
         [SerializeField] int damage;
         public int Damage => damage;
+
         [SerializeField] int maxDistance;
         public int MaxDistance => maxDistance;
+
         [SerializeField] float fireRate;
         public float FireRate => fireRate;
+
         [SerializeField] float reloadRate;
         public float ReloadRate => reloadRate;
     }
