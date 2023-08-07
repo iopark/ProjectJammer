@@ -63,13 +63,6 @@ namespace ildoo
             nextFire = Time.time + fireRate;
             currentGun.Fire();
         }
-
-        Coroutine Striking; 
-        void OnMelee(InputValue input)
-        {
-            Striking = StartCoroutine(Strike()); 
-        }
-
         Coroutine reloading; 
         private void OnReload(InputValue input)
         {
@@ -80,18 +73,6 @@ namespace ildoo
             currentGun.Reload(); 
         }
         //Testing 
-        #region Debugging for the anim expansion 
-        IEnumerator Strike()
-        {
-            isSwinging = true; 
-            leftArmRig.weight = 0f;
-            rightArmRig.weight = 1f; 
-            anim.SetTrigger("Melee");
-            yield return new WaitForSeconds(.5f);
-            leftArmRig.weight = 1f;
-            rightArmRig.weight = 0f;
-            isSwinging = false;
-        }
-        #endregion
+        
     }
 }

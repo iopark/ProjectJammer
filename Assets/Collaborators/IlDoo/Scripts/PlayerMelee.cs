@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.InputSystem;
 
 public class PlayerMelee : MonoBehaviourPun
 {
@@ -39,4 +40,23 @@ public class PlayerMelee : MonoBehaviourPun
     {
 
     }
+
+    private void OnMelee(InputValue input)
+    {
+
+    }
+    #region Melee Attack Under Construction 
+    //Coroutine Striking;
+    //IEnumerator Striking()
+    //{
+    //    isSwinging = true;
+    //    leftArmRig.weight = 0f;
+    //    rightArmRig.weight = 1f;
+    //    anim.SetTrigger("Melee");
+    //    yield return new WaitForSeconds(.5f);
+    //    leftArmRig.weight = 1f;
+    //    rightArmRig.weight = 0f;
+    //    isSwinging = false;
+    //}
+    #endregion
 }
