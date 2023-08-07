@@ -95,7 +95,7 @@ namespace Park_Woo_Young
             {
                 turnSpeed = 0;
                 state = State.Stop;
-                GameManager.Data.ChangeTarget(false);
+                GameManager.Enemy.ChangeTarget(false);
                 renderer.sharedMaterial = mat2;
                 
             }
@@ -105,7 +105,7 @@ namespace Park_Woo_Young
         {
             if(!disruptorHit)
             {
-                GameManager.Data.ChangeTarget(true);
+                GameManager.Enemy.ChangeTarget(true);
                 turnSpeed = fixTurnSpeed;
                 state = State.Activate;
                 renderer.sharedMaterial = mat1;
