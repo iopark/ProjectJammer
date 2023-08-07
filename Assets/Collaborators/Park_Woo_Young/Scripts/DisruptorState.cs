@@ -6,32 +6,41 @@ namespace Park_Woo_Young
 {
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable
     {
-        // 교란기 상호작용시 -> 교란기가 데이터 매니저에 신호를 주고
-        // 교란기 피격 -> 게임매니저에 보내서 처리하게 함
-        // 교란기가 생길 위치를 저장하고 그걸 데이터매니저에 보낸다음 위치를 가져오기
-        // 0단계 파괴되는 조건만1
+
         public bool deBug;
-        public float interaction = 4;           // 상호작용 거리(기본 4)
-        [SerializeField] GameObject hologram;   // 교란기 위의 홀로그램의 회전을 주기 위함
-        [SerializeField] Slider hpGauge;        // 체력게이지
-        [SerializeField] float fixTurnSpeed;    // 고정 회전속도
-        [SerializeField] float turnSpeed;       // 회전속도
-        [SerializeField] int fixHP;             // 고정시킬 체력
-        [SerializeField] int currentHP;         // 현재 HP
-        public bool disruptorHit;               // 피격당했을 때 멈추는 상태로 넘어가게 하기
-        [SerializeField] Material mat1;         // 활성화시 홀로그램 색상(파랑)
-        [SerializeField] Material mat2;         // 멈출시 홀로그램 색상9빨강)
+        public float interaction = 4;         
+        [SerializeField] GameObject hologram; 
+        [SerializeField] Slider hpGauge;      
+        [SerializeField] Slider repairGauge;
+        [SerializeField] float fixTurnSpeed;  
+        [SerializeField] float turnSpeed;     
+        [SerializeField] float repair;
+        [SerializeField] float maxRepair;
+        public float repairTime;
+        [SerializeField] int testRepair;
+        [SerializeField] int testCur;
+        [SerializeField] int fixHP;           
+        [SerializeField] int currentHP;       
+        public bool disruptorHit;             
+        [SerializeField] Material mat1;       
+        [SerializeField] Material mat2;       
         [SerializeField] new Renderer renderer;
+
         public Transform Player;
 
-        public enum State { Activate, Destroyed, Stop }
+        public enum State { Activate, Stop, Success, Destroyed }
         State state = State.Activate;
 
         private void Start()
         {
-            // 임시로 시작시 바로 실행
             GameStart();
-
+        }
+        private void dam(int damage)
+        {
+            if (Input.GetKeyDown(KeyCode.Space)) 
+            {
+                Hit(damage);
+            }
         }
         
         private void SetDisruptor()
@@ -46,24 +55,37 @@ namespace Park_Woo_Young
             renderer.sharedMaterial = mat1;
             turnSpeed = fixTurnSpeed;
             currentHP = fixHP;
+            repair = 0;
             SetDisruptor();
         }
 
         private void Hit(int damage)
         {
-            currentHP -= damage;
             disruptorHit = true;
+            if (repair > 0)
+            {
+                repair -= damage;
+            }
+            else
+            {
+                currentHP -= damage;
+            }
         }
         
         private void HpGauge()
         {
-            
             hpGauge.value = currentHP;
         }
-        
+        private void RepairGauge()
+        {
+            repairGauge.value = repair;
+        }
+
         private void Update()
         {
-            HpGauge();     // 체력게이지
+            dam(10);
+            HpGauge();     
+            RepairGauge();
             switch (state)
             {
                 case State.Activate:
@@ -71,6 +93,9 @@ namespace Park_Woo_Young
                     break;
                 case State.Stop:
                     StopDisruptor();
+                    break;
+                case State.Success:
+                    SuccessUpdate();
                     break;
                 case State.Destroyed:
                     DestroyedUpdate();
@@ -81,12 +106,31 @@ namespace Park_Woo_Young
         public void ActivateUpdate()
         {
             Rotate();
-
+            repairTime += Time.deltaTime;
+            if (repairTime > 1)
+            {
+                if (currentHP < fixHP)
+                {
+                    repairTime = 0;
+                    currentHP += testCur;
+                }
+                else if (currentHP == fixHP) 
+                {
+                    repairTime = 0;
+                    repair += testRepair;
+                }
+            }
             if (currentHP <= 0)
             {
-                //SceneManager.LoadScene(""); // 교란기 파괴시 여기에서 신을 불러와주기.
+                //SceneManager.LoadScene("");
                 state = State.Destroyed;
-                print("교란기 파괴");
+                print("占쏙옙占쏙옙占쏙옙 占식깍옙");
+            }
+            if (repair >= maxRepair)
+            {
+                //SceneManager.LoadScene("");
+                state = State.Success;
+                print("占쏙옙占쏙옙占쏙옙 占쏙옙占쏙옙占쏙옙占쏙옙");
             }
             if (disruptorHit)
             {
@@ -97,9 +141,10 @@ namespace Park_Woo_Young
                 
             }
         }
-        // 교란기 재가동
+ 
         private void StopDisruptor()
         {
+            print("1");
             if(!disruptorHit)
             {
                 GameManager.Enemy.ChangeTarget(true);
@@ -107,6 +152,11 @@ namespace Park_Woo_Young
                 state = State.Activate;
                 renderer.sharedMaterial = mat1;
             }
+        }
+
+        private void SuccessUpdate()
+        {
+
         }
 
         public void DestroyedUpdate()
@@ -139,10 +189,10 @@ namespace Park_Woo_Young
             if (other.tag == "Player")     
             {
                 Player = other.transform;   
-                float ToPlayer = Vector3.Distance(transform.position, other.transform.position); // 플레이어와 교란기 사이의 위치 구하기
-                if (Player != null && ToPlayer < interaction)        // 플레이어면서 수리가능한 범위안에 들어왔을 때
+                float ToPlayer = Vector3.Distance(transform.position, other.transform.position);
+                if (Player != null && ToPlayer < interaction)        
                 {
-                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // 교란기가 피격당한 상태에서만 F키를 눌러 고칠 수 있음
+                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) 
                         disruptorHit = false;
                 }
                 else if (Player != null && ToPlayer > interaction)
