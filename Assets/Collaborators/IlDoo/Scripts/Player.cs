@@ -39,12 +39,16 @@ namespace ildoo
 
         private void SetPlayerColor()
         {
-            int playerNumber = photonView.OwnerActorNr; 
+            int playerNumber = photonView.ViewID;
             if (playerColorList == null || playerColorList.Count <= playerNumber)
                 return; 
             playerRender.material.color = playerColorList[playerNumber];
         }
 
+        public int UniquePlayerNumber()
+        {
+            return photonView.ViewID; 
+        }
        //In case of Death and Revive
         
         private void OnEnable() 

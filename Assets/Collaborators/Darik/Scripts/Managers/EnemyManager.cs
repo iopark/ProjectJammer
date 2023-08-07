@@ -17,30 +17,16 @@ namespace Darik
             enemyList = new List<Enemy>();
         }
 
-        private void OnEnable()
-        {
-            GameManager.Data.OnChangedTarget += ChangeTarget;
-        }
-
-        private void OnDisable()
-        {
-            GameManager.Data.OnChangedTarget -= ChangeTarget;
-        }
-
-        private void ChangeTarget(bool isDisruptorActivated)
+        public void ChangeTarget(bool isDisruptorActivated)
         {
             this.isDisruptorActivated = isDisruptorActivated;
             if (!isDisruptorActivated)
-            {/*
-                foreach (Player player in PhotonNetwork.PlayerList)
+            {
+                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+                foreach (GameObject player in players)
                 {
-                    if (player.ActorNumber == PhotonNetwork.MasterClient.ActorNumber)
-                    {
-                        targetPlayerID = player.ActorNumber;
-                        Debug.Log(PhotonView.Find(targetPlayerID).gameObject.name);
-                        break;
-                    }
-                }*/
+                    targetPlayerID = player.GetComponent<ildoo.Player>().UniquePlayerNumber();
+                }
             }
         }
 
@@ -49,10 +35,9 @@ namespace Darik
             if (isDisruptorActivated)
                 return GameManager.Data.Disruptor;
             else
-            {/*
+            {
                 PhotonView pv = PhotonView.Find(targetPlayerID);
-                return pv.transform;*/
-                return GameObject.Find("PlayerHolder(Clone)").transform;
+                return pv.transform;
             }
         }
 

@@ -31,10 +31,13 @@ namespace Darik
 
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
         {
-            if (debug)
-                Debug.Log("Hitted");
+            if (curHp > 0)
+            {
+                if (debug)
+                    Debug.Log("Hitted");
 
-            photonView.RPC("Hit", RpcTarget.AllViaServer, damage, hitPoint, normal);
+                photonView.RPC("Hit", RpcTarget.AllViaServer, damage, hitPoint, normal);
+            }
         }
 
         [PunRPC]

@@ -10,7 +10,7 @@ namespace ildoo
     {
         public Gun currentGun;
 
-        private float nextFire;
+        [SerializeField] private float nextFire;
         public float fireRate { get; private set; }
         
         private void OnEnable()
@@ -36,9 +36,15 @@ namespace ildoo
             //either player is firing 
             if (currentGun.isReloading)
                 return;
-            if (currentGun.CurrentAmmo <= 0)
+            else if (currentGun.CurrentAmmo <= 0)
                 //TODO: Out of Ammo Interaction? 
                 return;
+            else if (Time.time < nextFire)
+            {
+                Debug.Log("Recharging"); 
+                return;
+            }
+
             //TODO: Make Auto Firing Rifle 
             Fire();
             //isShooting = input.isPressed;
