@@ -211,9 +211,10 @@ namespace Darik
 
             public override void Enter()
             {
-                owner.StartCoroutine(owner.NavDestinationCoroutine());
+                //owner.StartCoroutine(owner.NavDestinationCoroutine());
                 owner.isMove = true;
-                owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, true);
+                //owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, true);
+                anim.SetBool("IsWalk", true);
                 owner.stateText.text = "Walk";
             }
 
@@ -223,10 +224,10 @@ namespace Darik
                 {
                     owner.moveDir = GameManager.Enemy.FindTarget().transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
-                    /*
+                    
                     owner.moveDir.Normalize();
                     transform.Translate(owner.moveDir * owner.moveSpeed * Time.deltaTime, Space.World);
-                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(owner.moveDir.x, 0, owner.moveDir.z)), 0.1f);*/
+                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(owner.moveDir.x, 0, owner.moveDir.z)), 0.1f);
                 }
             }
 
@@ -241,9 +242,10 @@ namespace Darik
 
             public override void Exit()
             {
-                owner.StopAllCoroutines();
+                //owner.StopAllCoroutines();
                 owner.isMove = false;
-                owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, false);
+                //owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, false);
+                anim.SetBool("IsWalk", false);
             }
         }
 
