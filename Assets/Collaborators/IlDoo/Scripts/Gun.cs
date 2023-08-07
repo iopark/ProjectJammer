@@ -75,6 +75,8 @@ namespace ildoo
         {
             //animation?
             muzzleEffect.Play();
+            localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
+            PostShotWorkLocal(muzzlePoint.position, localEndPoint);
             photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
         }
 
@@ -95,17 +97,13 @@ namespace ildoo
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>();
                 hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
-                localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
-                PostShotWorkLocal(muzzlePoint.position, localEndPoint); 
-                photonView.RPC("PostShotWorkSync", RpcTarget.Others, muzzlePoint.position, hit.point);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, hit.point);
             }
             else
             {
-                localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
-                PostShotWorkLocal(muzzlePoint.position, localEndPoint);
                 //Where Quaternion.identity means no rotation value at all 
                 endPoint = centrePoint +(muzzlePoint.transform.forward * maxDistance);
-                photonView.RPC("PostShotWorkSync", RpcTarget.Others, muzzlePoint.position, endPoint);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, endPoint);
 
                 //Problem with this => in other's clients, bullet trail should be released from the muzzlepoint => *maxDistance. 
             }
@@ -125,6 +123,10 @@ namespace ildoo
         [PunRPC]
         public void PostShotWorkSync(Vector3 startPos, Vector3 endPos)
         {
+            if (photonView.IsMine)
+            {
+                return; 
+            }
             anim.SetTrigger("Fire");
             currentAmmo--;
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
