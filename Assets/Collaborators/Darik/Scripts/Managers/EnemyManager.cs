@@ -43,7 +43,7 @@ namespace Darik
 
         public void GenerateEnemy()
         {
-            GameObject enemy = PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(5, 0, 5), Quaternion.identity, 0);
+            GameObject enemy = PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
             enemyList.Add(enemy.GetComponent<Enemy>());
         }
     }
