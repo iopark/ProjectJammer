@@ -132,3 +132,8 @@ crashlytics-build.properties
 /Assets/Collaborators/IlDoo/Resources/BulletTrailTemp.prefab
 /Assets/Collaborators/IlDoo/Resources/BulletTrailTemp.prefab.meta
 /Assets/Collaborators/Darik/Animations
+/Assets/ProBuilder Data
+/Assets/ProBuilder Data.meta
+/ProjectSettings/Packages/com.unity.probuilder/Settings.json
+/ProjectSettings/GraphicsSettings.asset
+/ProjectSettings/NavMeshAreas.asset
