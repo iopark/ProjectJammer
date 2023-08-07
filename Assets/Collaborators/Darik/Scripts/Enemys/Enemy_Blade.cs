@@ -1,7 +1,6 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 
@@ -62,6 +61,15 @@ namespace Darik
             return (int)(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
         }
 
+        IEnumerator NavDestinationCoroutine()
+        {
+            while (true)
+            {
+                agent.destination = GameManager.Enemy.FindTarget().position;
+                yield return new WaitForSeconds(0.2f);
+            }
+        }
+
         [PunRPC]
         public override void Hit(int damage, Vector3 hitPoint, Vector3 normal)
         {
@@ -96,9 +104,15 @@ namespace Darik
         }
 
         [PunRPC]
-        public void SetTriggetAttack()
+        public void SetTriggerAttack()
         {
             anim.SetTrigger("OnAttack");
+        }
+
+        [PunRPC]
+        public void SetBoolMove(bool isWalk)
+        {
+            anim.SetBool("IsWalk", isWalk);
         }
 
         #region State
@@ -197,7 +211,9 @@ namespace Darik
 
             public override void Enter()
             {
+                //owner.StartCoroutine(owner.NavDestinationCoroutine());
                 owner.isMove = true;
+                //owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, true);
                 anim.SetBool("IsWalk", true);
                 owner.stateText.text = "Walk";
             }
@@ -208,7 +224,7 @@ namespace Darik
                 {
                     owner.moveDir = GameManager.Enemy.FindTarget().transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
-
+                    
                     owner.moveDir.Normalize();
                     transform.Translate(owner.moveDir * owner.moveSpeed * Time.deltaTime, Space.World);
                     transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(owner.moveDir.x, 0, owner.moveDir.z)), 0.1f);
@@ -226,7 +242,9 @@ namespace Darik
 
             public override void Exit()
             {
+                //owner.StopAllCoroutines();
                 owner.isMove = false;
+                //owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, false);
                 anim.SetBool("IsWalk", false);
             }
         }
