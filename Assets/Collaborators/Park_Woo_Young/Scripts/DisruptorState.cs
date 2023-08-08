@@ -8,7 +8,9 @@ namespace Park_Woo_Young
     {
         [SerializeField] GameObject hologram;            // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] GameObject test;
+        [SerializeField] float ttt;
         [SerializeField] new Renderer renderer;
+        public float t;
         [SerializeField] Material hologram_Blue;         // 활성화시 홀로그램 색상(파랑)
         [SerializeField] Material hologram_Red;          // 멈출시 홀로그램 색상(빨강)
         [SerializeField] Slider hp_Gauge;                // 체력게이지
@@ -97,7 +99,6 @@ namespace Park_Woo_Young
         private void Update()
         {
             TestHit(10);
-            TT();
 
             HpGauge();      
             ProgressGauge();
@@ -181,7 +182,7 @@ namespace Park_Woo_Young
         }
         public void SuccessUpdate()
         {
-
+            T1();
         }
 
         private void Rotate()
@@ -203,9 +204,18 @@ namespace Park_Woo_Young
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, interaction);
         }
+        private void T1()
+        {
+            t += Time.deltaTime;
+            if (t > 0.2)
+            {
+                test.transform.localScale = new Vector3(1f + ttt, 1f + ttt, 1f + ttt);
+            }
+        }
         public void TT()
         {
-            test.transform.localScale = new Vector3(1f + 1, 1f + 1, 1f + 1);
+            test.transform.localScale = new Vector3(1f +ttt, 1f +ttt, 1f +ttt);
+            ttt++;
         }
 
         public void Interact()
