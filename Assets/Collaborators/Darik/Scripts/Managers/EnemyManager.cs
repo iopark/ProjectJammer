@@ -8,6 +8,8 @@ namespace Darik
 {
     public class EnemyManager : MonoBehaviour
     {
+        [SerializeField] private bool debug;
+
         private List<Enemy> enemyList;
         private bool isDisruptorActivated;
         private int targetPlayerID;
@@ -43,8 +45,13 @@ namespace Darik
 
         public void GenerateEnemy()
         {
-            GameObject enemy = PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
-            enemyList.Add(enemy.GetComponent<Enemy>());
+            if (debug)
+                Debug.Log("Generate");
+
+            GameObject enemy_Blade = PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
+            enemyList.Add(enemy_Blade.GetComponent<Enemy>());
+            //GameObject enemy_Rifle = PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, 35), Quaternion.identity, 0);
+            //enemyList.Add(enemy_Rifle.GetComponent<Enemy>());
         }
     }
 }
