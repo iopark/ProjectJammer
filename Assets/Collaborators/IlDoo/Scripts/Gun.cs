@@ -78,7 +78,8 @@ namespace ildoo
         {
             //animation?
             muzzleEffect.Play();
-            localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
+            centrePoint = _gunCamera.ViewportToWorldPoint(middlePoint); 
+            localEndPoint = centrePoint +(_gunCamera.transform.forward * maxDistance);
             PostShotWorkLocal(muzzlePoint.position, localEndPoint);
             //photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
             photonView.RPC("ShotCalculationTwo", RpcTarget.MasterClient, camController.camCentrePoint, camController.camCentreForward);
