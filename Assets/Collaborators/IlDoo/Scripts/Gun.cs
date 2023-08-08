@@ -88,8 +88,6 @@ namespace ildoo
         [PunRPC]
         public void PlayerShotCalculation()
         {
-            //MasterClient calculation for shots 
-            //Shot dependency's on Camera Main
             centrePoint = _camera.ViewportToWorldPoint(middlePoint); 
             RaycastHit hit;
             if (Physics.Raycast(centrePoint, _camera.transform.forward, out hit, maxDistance, targetMask))
