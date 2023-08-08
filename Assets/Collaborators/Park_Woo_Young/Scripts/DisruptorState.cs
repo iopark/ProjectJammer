@@ -6,78 +6,90 @@ namespace Park_Woo_Young
 {
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable
     {
-
         public bool deBug;
-        public float interaction = 4;         
-        [SerializeField] GameObject hologram; // ÌôÄÎ°úÍ∑∏Îû®ÏùÑ ÎèåÎ¶¨Í∏∞ ÏúÑÌï®
-        [SerializeField] Slider hpGauge;      // Ï≤¥Î†•Í≤åÏù¥ÏßÄ
-        [SerializeField] Slider repairGauge;  // ÏàòÎ¶¨ÏßÑÌñâÎèÑ
-        [SerializeField] float fixTurnSpeed;  // Í≥†Ï†ïÏä§ÌîºÎìú(100)
-        [SerializeField] float turnSpeed;     // Î©àÏ∑ÑÏùÑÎïåÏôÄ ÎèåÏïÑÍ∞àÎïå Ïä§ÌîºÎìú(0)
-        [SerializeField] float repair;        // ÏàòÎ¶¨ÏßÑÌñâÎèÑ(0)
-        [SerializeField] float maxRepair;     // ÌÅ¥Î¶¨Ïñ¥ÌïòÍ∏∞ÏúÑÌïú ÏàòÎ¶¨ÏßÑÌñâÎèÑ(100)
-        public float repairTime;              // ÏàòÎ¶¨ÏßÑÌñâÎèÑÍ∞Ä Ïò¨ÎùºÍ∞ÄÍ∏∞ ÏúÑÌïú ÏãúÍ∞Ñ(1)
-        [SerializeField] int testRepair;      
-        [SerializeField] int testCur;
-        [SerializeField] int fixHP;           
-        [SerializeField] int currentHP;       
-        public bool disruptorHit;             
-        [SerializeField] Material mat1;       
-        [SerializeField] Material mat2;       
+        public float interaction = 4;                    // ªÛ»£¿€øÎ ∞≈∏Æ
+        [SerializeField] GameObject hologram;            // ±≥∂ı±‚ ¿ß¿« »¶∑Œ±◊∑•¿« »∏¿¸¿ª ¡÷±‚ ¿ß«‘
         [SerializeField] new Renderer renderer;
+        [SerializeField] Material hologram_Blue;         // »∞º∫»≠Ω√ »¶∑Œ±◊∑• ªˆªÛ(∆ƒ∂˚)
+        [SerializeField] Material hologram_Red;          // ∏ÿ√‚Ω√ »¶∑Œ±◊∑• ªˆªÛ(ª°∞≠)
+        [SerializeField] Slider hp_Gauge;                // √º∑¬∞‘¿Ã¡ˆ
+        [SerializeField] Slider progress_Gauge;          // ¡¯«‡µµ∞‘¿Ã¡ˆ
+        [SerializeField] int second;                     // ±≥∂ı±‚ ¡¯«‡µµ, √º∑¬ »∏∫πø° « ø‰«— Ω√∞£
 
+        [SerializeField] float maxTurnSpeed = 100;       // √÷¥Î »∏¿¸º”µµ
+        [SerializeField] int maxHP = 100;                // √÷¥Î √º∑¬
+        [SerializeField] int maxProgress = 100;          // ≈¨∏ÆæÓø° « ø‰«— ¡¯«‡µµ
+        [SerializeField] int progressGoesUp = 1;         // ±≥∂ı±‚ ¡¯«‡µµø° « ø‰«— Ω√∞£¿Ã √Ê¡∑µ«∏È ¡¯«‡µµ∞° ø√∂Û∞°¥¬ º”µµ
+        [SerializeField] int hpRepair = 1;               // √º∑¬∞®º“Ω√ Ω√∞£ø° µ˚∏• »∏∫πº”µµ
+
+        public float time; 
+        public bool disruptorHit;                        // ∞¯∞›¥Á«ﬂ¿ª ∂ß ∏ÿ√ﬂ¥¬ ªÛ≈¬∑Œ ≥—æÓ∞°∞‘ «œ±‚
         public Transform Player;
+        private float turnSpeed = 0;                     // »∏¿¸º”µµ
+        private int currentHP;                           // «ˆ¿Á HP(Ω√¿€Ω√ maxHp∂˚ ∞∞∞‘ º≥¡§«‘)
+        private int progress = 0;                        // «ˆ¿Á ¡¯«‡µµ
 
         public enum State { Activate, Stop, Success, Destroyed }
         State state = State.Activate;
 
         private void Start()
         {
+            // ¿”Ω√∑Œ Ω√¿€Ω√ πŸ∑Œ Ω««‡
             GameStart();
+
         }
         
         private void SetDisruptor()
         {
             GameManager.Data.Disruptor = this.transform;
             GameManager.Enemy.ChangeTarget(true);
-
         }
 
         public void GameStart()
         {
-            renderer.sharedMaterial = mat1;
-            turnSpeed = fixTurnSpeed;
-            currentHP = fixHP;
-            repair = 0;
+            renderer.sharedMaterial = hologram_Blue;
+            turnSpeed = maxTurnSpeed;
+            currentHP = maxHP;
             SetDisruptor();
         }
 
         private void Hit(int damage)
         {
-            disruptorHit = true;
-            if (repair > 0)
+            
+            if (progress > 0)
             {
-                repair -= damage;
+                progress -= damage;
             }
             else
             {
                 currentHP -= damage;
             }
+
+            disruptorHit = true;
         }
         
+        private void MaxGauge()
+        {
+            hp_Gauge.maxValue = maxHP;
+            progress_Gauge.maxValue = maxProgress;
+        }
         private void HpGauge()
         {
-            hpGauge.value = currentHP;
+            
+            hp_Gauge.value = currentHP;
         }
-        private void RepairGauge()
+        private void ProgressGauge()
         {
-            repairGauge.value = repair;
+            progress_Gauge.value = progress;
         }
+
 
         private void Update()
         {
-            HpGauge();     
-            RepairGauge();
+            HpGauge();      
+            ProgressGauge();
+            MaxGauge();      
+
             switch (state)
             {
                 case State.Activate:
@@ -87,7 +99,7 @@ namespace Park_Woo_Young
                     StopDisruptor();
                     break;
                 case State.Success:
-                    SuccessUpdate();
+                    SuccessUpdate(); 
                     break;
                 case State.Destroyed:
                     DestroyedUpdate();
@@ -98,62 +110,61 @@ namespace Park_Woo_Young
         public void ActivateUpdate()
         {
             Rotate();
-            repairTime += Time.deltaTime;
-            if (repairTime > 1)
+            time = Time.deltaTime;
+            if (time > second)
             {
-                if (currentHP < fixHP)
+                if (progress > 0)
                 {
-                    repairTime = 0;
-                    currentHP += testCur;
+                    progress += progressGoesUp;
+                    time = 0;
                 }
-                else if (currentHP == fixHP) 
+                if (progress == 0)
                 {
-                    repairTime = 0;
-                    repair += testRepair;
+                    currentHP += hpRepair;
+                    time = 0;
                 }
             }
-            if (currentHP <= 0)
+
+            if (currentHP == 0)
             {
-                //SceneManager.LoadScene("");
+                //SceneManager.LoadScene(""); // ±≥∂ı±‚ ∆ƒ±´Ω√ ø©±‚ø°º≠ Ω≈¿ª ∫“∑ØøÕ¡÷±‚.
                 state = State.Destroyed;
-                print("ÍµêÎûÄÍ∏∞ ÌååÍ¥¥Îê®");
+                print("±≥∂ı±‚ ∆ƒ±´");
             }
-            if (repair >= maxRepair)
+            if (progress == maxProgress)
             {
-                //SceneManager.LoadScene("");
+                //SceneManager.LoadScene(""); // ±≥∂ı±‚ º∫∞¯ ø©±‚ø°º≠ Ω≈¿ª ∫“∑ØøÕ¡÷±‚.
                 state = State.Success;
-                print("ÍµêÎûÄÍ∏∞Í∞Ä ÏôÑÎ≤ΩÌïòÍ≤å ÏàòÎ¶¨Îê®");
+                print("±≥∂ı±‚ øœ¿¸∞°µø");
             }
             if (disruptorHit)
             {
                 turnSpeed = 0;
                 state = State.Stop;
                 GameManager.Enemy.ChangeTarget(false);
-                renderer.sharedMaterial = mat2;
+                renderer.sharedMaterial = hologram_Red;
                 
             }
         }
- 
+        // ±≥∂ı±‚ ¿Á∞°µø
         private void StopDisruptor()
         {
-            print("1");
             if(!disruptorHit)
             {
                 GameManager.Enemy.ChangeTarget(true);
-                turnSpeed = fixTurnSpeed;
+                turnSpeed = maxTurnSpeed;
                 state = State.Activate;
-                renderer.sharedMaterial = mat1;
+                renderer.sharedMaterial = hologram_Blue;
             }
-        }
-
-        private void SuccessUpdate()
-        {
-
         }
 
         public void DestroyedUpdate()
         {
             
+        }
+        public void SuccessUpdate()
+        {
+
         }
 
         private void Rotate()
@@ -181,11 +192,13 @@ namespace Park_Woo_Young
             if (other.tag == "Player")     
             {
                 Player = other.transform;   
-                float ToPlayer = Vector3.Distance(transform.position, other.transform.position);
-                if (Player != null && ToPlayer < interaction)        
+                float ToPlayer = Vector3.Distance(transform.position, other.transform.position); // «√∑π¿ÃæÓøÕ ±≥∂ı±‚ ªÁ¿Ã¿« ¿ßƒ° ±∏«œ±‚
+                if (Player != null && ToPlayer < interaction)        // «√∑π¿ÃæÓ∏Èº≠ ºˆ∏Æ∞°¥…«— π¸¿ßæ»ø° µÈæÓø‘¿ª ∂ß
                 {
-                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) 
-                        disruptorHit = false;
+                    if (Input.GetKeyDown(KeyCode.F) && disruptorHit) // ±≥∂ı±‚∞° ««∞›¥Á«— ªÛ≈¬ø°º≠∏∏ F≈∞∏¶ ¥≠∑Ø ∞Ìƒ• ºˆ ¿÷¿Ω
+                    {
+                        RepairInteraction();
+                    }
                 }
                 else if (Player != null && ToPlayer > interaction)
                 {
@@ -194,16 +207,10 @@ namespace Park_Woo_Young
             }
         }
 
-        public void DisruptorActivate()
+        public void RepairInteraction()
         {
-            if (disruptorHit)
-            {
-                disruptorHit = false;
-            }
-            else
-            {
-                return;
-            }
+            photonView.RPC("Repair", RpcTarget.All);
+            
         }
     }
 }
