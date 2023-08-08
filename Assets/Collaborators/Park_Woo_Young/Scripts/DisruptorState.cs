@@ -51,16 +51,18 @@ namespace Park_Woo_Young
             hologramRotSpeed = maxHologramRotSpeed;
             currentHP = maxHP;
             SetDisruptor();
+            progress = 1;
+            
         }
 
         private void Hit(int damage)
         {
             
-            if (progress > 0)
+            if (progress >= 0)
             {
                 progress -= damage;
             }
-            else
+            else if (progress < 0)
             {
                 currentHP -= damage;
             }
@@ -113,7 +115,7 @@ namespace Park_Woo_Young
             time += Time.deltaTime;
             if (time > second)
             {
-                if (progress >= 0)
+                if (progress > 0)
                 {
                     progress += progressGoesUp;
                     time = 0;
