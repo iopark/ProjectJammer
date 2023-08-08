@@ -1,10 +1,7 @@
-using Photon.Pun; 
+using Photon.Pun;
 using UnityEngine;
-using System;
 using System.Collections;
 using Darik;
-using UnityEngine.Events;
-using LDW;
 using UnityEngine.Animations.Rigging;
 
 namespace ildoo
@@ -81,8 +78,7 @@ namespace ildoo
             centrePoint = _gunCamera.ViewportToWorldPoint(middlePoint); 
             localEndPoint = centrePoint +(_gunCamera.transform.forward * maxDistance);
             PostShotWorkLocal(muzzlePoint.position, localEndPoint);
-            //photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
-            photonView.RPC("ShotCalculationTwo", RpcTarget.MasterClient, camController.camCentrePoint, camController.camCentreForward);
+            photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient, camController.camCentrePoint, camController.camCentreForward);
         }
         //ShotCalculationV1 
 
@@ -90,32 +86,8 @@ namespace ildoo
         Vector3 middlePoint = new Vector3(0.5f, 0.5f, 0);
         Vector3 localEndPoint; 
         Vector3 endPoint; 
-
         [PunRPC]
-        public void PlayerShotCalculation()
-        {
-            centrePoint = camController.camCentrePoint; 
-            RaycastHit hit;
-            if (Physics.Raycast(centrePoint, camController.camCentreForward, out hit, maxDistance, targetMask))
-            {
-                //이펙트에 대해서 오브젝트 풀링으로 구현 
-                IHittable hittableObj = hit.transform.GetComponent<IHittable>();
-                hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
-                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, hit.point);
-            }
-            else
-            {
-                //Where Quaternion.identity means no rotation value at all 
-                endPoint = centrePoint +(muzzlePoint.transform.forward * maxDistance);
-                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, endPoint);
-
-                //Problem with this => in other's clients, bullet trail should be released from the muzzlepoint => *maxDistance. 
-            }
-        }
-
-        //ShotCalculationV2 
-        [PunRPC]
-        public void ShotCalculationTwo(Vector3 shotPoint, Vector3 shotPointForward)
+        public void PlayerShotCalculation(Vector3 shotPoint, Vector3 shotPointForward)
         {
             RaycastHit hit;
             if (Physics.Raycast(shotPoint, shotPointForward, out hit, maxDistance, targetMask))

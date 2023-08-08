@@ -46,7 +46,7 @@ public class PlayerMelee : MonoBehaviourPun
 
     }
     #region Melee Attack Under Construction 
-    //Coroutine Striking;
+    //Coroutine StrikeAnim;
     //IEnumerator Striking()
     //{
     //    isSwinging = true;
