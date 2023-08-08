@@ -15,6 +15,7 @@ namespace ildoo
         [SerializeField] private Transform muzzlePoint;
         Camera _camera;
         Camera _gunCamera;
+        FPSCameraController camController; 
         [SerializeField] LayerMask targetMask; 
 
         //AMMO
@@ -54,7 +55,9 @@ namespace ildoo
         {
             _camera = Camera.main;
             _gunCamera = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
+            camController = GetComponent<FPSCameraController>();
             anim = GetComponent<Animator>();
+
             //defaultGunInfo = GetComponent<GunData>();
             reloadInterval = defaultGunInfo.ReloadRate;
             reloadYieldInterval = new WaitForSeconds(reloadInterval); 
@@ -77,8 +80,10 @@ namespace ildoo
             muzzleEffect.Play();
             localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
             PostShotWorkLocal(muzzlePoint.position, localEndPoint);
-            photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
+            //photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient);
+            photonView.RPC("ShotCalculationTwo", RpcTarget.MasterClient, camController.camCentrePoint, camController.camCentreForward);
         }
+        //ShotCalculationV1 
 
         Vector3 centrePoint;
         Vector3 middlePoint = new Vector3(0.5f, 0.5f, 0);
@@ -88,9 +93,9 @@ namespace ildoo
         [PunRPC]
         public void PlayerShotCalculation()
         {
-            centrePoint = _camera.ViewportToWorldPoint(middlePoint); 
+            centrePoint = camController.camCentrePoint; 
             RaycastHit hit;
-            if (Physics.Raycast(centrePoint, _camera.transform.forward, out hit, maxDistance, targetMask))
+            if (Physics.Raycast(centrePoint, camController.camCentreForward, out hit, maxDistance, targetMask))
             {
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>();
@@ -101,6 +106,28 @@ namespace ildoo
             {
                 //Where Quaternion.identity means no rotation value at all 
                 endPoint = centrePoint +(muzzlePoint.transform.forward * maxDistance);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, endPoint);
+
+                //Problem with this => in other's clients, bullet trail should be released from the muzzlepoint => *maxDistance. 
+            }
+        }
+
+        //ShotCalculationV2 
+        [PunRPC]
+        public void ShotCalculationTwo(Vector3 shotPoint, Vector3 shotPointForward)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(shotPoint, shotPointForward, out hit, maxDistance, targetMask))
+            {
+                //이펙트에 대해서 오브젝트 풀링으로 구현 
+                IHittable hittableObj = hit.transform.GetComponent<IHittable>();
+                hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, hit.point);
+            }
+            else
+            {
+                //Where Quaternion.identity means no rotation value at all 
+                endPoint = shotPoint + (muzzlePoint.transform.forward * maxDistance);
                 photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, endPoint);
 
                 //Problem with this => in other's clients, bullet trail should be released from the muzzlepoint => *maxDistance. 
