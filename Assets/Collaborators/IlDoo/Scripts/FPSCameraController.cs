@@ -86,11 +86,11 @@ namespace ildoo
         //    if (stream.IsWriting)
         //    {
         //        stream.SendNext(camCentrePoint);
-        //        stream.SendNext(camCentreForward); 
+        //        stream.SendNext(camCentreForward);
         //    }
         //    else
         //    {
-        //        camCentrePoint = (Vector3)stream.ReceiveNext(); 
+        //        camCentrePoint = (Vector3)stream.ReceiveNext();
         //        camCentreForward = (Vector3)stream.ReceiveNext();
         //    }
         //}
