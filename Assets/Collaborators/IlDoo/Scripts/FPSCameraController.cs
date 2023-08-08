@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace ildoo
 {
-    public class FPSCameraController : MonoBehaviourPun, IPunObservable
+    public class FPSCameraController : MonoBehaviourPun
     {
         [SerializeField] float mouseSensitivity;
         [SerializeField] Transform cameraRoot;
@@ -81,19 +81,19 @@ namespace ildoo
         }
 
         #region Deprecated 
-        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-        {
-            if (stream.IsWriting)
-            {
-                stream.SendNext(camCentrePoint);
-                stream.SendNext(camCentreForward);
-            }
-            else
-            {
-                camCentrePoint = (Vector3)stream.ReceiveNext();
-                camCentreForward = (Vector3)stream.ReceiveNext();
-            }
-        }
+        //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        //{
+        //    if (stream.IsWriting)
+        //    {
+        //        stream.SendNext(camCentrePoint);
+        //        stream.SendNext(camCentreForward);
+        //    }
+        //    else
+        //    {
+        //        camCentrePoint = (Vector3)stream.ReceiveNext();
+        //        camCentreForward = (Vector3)stream.ReceiveNext();
+        //    }
+        //}
         #endregion
     }
 }
