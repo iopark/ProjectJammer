@@ -14,6 +14,8 @@ namespace Darik
         [SerializeField] private TMP_Text stateText;
         [SerializeField] private float appearTime = 3f;
         [SerializeField] private int attackRange;
+        [SerializeField] private float fireCoolTime = 0.5f;
+        [SerializeField] private float bashCoolTime = 3f;
 
         private Vector3 moveDir;
         private bool isMove = false;
@@ -71,8 +73,40 @@ namespace Darik
         }
 
         [PunRPC]
-        public void SetTriggerAttack()
+        public override void Hit(int damage, Vector3 hitPoint, Vector3 normal)
         {
+            base.Hit(damage, hitPoint, normal);
+
+            if (debug)
+                Debug.Log($"hitted, current Hp : {curHp} / {maxHp}");
+
+            if (curHp <= 0)
+            {
+                isDie = true;
+                stateMachine.ChangeState(State.Die);
+            }
+
+            if (!isMove)
+                anim.SetTrigger("OnHit");
+        }
+
+        IEnumerator AttackCoroutine()
+        {
+            while (reload)
+            {
+                reload = false;
+                photonView.RPC("Fire", RpcTarget.AllViaServer);
+                yield return new WaitForSeconds(fireCoolTime);
+                reload = true;
+            }
+        }
+
+        [PunRPC]
+        public void Fire()
+        {
+            if (debug)
+                Debug.Log("Fire");
+            //PhotonNetwork.Instantiate("EnemyBullet", transform.position, Quaternion.identity);
             anim.SetTrigger("OnAttack");
         }
 
@@ -236,6 +270,9 @@ namespace Darik
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
+                    
+                    owner.moveDir.Normalize();
+                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(owner.moveDir), 0.1f);
                 }
             }
 
