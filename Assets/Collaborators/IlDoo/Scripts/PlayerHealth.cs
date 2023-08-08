@@ -33,8 +33,8 @@ namespace ildoo {
             //UI activity? 
             //Sound? 
 
-            ParticleSystem effect = GameManager.Resource.Instantiate(afterShot, hitPoint, Quaternion.LookRotation(normal), true); 
-            effect.transform.SetParent(transform); 
+            //ParticleSystem effect = GameManager.Resource.Instantiate(afterShot, hitPoint, Quaternion.LookRotation(normal), true); 
+            //effect.transform.SetParent(transform); 
 
             if (health <= 0) { 
                 Death(); 
