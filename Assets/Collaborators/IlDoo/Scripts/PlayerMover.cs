@@ -139,7 +139,7 @@ namespace ildoo
                 rigid.velocity = (Vector3)stream.ReceiveNext();
                 float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
                 rigid.position += rigid.velocity * lag;
-                transform.position = rigid.position;    
+                //transform.position = rigid.position;
             }
         }
         //private void Jump()
