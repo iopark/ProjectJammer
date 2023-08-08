@@ -39,7 +39,7 @@ namespace ildoo
 
         private void SetPlayerColor()
         {
-            int playerNumber = photonView.ViewID;
+            int playerNumber = photonView.OwnerActorNr;
             if (playerColorList == null || playerColorList.Count <= playerNumber)
                 return; 
             playerRender.material.color = playerColorList[playerNumber];
