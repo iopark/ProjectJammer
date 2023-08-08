@@ -4,19 +4,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInteractor : MonoBehaviourPun
+namespace ildoo
 {
-    [SerializeField] float distToDistruptor;
-    FPSCameraController camController;
-
-    private void Awake()
+    public class PlayerInteractor : MonoBehaviourPun
     {
-        camController = GetComponent<FPSCameraController>();
-    }
+        [SerializeField] float distToDistruptor;
+        FPSCameraController camController;
 
-    [PunRPC] 
-    public void AttemptToActivate()
-    {
+        private void Awake()
+        {
+            camController = GetComponent<FPSCameraController>();
+        }
 
+        [PunRPC]
+        public void AttemptToActivate()
+        {
+
+        }
     }
 }
+
