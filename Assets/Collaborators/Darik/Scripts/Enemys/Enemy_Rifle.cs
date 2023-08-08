@@ -2,7 +2,6 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace Darik
@@ -35,6 +34,7 @@ namespace Darik
 
         private void Start()
         {
+            stateText.text = "Start";
             stateMachine.SetUp(State.Appear);
         }
 
