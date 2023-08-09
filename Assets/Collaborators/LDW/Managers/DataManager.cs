@@ -11,12 +11,15 @@ namespace LDW
     {
         public class PlayerData
         {
-            public string name;
+            public int viewId;
             public int hp;
+            public int ammo;
         }
 
         public PlayerData playerData = new PlayerData();
         public Transform Disruptor;
+
+        public Dictionary<int, PlayerData> playerDict { get; private set; } = new Dictionary<int, PlayerData>();
 
         public MySqlConnection con;
         public MySqlDataReader reader;
@@ -64,9 +67,9 @@ namespace LDW
             disruptorHP = 100;
         }
 
-        public void SetDisruptorHP(int hp)
+        public void SetDisruptorProgress(int progress)
         {
-            disruptorHP = hp;
+            disruptorProgress = progress;
         }
     }
 }
