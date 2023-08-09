@@ -12,11 +12,18 @@ namespace Darik
         [SerializeField] private int damage;
         [SerializeField] private float moveSpeed = 1f;
 
+        private TrailRenderer trailRenderer;
         private bool isDestroyed = false;
         private float curTime;
 
+        private void Awake()
+        {
+            trailRenderer = GetComponent<TrailRenderer>();
+        }
+
         private void OnEnable()
         {
+            trailRenderer.Clear();
             isDestroyed = false;
             curTime = 0f;
         }
