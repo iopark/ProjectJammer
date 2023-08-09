@@ -58,8 +58,8 @@ namespace Darik
 
                 GameObject enemy_blade = PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
                 enemyList.Add(enemy_blade.GetComponent<Enemy>());
-                //GameObject enemy_Rifle = PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, 35), Quaternion.identity, 0);
-                //enemyList.Add(enemy_Rifle.GetComponent<Enemy>());
+                GameObject enemy_Rifle = PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, 35), Quaternion.identity, 0);
+                enemyList.Add(enemy_Rifle.GetComponent<Enemy>());
                 yield return new WaitForSeconds(SpawnCoolTime);
             }
         }
