@@ -325,7 +325,7 @@ namespace Darik
 
             public override void Exit()
             {
-
+                anim.SetBool("IsDie", false);
             }
         }
         #endregion
