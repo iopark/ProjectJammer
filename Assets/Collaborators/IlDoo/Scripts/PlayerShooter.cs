@@ -114,10 +114,13 @@ namespace ildoo
         
         IEnumerator RapidFire()
         {
-            while (true)
+            while (isShooting && currentGun.CurrentAmmo > 0)
             {
+                isRapidFiring = true; 
                 Fire();
+                yield return null; 
             }
+            isRapidFiring = false; 
         }
     }
 }
