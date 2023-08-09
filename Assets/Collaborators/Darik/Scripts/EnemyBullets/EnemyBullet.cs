@@ -8,22 +8,16 @@ namespace Darik
     public class EnemyBullet : MonoBehaviour
     {
         [SerializeField] private bool debug;
+        [SerializeField] private TrailRenderer trailRenderer;
         [SerializeField] LayerMask ignoreLayerMask;
         [SerializeField] private int damage;
         [SerializeField] private float moveSpeed = 1f;
 
-        private TrailRenderer trailRenderer;
         private bool isDestroyed = false;
         private float curTime;
 
-        private void Awake()
-        {
-            trailRenderer = GetComponent<TrailRenderer>();
-        }
-
         private void OnEnable()
         {
-            trailRenderer.Clear();
             isDestroyed = false;
             curTime = 0f;
         }
@@ -53,6 +47,7 @@ namespace Darik
             if (!isDestroyed)
             {
                 isDestroyed = true;
+                trailRenderer.Clear();
                 GameManager.Resource.Destroy(gameObject);
             }
         }
