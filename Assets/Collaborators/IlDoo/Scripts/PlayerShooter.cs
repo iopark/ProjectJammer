@@ -1,8 +1,10 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions; 
 
 namespace ildoo
 {
@@ -14,11 +16,14 @@ namespace ildoo
         Animator anim;
         [SerializeField] Rig leftArmRig;
         [SerializeField] Rig rightArmRig;
-        bool isSwinging; 
+        bool isSwinging;
+        bool isRapidFiring; 
+        bool isShooting; 
         public float fireRate { get; private set; }
-        
+        [SerializeField] float rapidFireEval;
         private void OnEnable()
         {
+            var 
             nextFire = 0f;
         }
 
@@ -27,6 +32,8 @@ namespace ildoo
             anim = GetComponent<Animator>();
             fireRate = currentGun.fireRate;
             isSwinging = false;
+            isRapidFiring = false; 
+            isShooting = false;
         }
         private void Update()
         {
@@ -39,11 +46,48 @@ namespace ildoo
             //{
             //    Fire(); 
             //}
+            ContestForRapidFire(); 
         }
 
-        private void OnFire(InputValue input)
+        private void ContestForRapidFire()
         {
+
+        }
+        float holdTimer = 0f;  
+        private void OnFire(InputValue value)
+        {
+            
+        }
+        public void OnFire(InputAction.CallbackContext context)
+        {
+            //isShooting = value.isPressed;
+            //Fire();
+            //if (value.Get<>)
             //either player is firing 
+            if (context.started)
+            {
+                //Register, try for fire. 
+                //Run the Hold Timer for further analysis on the Rapid Firing 
+                if (context.duration >= rapidFireEval && !isRapidFiring)
+                {
+                    isRapidFiring = true;
+                    StartCoroutine(RapidFire());
+                }
+                else
+                {
+                    Fire();
+                }
+            }
+            else if (context.canceled)
+            {
+                isRapidFiring = false;
+                holdTimer = 0f;
+                StopAllCoroutines();
+                //If there has been any 
+            }
+        }
+        public void Fire()
+        {
             if (currentGun.isReloading)
                 return;
             else if (currentGun.CurrentAmmo <= 0)
@@ -53,13 +97,7 @@ namespace ildoo
                 return;
             }
             else if (isSwinging)
-                return; 
-
-            //TODO: Make Auto Firing Rifle 
-            Fire();
-        }
-        public void Fire()
-        {
+                return;
             nextFire = Time.time + fireRate;
             currentGun.Fire();
         }
@@ -74,5 +112,12 @@ namespace ildoo
         }
         //Testing 
         
+        IEnumerator RapidFire()
+        {
+            while (true)
+            {
+                Fire();
+            }
+        }
     }
 }

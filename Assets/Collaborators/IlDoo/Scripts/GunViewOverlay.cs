@@ -1,3 +1,4 @@
+using ildoo;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +8,8 @@ public class GunViewOverlay : MonoBehaviourPun
 {
     [SerializeField] Transform MeleeStrikeView;
     [SerializeField] GameObject gunToShake;
-    [SerializeField] Transform shakePos; 
+    [SerializeField] Transform shakePos;
+    Gun playerGun; 
     Camera overlayCam;
     private void Awake()
     {
@@ -15,6 +17,7 @@ public class GunViewOverlay : MonoBehaviourPun
             return;
         overlayCam = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
         SetCamPos(); 
+        playerGun = GetComponentInParent<Gun>();
     }
     private void SetCamPos()
     {
@@ -46,26 +49,40 @@ public class GunViewOverlay : MonoBehaviourPun
 
     }
 
-    private void ShakeCam()
+    public void ShakeCam()
     {
-
+        StopAllCoroutines();
+        StartCoroutine(GunShake()); 
     }
+
+
     //Transform originalPos;
 
     //float timer; 
     //const float shakeTiming = 0.3f; 
 
-    //IEnumerator GunShake()
-    //{
-    //    overlayCam.gameObject.transform.SetParent(MeleeStrikeView); 
-    //    while (timer < shakeTiming)
-    //    {
+    Vector2 randomSource;
+    Vector3 randomPos;
+    //This should be implemented through the localPositioning and rotation. 
 
-    //    }
-    //    yield return null; 
-    //    gunToShake.transform.position = originalPos.position;
-    //    gunToShake.transform.rotation = originalPos.rotation;
-    //    SetCamPos(); 
-    //}
+    const float returnTime = .15f;
+    float shakeTimer; 
+
+    IEnumerator GunShake()
+    {
+        randomSource = Random.insideUnitCircle;
+        randomPos.x = overlayCam.transform.position.x; 
+        randomPos.y = overlayCam.transform.position.y + randomSource.y;
+        randomPos.z = overlayCam.transform.position.z + Mathf.Abs(randomPos.x); 
+        overlayCam.transform.position = randomPos;
+        shakeTimer = 0f; 
+        while (shakeTimer < returnTime)
+        {
+            shakeTimer += Time.deltaTime;
+
+        }
+        yield return null;
+        SetCamPos();
+    }
     //Temporarily turn off 
 }

@@ -10,23 +10,18 @@ namespace ildoo
     {
        //Manages 1.Player Color      3.PlayerInput
         private PlayerInput playerInput;
-
         //=============Non Player Settings 
         [SerializeField] GunData nonPlayerGun; 
         [SerializeField] List<Color> playerColorList;
         [SerializeField] Renderer playerRender;
-
-        //Temporary Variable 
-        [SerializeField] Canvas crossHair; 
         
-       
+        //OnDeathSettings 
         private void Awake() 
         {
             playerInput = GetComponent<PlayerInput>();
             SetPlayerColor();
             if (!photonView.IsMine)
             {
-                crossHair.gameObject.SetActive(false);
                 int nonOwnerMask = LayerMask.NameToLayer("Default"); 
                 Destroy(playerInput);
                 SetGameLayerRecursive(gameObject, nonOwnerMask);

@@ -2,12 +2,13 @@ using System;
 using Darik; 
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace ildoo { 
 
     public class PlayerHealth : MonoBehaviourPun, IHittable
-{ 
-    
+    {
+        public UnityAction onDeath; 
         public int health; 
         public bool isDead; 
         public const int fixedHealth = 100; 
@@ -45,11 +46,11 @@ namespace ildoo {
         {
             this.health = health; 
         }
-
         [PunRPC]
         private void Death() 
         { 
             isDead = true; 
+            onDeath?.Invoke();
             gameObject.SetActive(false); 
         }
     }
