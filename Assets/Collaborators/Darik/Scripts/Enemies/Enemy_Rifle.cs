@@ -14,6 +14,8 @@ namespace Darik
         [SerializeField] private TMP_Text stateText;
         [SerializeField] private float appearTime = 3f;
         [SerializeField] private int attackRange;
+
+        [SerializeField] Transform muzzlePosition;
         [SerializeField] private float fireCoolTime = 0.5f;
         [SerializeField] private float bashCoolTime = 3f;
 
@@ -36,7 +38,6 @@ namespace Darik
 
         private void Start()
         {
-            stateText.text = "Start";
             stateMachine.SetUp(State.Appear);
         }
 
@@ -106,7 +107,8 @@ namespace Darik
         {
             if (debug)
                 Debug.Log("Fire");
-            //PhotonNetwork.Instantiate("EnemyBullet", transform.position, Quaternion.identity);
+            Vector3 dir = ((target.position + Vector3.up * 1.666f) - muzzlePosition.position).normalized;
+            GameManager.Resource.Instantiate<GameObject>("Prefabs/EnemyBullets/EnemyBullet", muzzlePosition.position, Quaternion.LookRotation(dir), true);
             anim.SetTrigger("OnAttack");
         }
 
@@ -259,7 +261,7 @@ namespace Darik
             public override void Enter()
             {
                 owner.reload = true;
-                //owner.StartCoroutine(owner.AttackCoroutine());
+                owner.StartCoroutine(owner.AttackCoroutine());
                 owner.stateText.text = "Attack";
             }
 
@@ -325,7 +327,7 @@ namespace Darik
 
             public override void Exit()
             {
-
+                anim.SetBool("IsDie", false);
             }
         }
         #endregion

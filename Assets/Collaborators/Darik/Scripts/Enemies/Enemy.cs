@@ -54,8 +54,7 @@ namespace Darik
         {
             curHp -= damage;
 
-            GameObject hitEffect = PhotonNetwork.Instantiate("HitEffect", hitPoint, Quaternion.LookRotation(normal));
-            hitEffect.transform.SetParent(transform);
+            GameManager.Resource.Instantiate<GameObject>("Prefabs/Effects/HitEffect", hitPoint, Quaternion.LookRotation(normal), transform, true);
         }
     }
 }
