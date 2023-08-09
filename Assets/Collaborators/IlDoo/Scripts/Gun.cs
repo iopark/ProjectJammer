@@ -40,6 +40,10 @@ namespace ildoo
         [SerializeField] private ParticleSystem muzzleEffect;
         [SerializeField] private TrailRenderer bulletTrail;
         [SerializeField] float trailLastingTime;
+        [SerializeField] float smokeLastingTime; 
+
+        LineRenderer smokeLine;
+        WaitForSeconds smokeLastInterval; 
         WaitForSeconds bulletTrailTime;
 
         //ANIMATIONS
@@ -54,17 +58,19 @@ namespace ildoo
             _gunCamera = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
             camController = GetComponent<FPSCameraController>();
             anim = GetComponent<Animator>();
-
+            smokeLine = defaultGunInfo.gameObject.GetComponent<LineRenderer>();
             //defaultGunInfo = GetComponent<GunData>();
             reloadInterval = defaultGunInfo.ReloadRate;
             reloadYieldInterval = new WaitForSeconds(reloadInterval); 
             bulletTrailTime = new WaitForSeconds(trailLastingTime);
+            smokeLastInterval = new WaitForSeconds(smokeLastingTime);
             maxDistance = defaultGunInfo.MaxDistance;
             maxAmmo = defaultGunInfo.MaxAmmo;
             fireRate = defaultGunInfo.FireRate;
             gunDamage = defaultGunInfo.Damage;
             currentAmmo = maxAmmo;
         }
+
         private void OnEnable()
         {
             currentAmmo = maxAmmo;
@@ -75,8 +81,10 @@ namespace ildoo
         {
             //animation?
             muzzleEffect.Play();
+            smokeLine.SetPosition(0, muzzlePoint.position); 
             centrePoint = _gunCamera.ViewportToWorldPoint(middlePoint); 
             localEndPoint = centrePoint +(_gunCamera.transform.forward * maxDistance);
+            smokeLine.SetPosition(1, localEndPoint); 
             PostShotWorkLocal(muzzlePoint.position, localEndPoint);
             photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient, camController.camCentrePoint, camController.camCentreForward);
         }
@@ -112,9 +120,7 @@ namespace ildoo
         {
             anim.SetTrigger("Fire"); 
             currentAmmo--;
-            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailLocal", muzzlePoint.position, Quaternion.identity, true);
-            GameManager.Resource.Destroy(trail.gameObject, 3f);
-            shotEffect = StartCoroutine(ShotEffectLocal(trail,startPos, endPos)); 
+            shotEffect = StartCoroutine(ShotEffectLocal()); 
         }
 
         Coroutine shotEffectSync; 
@@ -128,23 +134,16 @@ namespace ildoo
             anim.SetTrigger("Fire");
             currentAmmo--;
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
-            GameManager.Resource.Destroy(trail.gameObject, 3f);
+            GameManager.Resource.Destroy(trail.gameObject, 2f);
             shotEffectSync = StartCoroutine(ShotEffectSync(trail, startPos, endPos));
         }
 
 
-        IEnumerator ShotEffectLocal(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
+        IEnumerator ShotEffectLocal()
         {
-            float totalTime = Vector2.Distance(startPos, endPos) / maxDistance;
-
-            float time = 0;
-            while (time < 1)
-            {
-                trail.transform.position = Vector3.Lerp(startPos, endPos, time);
-                time += Time.deltaTime / totalTime;
-
-                yield return null;
-            }
+            smokeLine.enabled = true; 
+            yield return null;
+            smokeLine.enabled = false;
         }
 
         IEnumerator ShotEffectSync(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
