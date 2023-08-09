@@ -8,21 +8,25 @@ namespace Darik
 {
     public class Enemy_Rifle : Enemy
     {
-        public enum State { Appear, Idle, Move, Attack, Die }
+        public enum State { Appear, Idle, Move, FireAttack, BashAttack, Die }
         StateMachine<State, Enemy_Rifle> stateMachine;
 
         [SerializeField] private TMP_Text stateText;
         [SerializeField] private float appearTime = 3f;
-        [SerializeField] private int attackRange;
+        [SerializeField] private float fireAttackRange = 10f;
+        [SerializeField] private float bashAttackRange = 1f;
+        [SerializeField] private float bashAttackTiming = 0.1f;
 
         [SerializeField] Transform muzzlePosition;
         [SerializeField] private float fireCoolTime = 0.5f;
         [SerializeField] private float bashCoolTime = 3f;
+        [SerializeField] private int bashAttackDamage = 1;
 
         private Vector3 moveDir;
         private bool isMove = false;
         private int squareDistanceToTarget;
-        private bool reload = true;
+        private bool fireReload = true;
+        private bool bashReload = true;
 
         protected override void Awake()
         {
@@ -32,7 +36,8 @@ namespace Darik
             stateMachine.AddState(State.Appear, new AppearState(this, stateMachine));
             stateMachine.AddState(State.Idle, new IdleState(this, stateMachine));
             stateMachine.AddState(State.Move, new MoveState(this, stateMachine));
-            stateMachine.AddState(State.Attack, new AttackState(this, stateMachine));
+            stateMachine.AddState(State.FireAttack, new FireAttackState(this, stateMachine));
+            stateMachine.AddState(State.BashAttack, new BashAttackState(this, stateMachine));
             stateMachine.AddState(State.Die, new DieState(this, stateMachine));
         }
 
@@ -91,14 +96,14 @@ namespace Darik
                 anim.SetTrigger("OnHit");
         }
 
-        IEnumerator AttackCoroutine()
+        IEnumerator FireAttackCoroutine()
         {
-            while (reload)
+            while (fireReload)
             {
-                reload = false;
+                fireReload = false;
                 photonView.RPC("Fire", RpcTarget.AllViaServer);
                 yield return new WaitForSeconds(fireCoolTime);
-                reload = true;
+                fireReload = true;
             }
         }
 
@@ -107,9 +112,32 @@ namespace Darik
         {
             if (debug)
                 Debug.Log("Fire");
+
             Vector3 dir = ((target.position + Vector3.up * 1.666f) - muzzlePosition.position).normalized;
             GameManager.Resource.Instantiate<GameObject>("Prefabs/EnemyBullets/EnemyBullet", muzzlePosition.position, Quaternion.LookRotation(dir), true);
-            anim.SetTrigger("OnAttack");
+            anim.SetTrigger("OnFireAttack");
+        }
+
+        IEnumerator BashAttackCoroutine()
+        {
+            while (bashReload)
+            {
+                bashReload = false;
+                photonView.RPC("SetTriggerBashAttack", RpcTarget.AllViaServer);
+                yield return new WaitForSeconds(bashAttackTiming);
+
+                if (debug)
+                    Debug.Log("Bash");
+                target.gameObject.GetComponent<IHittable>()?.TakeDamage(bashAttackDamage, Vector3.zero, transform.forward);
+                yield return new WaitForSeconds(bashCoolTime - bashAttackTiming);
+                bashReload = true;
+            }
+        }
+
+        [PunRPC]
+        public void SetTriggerBashAttack()
+        {
+            anim.SetTrigger("OnBashAttack");
         }
 
         [PunRPC]
@@ -234,8 +262,8 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget <= owner.attackRange)
-                    stateMachine.ChangeState(State.Attack);
+                if (owner.squareDistanceToTarget <= (owner.fireAttackRange * owner.fireAttackRange))
+                    stateMachine.ChangeState(State.FireAttack);
             }
 
             public override void Exit()
@@ -247,9 +275,9 @@ namespace Darik
             }
         }
 
-        private class AttackState : Enemy_RifleState
+        private class FireAttackState : Enemy_RifleState
         {
-            public AttackState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public FireAttackState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -260,9 +288,9 @@ namespace Darik
 
             public override void Enter()
             {
-                owner.reload = true;
-                owner.StartCoroutine(owner.AttackCoroutine());
-                owner.stateText.text = "Attack";
+                owner.fireReload = true;
+                owner.StartCoroutine(owner.FireAttackCoroutine());
+                owner.stateText.text = "FireAttack";
             }
 
             public override void Update()
@@ -283,8 +311,57 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget > owner.attackRange)
+                if (owner.squareDistanceToTarget <= (owner.bashAttackRange * owner.bashAttackRange))
+                    stateMachine.ChangeState(State.BashAttack);
+
+                if (owner.squareDistanceToTarget > (owner.fireAttackRange * owner.fireAttackRange))
                     stateMachine.ChangeState(State.Move);
+            }
+
+            public override void Exit()
+            {
+                owner.StopAllCoroutines();
+            }
+        }
+
+        private class BashAttackState : Enemy_RifleState
+        {
+            public BashAttackState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            {
+            }
+
+            public override void Setup()
+            {
+
+            }
+
+            public override void Enter()
+            {
+                owner.bashReload = true;
+                owner.StartCoroutine(owner.BashAttackCoroutine());
+                owner.stateText.text = "BashAttack";
+            }
+
+            public override void Update()
+            {
+                owner.SearchTarget();
+                if (owner.target != null)
+                {
+                    owner.moveDir = owner.target.transform.position - transform.position;
+                    owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
+
+                    owner.moveDir.Normalize();
+                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(owner.moveDir), 0.1f);
+                }
+            }
+
+            public override void Transition()
+            {
+                if (owner.target == null)
+                    stateMachine.ChangeState(State.Idle);
+
+                if (owner.squareDistanceToTarget > (owner.bashAttackRange * owner.bashAttackRange))
+                    stateMachine.ChangeState(State.FireAttack);
             }
 
             public override void Exit()
