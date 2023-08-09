@@ -1,4 +1,5 @@
 using MySql.Data.MySqlClient;
+using Park_Woo_Young;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,12 +9,20 @@ namespace LDW
 {
     public class DataManager : MonoBehaviour
     {
+        public class PlayerData
+        {
+            public string name;
+            public int hp;
+        }
+
+        public PlayerData playerData = new PlayerData();
         public Transform Disruptor;
 
         public MySqlConnection con;
         public MySqlDataReader reader;
 
         public int disruptorHP;
+        public int disruptorProgress;
 
         private void Start()
         {
@@ -53,16 +62,6 @@ namespace LDW
             JammerStatDict = LoadJson<JammerStatData, int, JammerStat>("JammerData").MakeDict();
 
             disruptorHP = 100;
-        }
-
-        public void SetDisruptor()
-        {
-            
-        }
-
-        public void DataSync()
-        {
-
         }
 
         public void SetDisruptorHP(int hp)
