@@ -1,4 +1,5 @@
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,29 +8,33 @@ namespace Park_Woo_Young
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable, IInteractable
     {
         [SerializeField] GameObject hologram;            // 교란기 위의 홀로그램의 회전을 주기 위함
-        [SerializeField] GameObject test;
-        [SerializeField] float ttt;
+        [SerializeField] GameObject emp;                 // 클리어시 생기는 이펙트
+        [SerializeField] TMP_Text progress_Text;         // 슬라이드를 대체할 텍스트 진행도
         [SerializeField] new Renderer renderer;
-        public float t;
         [SerializeField] Material hologram_Blue;         // 활성화시 홀로그램 색상(파랑)
         [SerializeField] Material hologram_Red;          // 멈출시 홀로그램 색상(빨강)
         [SerializeField] Slider hp_Gauge;                // 체력게이지
         [SerializeField] Slider progress_Gauge;          // 진행도게이지
-        [SerializeField] int perSecond;              // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
-
+        
+        [SerializeField] int perSecond = 1;              // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
         [SerializeField] float maxHologramRotSpeed = 100;// 홀로그램 최대 회전속도
         [SerializeField] int maxHP = 100;                // 최대 체력
         [SerializeField] int maxProgress = 100;          // 클리어에 필요한 진행도
         [SerializeField] int progressGoesUp = 1;         // 교란기 진행도에 필요한 시간이 충족되면 진행도가 올라가는 속도
         [SerializeField] int hpRepair = 1;               // 체력감소시 시간에 따른 회복속도
-
+        
         public float interaction = 4;                    // 상호작용 거리
         public float time;                               // 델타타임
         public bool disruptorHit;                        // 공격당했을 때 멈추는 상태로 넘어가게 하기
-        public bool deBug;                               // 탐지범위 기즈모로 확인
         private float hologramRotSpeed = 0;              // 홀로그램 현재 회전속도
         public int currentHP;                            // 현재 HP(시작시 maxHp랑 같게 설정함)
         public int progress = 0;                         // 현재 진행도
+        private float smallSwellingTime;                 // 처음 작은 범위로 확장하는 시간 
+        private float shrinkageTime;                     // 처음 확장한걸 다시 0으로 만드는데 걸리는 시간
+        private float empExplosionTime;                  // 0으로 만든뒤 계속 확장
+        private float smallSwellingRange;                // 업데이트 한번당 확장범위
+        private float Range;                             // 업데이트 한번당 수축 범위
+        private float EmpRange;                          // 수축된뒤 확장하는 범위
 
         public enum State { Activate, Stop, Success, Destroyed }
         State state = State.Activate;
@@ -39,7 +44,7 @@ namespace Park_Woo_Young
             GameStart();
 
         }
-        
+
         private void SetDisruptor()
         {
             GameManager.Data.Disruptor = this.transform;
@@ -53,15 +58,9 @@ namespace Park_Woo_Young
             currentHP = maxHP;
             perSecond = 1;
             SetDisruptor();
-            
+
         }
-        private void TestHit(int damage)
-        {
-            if(Input.GetKeyDown(KeyCode.E)) 
-            {
-                Hit(damage);
-            }
-        }
+
         private void Hit(int damage)
         {
             if (progress >= 0)
@@ -71,7 +70,7 @@ namespace Park_Woo_Young
                 {
                     progress = 0;
                 }
-                
+
             }
             if (progress == 0 || currentHP <= maxHP)
             {
@@ -79,7 +78,7 @@ namespace Park_Woo_Young
             }
             disruptorHit = true;
         }
-        
+
         private void MaxGauge()
         {
             hp_Gauge.maxValue = maxHP;
@@ -87,7 +86,7 @@ namespace Park_Woo_Young
         }
         private void HpGauge()
         {
-            
+
             hp_Gauge.value = currentHP;
         }
         private void ProgressGauge()
@@ -98,11 +97,10 @@ namespace Park_Woo_Young
 
         private void Update()
         {
-            TestHit(10);
-
-            HpGauge();      
+            HpGauge();
             ProgressGauge();
             MaxGauge();
+            
 
             switch (state)
             {
@@ -113,7 +111,7 @@ namespace Park_Woo_Young
                     StopDisruptor();
                     break;
                 case State.Success:
-                    SuccessUpdate(); 
+                    SuccessUpdate();
                     break;
                 case State.Destroyed:
                     DestroyedUpdate();
@@ -125,18 +123,17 @@ namespace Park_Woo_Young
         {
             Rotate();
             time += Time.deltaTime;
+            progress_Text.text = $"current Progress : {progress}/{maxProgress}";
             if (time > perSecond)
             {
                 if (progress >= 0 && currentHP == 100)
                 {
-                    print("1");
                     time = 0;
                     progress += progressGoesUp;
                     currentHP = maxHP;
                 }
-                else if (progress <= 0 && currentHP < 99 )
+                else if (progress <= 0 && currentHP < 99)
                 {
-                    print("2");
                     time = 0;
                     progress = 0;
                     currentHP += hpRepair;
@@ -147,6 +144,8 @@ namespace Park_Woo_Young
                 //SceneManager.LoadScene(""); // 교란기 성공 여기에서 신을 불러와주기.
                 state = State.Success;
                 print("교란기 완전가동");
+                progress_Text.color = Color.blue;
+                progress_Text.text = "Success";
             }
             if (disruptorHit)
             {
@@ -154,19 +153,23 @@ namespace Park_Woo_Young
                 state = State.Stop;
                 GameManager.Enemy.ChangeTarget(false);
                 renderer.sharedMaterial = hologram_Red;
-                
+                progress_Text.color = Color.red;
+
             }
         }
         // 교란기 재가동
         private void StopDisruptor()
         {
             time = 0;
-            if(!disruptorHit)
+            progress_Text.text = $"current Progress : {progress}/{maxProgress}";
+            
+            if (!disruptorHit)
             {
                 GameManager.Enemy.ChangeTarget(true);
                 hologramRotSpeed = maxHologramRotSpeed;
                 state = State.Activate;
                 renderer.sharedMaterial = hologram_Blue;
+                progress_Text.color = Color.white;
             }
             if (currentHP <= 0)
             {
@@ -176,13 +179,55 @@ namespace Park_Woo_Young
             }
         }
 
+        private void SuccessEffect()
+        {
+            smallSwellingTime += Time.deltaTime;
+
+            if (smallSwellingTime > 0.01f)
+            {
+                smallSwellingRange += 0.1f;
+                Range += 0.1f;
+                emp.transform.localScale = new Vector3(0f + smallSwellingRange, 0f + smallSwellingRange, 0f + smallSwellingRange);
+                smallSwellingTime = 0;
+
+            }
+            else if (smallSwellingRange > 10)
+            {
+                smallSwellingTime = -1;
+
+            }
+
+            if (smallSwellingTime == -1)
+            {
+                
+                shrinkageTime += Time.deltaTime;
+                if (shrinkageTime > 0.01f)
+                {
+                    Range -= 0.4f;
+                    emp.transform.localScale = new Vector3(0f - Range, 0f - Range, 0f - Range);
+                }
+                if (Range < 0)
+                {
+                    shrinkageTime = -1;
+                }
+
+            }
+            if (smallSwellingTime == -1 && shrinkageTime == -1)
+            {
+                empExplosionTime += Time.deltaTime;
+                EmpRange += 0.8f;
+                emp.transform.localScale = new Vector3(0f + EmpRange, 0f + EmpRange, 0f + EmpRange);
+            }
+        }
+
+
         public void DestroyedUpdate()
         {
-            
+
         }
         public void SuccessUpdate()
         {
-            T1();
+            SuccessEffect();
         }
 
         private void Rotate()
@@ -195,29 +240,6 @@ namespace Park_Woo_Young
             Hit(damage);
         }
 
-
-        private void OnDrawGizmosSelected()
-        {
-            if (!deBug)
-                return;
-
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, interaction);
-        }
-        private void T1()
-        {
-            t += Time.deltaTime;
-            if (t > 0.2)
-            {
-                test.transform.localScale = new Vector3(1f + ttt, 1f + ttt, 1f + ttt);
-            }
-        }
-        public void TT()
-        {
-            test.transform.localScale = new Vector3(1f +ttt, 1f +ttt, 1f +ttt);
-            ttt++;
-        }
-
         public void Interact()
         {
             if (disruptorHit)
@@ -227,6 +249,14 @@ namespace Park_Woo_Young
             else
             {
                 return;
+            }
+        }
+
+        private void TestHit(int damage)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Hit(damage);
             }
         }
     }

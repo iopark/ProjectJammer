@@ -99,7 +99,7 @@ namespace Darik
                 photonView.RPC("SetTriggerAttack", RpcTarget.AllViaServer);
                 yield return new WaitForSeconds(attackTiming);
 
-                target.gameObject.GetComponent<IHittable>()?.TakeDamage(damage, Vector3.zero, Vector3.zero);
+                target.gameObject.GetComponent<IHittable>()?.TakeDamage(damage, Vector3.zero, transform.forward);
 
                 yield return new WaitForSeconds(attackCoolTime - attackTiming);
                 reload = true;
