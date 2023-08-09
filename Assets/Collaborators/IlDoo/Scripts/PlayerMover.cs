@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace ildoo
 {
-    public class PlayerMover : MonoBehaviourPun
+    public class PlayerMover : MonoBehaviourPun, IPunObservable
     {
         //Distinguishing each client 
         private Rigidbody rigid;
@@ -124,23 +124,24 @@ namespace ildoo
 
         //===================================================================
         #region Deprecated
-        //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-        //{
-        //    if (stream.IsWriting)
-        //    {
-        //        stream.SendNext(rigid.position);
-        //        stream.SendNext(rigid.rotation);
-        //        stream.SendNext(rigid.velocity);
-        //    }
-        //    else
-        //    {
-        //        rigid.position = (Vector3)stream.ReceiveNext();
-        //        rigid.rotation = (Quaternion)stream.ReceiveNext();
-        //        rigid.velocity = (Vector3)stream.ReceiveNext();
-        //        float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
-        //        rigid.position += rigid.velocity * lag;
-        //    }
-        //}
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
+            {
+                stream.SendNext(rigid.position);
+                stream.SendNext(rigid.rotation);
+                stream.SendNext(rigid.velocity);
+            }
+            else
+            {
+                rigid.position = (Vector3)stream.ReceiveNext();
+                rigid.rotation = (Quaternion)stream.ReceiveNext();
+                rigid.velocity = (Vector3)stream.ReceiveNext();
+                float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+                rigid.position += rigid.velocity * lag;
+                //transform.position = rigid.position;
+            }
+        }
         //private void Jump()
         //{
         //    ySpeed += Physics.gravity.y * Time.deltaTime;

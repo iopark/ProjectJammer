@@ -14,7 +14,11 @@ namespace ildoo
         //=============Non Player Settings 
         [SerializeField] GunData nonPlayerGun; 
         [SerializeField] List<Color> playerColorList;
-        [SerializeField] Renderer playerRender; 
+        [SerializeField] Renderer playerRender;
+
+        //Temporary Variable 
+        [SerializeField] Canvas crossHair; 
+        
        
         private void Awake() 
         {
@@ -22,6 +26,7 @@ namespace ildoo
             SetPlayerColor();
             if (!photonView.IsMine)
             {
+                crossHair.gameObject.SetActive(false);
                 int nonOwnerMask = LayerMask.NameToLayer("Default"); 
                 Destroy(playerInput);
                 SetGameLayerRecursive(gameObject, nonOwnerMask);
@@ -39,7 +44,7 @@ namespace ildoo
 
         private void SetPlayerColor()
         {
-            int playerNumber = photonView.ViewID;
+            int playerNumber = photonView.OwnerActorNr;
             if (playerColorList == null || playerColorList.Count <= playerNumber)
                 return; 
             playerRender.material.color = playerColorList[playerNumber];
