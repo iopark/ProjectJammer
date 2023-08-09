@@ -25,6 +25,8 @@ namespace LDW
 
         public void UpdatePlayerStatusUI()
         {
+            playerhp = playerHealth.health;
+
             hpText.text = $"{playerhp} / 500";
             hpSlider.value = playerhp;
 

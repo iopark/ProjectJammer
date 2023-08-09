@@ -9,7 +9,9 @@ namespace LDW
     {
         [SerializeField] TMP_Text repairProgress;
 
-        public void UpdateProgressUI(int progress)
+        public int progress;
+
+        public void UpdateProgressUI()
         {
             progress = GameManager.Data.disruptorProgress;
 

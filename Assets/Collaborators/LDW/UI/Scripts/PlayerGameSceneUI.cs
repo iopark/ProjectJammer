@@ -8,24 +8,30 @@ namespace LDW
     public class PlayerGameSceneUI : MonoBehaviour
     {
         [SerializeField] PlayerStatus playerStatus;
-        [SerializeField] GameObject weaponStat;
+        [SerializeField] WeaponStat weaponStat;
         [SerializeField] GameObject teamStats;
         [SerializeField] RepairProgress repairProgress;
 
         public void GameSceneUIUpdate()
         {
-            repairProgress.UpdateProgressUI(GameManager.Data.disruptorProgress);
-            playerStatus.UpdatePlayerStatusUI();
+            progressUIUpdate();
+            playerStatusUIUpdate();
+            weaponStatUIUpdate();
         }
 
         private void progressUIUpdate()
         {
-            repairProgress.UpdateProgressUI(GameManager.Data.disruptorProgress);
+            repairProgress.UpdateProgressUI();
         }
 
         private void playerStatusUIUpdate()
         {
             playerStatus.UpdatePlayerStatusUI();
+        }
+
+        private void weaponStatUIUpdate()
+        {
+            weaponStat.UpdateWeponStatUI();
         }
     }
 }

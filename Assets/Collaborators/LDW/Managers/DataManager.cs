@@ -16,10 +16,7 @@ namespace LDW
             public int ammo;
         }
 
-        public PlayerData playerData = new PlayerData();
         public Transform Disruptor;
-
-        public Dictionary<int, PlayerData> playerDict { get; private set; } = new Dictionary<int, PlayerData>();
 
         public MySqlConnection con;
         public MySqlDataReader reader;
@@ -52,6 +49,7 @@ namespace LDW
 
         public Dictionary<int, Stat> MonsterStatDict { get; private set; } = new Dictionary<int, Stat>();
         public Dictionary<int, JammerStat> JammerStatDict { get; private set; } = new Dictionary<int, JammerStat>();
+        public Dictionary<int, PlayerData> playerDict { get; private set; } = new Dictionary<int, PlayerData>();
 
         Loader LoadJson<Loader, Key, Value>(string path) where Loader : ILoader<Key, Value>
         {
@@ -62,7 +60,6 @@ namespace LDW
         public void DataInit()
         {
             MonsterStatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
-            JammerStatDict = LoadJson<JammerStatData, int, JammerStat>("JammerData").MakeDict();
 
             disruptorHP = 100;
         }
