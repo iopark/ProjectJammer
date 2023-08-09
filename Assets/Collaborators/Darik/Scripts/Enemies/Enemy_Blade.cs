@@ -6,16 +6,18 @@ using UnityEngine;
 
 namespace Darik
 {
-    public class Enemy_Rifle : Enemy
+    public class Enemy_Blade : Enemy
     {
         public enum State { Appear, Idle, Move, Attack, Die }
-        StateMachine<State, Enemy_Rifle> stateMachine;
+        StateMachine<State, Enemy_Blade> stateMachine;
 
         [SerializeField] private TMP_Text stateText;
+        [SerializeField] private LayerMask layerMask;
         [SerializeField] private float appearTime = 3f;
         [SerializeField] private int attackRange;
-        [SerializeField] private float fireCoolTime = 0.5f;
-        [SerializeField] private float bashCoolTime = 3f;
+        [SerializeField] private float attackCoolTime = 3f;
+        [SerializeField] private float attackTiming = 0.2f;
+        [SerializeField] private int damage = 1;
 
         private Vector3 moveDir;
         private bool isMove = false;
@@ -26,7 +28,7 @@ namespace Darik
         {
             base.Awake();
 
-            stateMachine = new StateMachine<State, Enemy_Rifle>(this);
+            stateMachine = new StateMachine<State, Enemy_Blade>(this);
             stateMachine.AddState(State.Appear, new AppearState(this, stateMachine));
             stateMachine.AddState(State.Idle, new IdleState(this, stateMachine));
             stateMachine.AddState(State.Move, new MoveState(this, stateMachine));
@@ -36,7 +38,6 @@ namespace Darik
 
         private void Start()
         {
-            stateText.text = "Start";
             stateMachine.SetUp(State.Appear);
         }
 
@@ -95,18 +96,19 @@ namespace Darik
             while (reload)
             {
                 reload = false;
-                photonView.RPC("Fire", RpcTarget.AllViaServer);
-                yield return new WaitForSeconds(fireCoolTime);
+                photonView.RPC("SetTriggerAttack", RpcTarget.AllViaServer);
+                yield return new WaitForSeconds(attackTiming);
+
+                target.gameObject.GetComponent<IHittable>()?.TakeDamage(damage, Vector3.zero, transform.forward);
+
+                yield return new WaitForSeconds(attackCoolTime - attackTiming);
                 reload = true;
             }
         }
 
         [PunRPC]
-        public void Fire()
+        public void SetTriggerAttack()
         {
-            if (debug)
-                Debug.Log("Fire");
-            //PhotonNetwork.Instantiate("EnemyBullet", transform.position, Quaternion.identity);
             anim.SetTrigger("OnAttack");
         }
 
@@ -117,7 +119,7 @@ namespace Darik
         }
 
         #region State
-        private abstract class Enemy_RifleState : StateBase<State, Enemy_Rifle>
+        private abstract class Enemy_BladeState : StateBase<State, Enemy_Blade>
         {
             protected GameObject gameObject => owner.gameObject;
             protected Transform transform => owner.transform;
@@ -125,16 +127,16 @@ namespace Darik
             protected Animator anim => owner.anim;
             protected Collider collider => owner.collider;
 
-            protected Enemy_RifleState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            protected Enemy_BladeState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
         }
 
-        private class AppearState : Enemy_RifleState
+        private class AppearState : Enemy_BladeState
         {
             private float curTime;
 
-            public AppearState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public AppearState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -166,9 +168,9 @@ namespace Darik
             }
         }
 
-        private class IdleState : Enemy_RifleState
+        private class IdleState : Enemy_BladeState
         {
-            public IdleState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public IdleState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -199,9 +201,9 @@ namespace Darik
             }
         }
 
-        private class MoveState : Enemy_RifleState
+        private class MoveState : Enemy_BladeState
         {
-            public MoveState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public MoveState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -245,9 +247,9 @@ namespace Darik
             }
         }
 
-        private class AttackState : Enemy_RifleState
+        private class AttackState : Enemy_BladeState
         {
-            public AttackState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public AttackState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -259,7 +261,7 @@ namespace Darik
             public override void Enter()
             {
                 owner.reload = true;
-                //owner.StartCoroutine(owner.AttackCoroutine());
+                owner.StartCoroutine(owner.AttackCoroutine());
                 owner.stateText.text = "Attack";
             }
 
@@ -270,9 +272,6 @@ namespace Darik
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
-                    
-                    owner.moveDir.Normalize();
-                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(owner.moveDir), 0.1f);
                 }
             }
 
@@ -291,11 +290,11 @@ namespace Darik
             }
         }
 
-        private class DieState : Enemy_RifleState
+        private class DieState : Enemy_BladeState
         {
             private float curTime;
 
-            public DieState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public DieState(Enemy_Blade owner, StateMachine<State, Enemy_Blade> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -325,7 +324,7 @@ namespace Darik
 
             public override void Exit()
             {
-
+                anim.SetBool("IsDie", false);
             }
         }
         #endregion
