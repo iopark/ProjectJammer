@@ -11,6 +11,8 @@ namespace ildoo
         [SerializeField] float mouseSensitivity;
         [SerializeField] Transform cameraRoot;
         [SerializeField] Transform aimTarget;
+        public Vector3 camCentrePoint;
+        public Vector3 camCentreForward; 
         Camera _camera;
 
 
@@ -21,13 +23,14 @@ namespace ildoo
 
         private void Awake()
         {
+            camCentreForward = Vector3.zero; 
+            camCentrePoint = Vector3.zero;
             if (!photonView.IsMine)
                 return;
             _camera = Camera.main;
             _camera.transform.position = cameraRoot.position;
             _camera.transform.rotation = cameraRoot.rotation;
             _camera.transform.SetParent(cameraRoot);
-            //cameraRoot = GetComponent<Transform>(); 
         }
 
         private void Start()
@@ -54,6 +57,7 @@ namespace ildoo
                 return;
             Look();
         }
+        Vector3 camFOVCentre = new Vector3(0.5f, 0.5f, 0); 
 
         private void Look()
         {
@@ -66,6 +70,8 @@ namespace ildoo
 
             Vector3 setAimTarget = _camera.transform.position + _camera.transform.forward * 50;
             aimTarget.position = setAimTarget;
+            camCentrePoint = _camera.ViewportToWorldPoint(camFOVCentre);
+            camCentreForward = _camera.transform.forward; 
         }
 
         private void OnLook(InputValue value)

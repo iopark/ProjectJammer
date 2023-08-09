@@ -114,6 +114,12 @@ crashlytics-build.properties
 /Assets/Collaborators/IlDoo/Animation
 /Assets/Collaborators/IlDoo/Resources
 /Assets/Collaborators/IlDoo/Animation.meta
+/Assets/Collaborators/IlDoo/Animation/PlayerAnimation
+/Assets/Collaborators/IlDoo/Animation/PlayerAnimation.meta
+/Assets/Collaborators/IlDoo/Animation/PlayerAnimation/Player.controller
+/Assets/Collaborators/IlDoo/Animation/PlayerAnimation/Player.controller.meta
+/Assets/Collaborators/IlDoo/Animation/UpperMask.mask
+/Assets/Collaborators/IlDoo/Animation/UpperMask.mask.meta
 /Assets/Collaborators/IlDoo/Resources.meta
 /Assets/Collaborators/IlDoo/Scenes.meta
 /Assets/Collaborators/IlDoo/Resources/DefaultRifle.prefab
@@ -132,4 +138,9 @@ crashlytics-build.properties
 /Assets/Collaborators/IlDoo/Resources/BulletTrailTemp.prefab
 /Assets/Collaborators/IlDoo/Resources/BulletTrailTemp.prefab.meta
 /Assets/Collaborators/Darik/Animations
-/Assets/Scenes
+/Assets/ProBuilder Data
+/Assets/ProBuilder Data.meta
+/ProjectSettings/Packages/com.unity.probuilder/Settings.json
+/ProjectSettings/GraphicsSettings.asset
+/ProjectSettings/NavMeshAreas.asset
+/Assets/Collaborators/Darik/Animations/EnemyBlade/EnemyBlade.controller
