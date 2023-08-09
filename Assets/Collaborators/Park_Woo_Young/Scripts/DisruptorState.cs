@@ -1,4 +1,5 @@
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,21 +8,21 @@ namespace Park_Woo_Young
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable, IInteractable
     {
         [SerializeField] GameObject hologram;            // 교란기 위의 홀로그램의 회전을 주기 위함
+        [SerializeField] GameObject emp;                 // 클리어시 생기는 이펙트
+        [SerializeField] TMP_Text progress_Text;         // 슬라이드를 대체할 텍스트 진행도
         [SerializeField] new Renderer renderer;
         [SerializeField] Material hologram_Blue;         // 활성화시 홀로그램 색상(파랑)
         [SerializeField] Material hologram_Red;          // 멈출시 홀로그램 색상(빨강)
         [SerializeField] Slider hp_Gauge;                // 체력게이지
         [SerializeField] Slider progress_Gauge;          // 진행도게이지
-        [SerializeField] int perSecond;                  // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
-
-        [SerializeField] GameObject emp;                // 클리어시 생기는 이펙트
-
+        
+        [SerializeField] int perSecond = 1;              // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
         [SerializeField] float maxHologramRotSpeed = 100;// 홀로그램 최대 회전속도
         [SerializeField] int maxHP = 100;                // 최대 체력
         [SerializeField] int maxProgress = 100;          // 클리어에 필요한 진행도
         [SerializeField] int progressGoesUp = 1;         // 교란기 진행도에 필요한 시간이 충족되면 진행도가 올라가는 속도
         [SerializeField] int hpRepair = 1;               // 체력감소시 시간에 따른 회복속도
-
+        
         public float interaction = 4;                    // 상호작용 거리
         public float time;                               // 델타타임
         public bool disruptorHit;                        // 공격당했을 때 멈추는 상태로 넘어가게 하기
@@ -99,6 +100,7 @@ namespace Park_Woo_Young
             HpGauge();
             ProgressGauge();
             MaxGauge();
+            
 
             switch (state)
             {
@@ -121,6 +123,7 @@ namespace Park_Woo_Young
         {
             Rotate();
             time += Time.deltaTime;
+            progress_Text.text = $"current Progress : {progress}/{maxProgress}";
             if (time > perSecond)
             {
                 if (progress >= 0 && currentHP == 100)
@@ -141,6 +144,8 @@ namespace Park_Woo_Young
                 //SceneManager.LoadScene(""); // 교란기 성공 여기에서 신을 불러와주기.
                 state = State.Success;
                 print("교란기 완전가동");
+                progress_Text.color = Color.blue;
+                progress_Text.text = "Success";
             }
             if (disruptorHit)
             {
@@ -148,6 +153,7 @@ namespace Park_Woo_Young
                 state = State.Stop;
                 GameManager.Enemy.ChangeTarget(false);
                 renderer.sharedMaterial = hologram_Red;
+                progress_Text.color = Color.red;
 
             }
         }
@@ -155,12 +161,15 @@ namespace Park_Woo_Young
         private void StopDisruptor()
         {
             time = 0;
+            progress_Text.text = $"current Progress : {progress}/{maxProgress}";
+            
             if (!disruptorHit)
             {
                 GameManager.Enemy.ChangeTarget(true);
                 hologramRotSpeed = maxHologramRotSpeed;
                 state = State.Activate;
                 renderer.sharedMaterial = hologram_Blue;
+                progress_Text.color = Color.white;
             }
             if (currentHP <= 0)
             {
