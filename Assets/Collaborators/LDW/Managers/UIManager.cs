@@ -6,10 +6,6 @@ namespace LDW
 {
     public class UIManager : MonoBehaviour
     {
-        private static PlayerGameSceneUI gameSceneUI;
-
-        public static PlayerGameSceneUI SceneUI { get { return gameSceneUI; } }
-
         private EventSystem eventSystem;
 
         public Canvas canvasRoot;
@@ -78,10 +74,5 @@ namespace LDW
             }
         }
         #endregion PopUpUI
-
-        public void GameSceneUIUpdate()
-        {
-            SceneUI.GameSceneUIUpdate();
-        }
     }
 }
