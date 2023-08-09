@@ -1,24 +1,55 @@
 using System;
-using Darik; 
+using Darik;
+using LDW;
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace ildoo { 
 
     public class PlayerHealth : MonoBehaviourPun, IHittable
-{ 
-    
+    {
+        public UnityAction onDeath; 
         public int health; 
+        public int Health
+        {
+            get
+            {
+                return health;
+            }
+            set
+            {
+                health = value;
+
+            }
+        }
         public bool isDead; 
-        public const int fixedHealth = 100; 
+        public const int fixedHealth = 50; 
     //EFFECTS 
         [SerializeField] private ParticleSystem afterShot;
+        [SerializeField] public PlayerGameSceneUI gameSceneUI;
 
+        private void Awake()
+        {
+            gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
+        }
         private void OnEnable() 
         {
             health = fixedHealth; 
             isDead = false; 
         } 
+
+        //Debugging Purposes
+        public void OnGetHit(InputValue value)
+        {
+            GetDamage(20);
+            gameSceneUI.GameSceneUIUpdate();
+        }
+        public void GetDamage(int danage)
+        {
+            TakeDamage(danage, Vector3.zero, Vector3.zero); 
+        }
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal) 
         { 
             //For now, masterclient computes any damage taken first, and then others. 
@@ -45,11 +76,11 @@ namespace ildoo {
         {
             this.health = health; 
         }
-
         [PunRPC]
         private void Death() 
         { 
             isDead = true; 
+            onDeath?.Invoke();
             gameObject.SetActive(false); 
         }
     }
