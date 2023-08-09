@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using Darik;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Events;
 
 namespace ildoo
 {
@@ -42,6 +43,7 @@ namespace ildoo
         public bool isReloading;
         WaitForSeconds reloadYieldInterval;
         [SerializeField] GunData defaultGunInfo;
+        public UnityAction shotFired; 
         private void Awake()
         {
             _camera = Camera.main;
@@ -73,6 +75,7 @@ namespace ildoo
         {
             //animation?
             muzzleEffect.Play();
+            shotFired?.Invoke(); 
             centrePoint = _gunCamera.ViewportToWorldPoint(middlePoint); 
             localEndPoint = centrePoint +(_gunCamera.transform.forward * maxDistance);
             PostShotWorkLocal(muzzlePoint.position, localEndPoint);
@@ -135,12 +138,9 @@ namespace ildoo
 
         IEnumerator ShotEffectLocal(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
-            //float totalTime = Vector2.Distance(startPos, endPos) / maxDistance;
             float deltaDist = Vector3.SqrMagnitude(endPos - startPos);
             while (deltaDist > 1)
             {
-                //trail.transform.position = Vector3.Lerp(startPos, endPos, time);
-                //time += Time.deltaTime / totalTime;
                 trail.transform.position = Vector3.MoveTowards(trail.transform.position, endPos, .75f);
                 deltaDist = Vector3.SqrMagnitude(endPos - startPos);
                 yield return null;

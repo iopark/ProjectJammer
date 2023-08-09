@@ -56,7 +56,7 @@ namespace ildoo
         float holdTimer = 0f;  
         private void OnFire(InputValue value)
         {
-            
+            Fire(); 
         }
         public void OnFire(InputAction.CallbackContext context)
         {
