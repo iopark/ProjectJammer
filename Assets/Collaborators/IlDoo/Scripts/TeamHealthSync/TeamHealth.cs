@@ -15,15 +15,19 @@ namespace ildoo
 
         private void Awake()
         {
+            teamHPvalue.minValue = 0; 
+            teamHPvalue.maxValue = 100;
+            teamHPvalue.value = 100; 
             if (photonView.IsMine)
             {
                 teamName.color = Color.yellow;
-                //
             }
         }
 
         private void Start()
         {
+            if (!photonView.IsMine)
+                return; 
             foreach (KeyValuePair<int, PlayerData> entry in GameManager.Data.playerDict)
             {
                 PhotonView pv = PhotonView.Find(entry.Value.viewId);
@@ -41,7 +45,7 @@ namespace ildoo
 
         public void LocalUpdate(int value)
         {
-            photonView.RPC("SyncUpdate", RpcTarget.Others, value); 
+            photonView.RPC("SyncUpdate", RpcTarget.All, value); 
         }
 
         [PunRPC]
@@ -49,6 +53,7 @@ namespace ildoo
         {
             teamHPvalue.value = value;
         }
+
         [PunRPC]
         public void SyncName(string value)
         {

@@ -66,6 +66,15 @@ namespace ildoo
         private void OnEnable()
         {
             currentAmmo = maxAmmo;
+            if (_gunCamera.gameObject.activeSelf)
+                return; 
+            _gunCamera.gameObject.SetActive(true);
+        }
+
+        private void OnDisable()
+        {
+            anim.Rebind(); 
+            _gunCamera.gameObject.SetActive(false);
         }
 
         #region Shooting
@@ -140,7 +149,7 @@ namespace ildoo
             float deltaDist = Vector3.SqrMagnitude(endPos - startPos);
             while (deltaDist > 1)
             {
-                trail.transform.position = Vector3.MoveTowards(trail.transform.position, endPos, .75f);
+                trail.transform.position = Vector3.MoveTowards(trail.transform.position, endPos, .85f);
                 deltaDist = Vector3.SqrMagnitude(endPos - startPos);
                 yield return null;
             }

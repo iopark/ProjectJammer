@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Darik;
 using LDW;
 using Photon.Pun;
@@ -23,11 +24,11 @@ namespace ildoo
             set
             {
                 health = value;
-
+                onHealthChange?.Invoke(health);
             }
         }
         public bool isDead;
-        public const int fixedHealth = 50;
+        public const int fixedHealth = 100;
         //EFFECTS 
         [SerializeField] private ParticleSystem afterShot;
         [SerializeField] public PlayerGameSceneUI gameSceneUI;
@@ -51,11 +52,9 @@ namespace ildoo
                 return;
 
             // Other client reacts the same after Masterclient 
-
+            Health -= damage;
             photonView.RPC("HealthUpdate", RpcTarget.Others, health);
-            health -= damage;
             health = Mathf.Clamp(health, 0, 100);
-            //UI activity? 
             //Sound? 
 
             //ParticleSystem effect = GameManager.Resource.Instantiate(afterShot, hitPoint, Quaternion.LookRotation(normal), true); 
@@ -85,17 +84,28 @@ namespace ildoo
             GetDamage(20);
             gameSceneUI.GameSceneUIUpdate();
             //TeamHealthManager Update Health 
-
         }
-        public void GetDamage(int danage)
+        public void GetDamage(int damage)
         {
-            TakeDamage(danage, Vector3.zero, Vector3.zero);
+            TakeDamage(damage, Vector3.zero, Vector3.zero);
         }
         [PunRPC]
         public void AddHealth(int amount)
         {
             health += amount;
             health = Mathf.Clamp(health, 0, 100);
+        }
+
+        public void Respawn()
+        {
+            //transform.position = Respawn Position. 
+            gameObject.SetActive(true); 
+        }
+
+        IEnumerator RespawnRoutine()
+        {
+            yield return new WaitForSeconds(5);
+            Respawn(); 
         }
     }
 }

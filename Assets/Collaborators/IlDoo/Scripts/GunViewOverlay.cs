@@ -3,15 +3,21 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class GunViewOverlay : MonoBehaviourPun
 {
     [SerializeField] Transform MeleeStrikeView;
     [SerializeField] GameObject gunToShake;
+    [SerializeField] GameObject physicalScope; 
     [SerializeField] float shakeStrength;
     [SerializeField] float shakeSpeed;
-    [SerializeField] Transform shakePos;
+    [SerializeField] Transform zoomPos;
+    Volume zoomEffect; 
+
+    bool isZooming; 
     Gun playerGun;
+    PlayerShooter playerShooter; 
     Camera overlayCam;
     private void Awake()
     {
@@ -19,7 +25,10 @@ public class GunViewOverlay : MonoBehaviourPun
             return;
         overlayCam = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
         SetCamPos();
+        zoomEffect = Camera.main.GetComponent<Volume>();
+        playerShooter = GetComponentInParent<PlayerShooter>(); 
         playerGun = GetComponentInParent<Gun>();
+        playerShooter.zoomIn += ZoomInAction;
         playerGun.shotFired += ShakeCam;
     }
     private void SetCamPos()
@@ -41,6 +50,24 @@ public class GunViewOverlay : MonoBehaviourPun
         overlayCam.gameObject.transform.SetParent(MeleeStrikeView);
     }
 
+    Coroutine zoomInRoutine;
+    Coroutine zoomOutRoutine; 
+    public void ZoomInAction(bool zoomState)
+    {
+        if (zoomState)
+        {
+            if (zoomOutRoutine != null)
+                StopCoroutine(zoomOutRoutine);
+            zoomInRoutine = StartCoroutine(ZoomInAction()); 
+        }
+        else
+        {
+            if (zoomInRoutine != null)
+                StopCoroutine(zoomInRoutine);
+            zoomOutRoutine = StartCoroutine(ZoomOutAction());
+        }
+    }
+
     public void ReturnToGunCam()
     {
         SetCamPos();
@@ -54,6 +81,8 @@ public class GunViewOverlay : MonoBehaviourPun
 
     public void ShakeCam()
     {
+        if (isZooming)
+            return; 
         StopAllCoroutines();
         StartCoroutine(GunShake());
     }
@@ -89,6 +118,42 @@ public class GunViewOverlay : MonoBehaviourPun
         }
         yield return null;
         SetCamPos();
+    }
+
+    float deltaDist;
+    const float normalNearClipPlane = .15f;
+    const float zoomNearClipPlane = .01f; 
+    IEnumerator ZoomInAction()
+    {
+        isZooming = true;
+        deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - zoomPos.position);
+        physicalScope.gameObject.SetActive(false);
+        zoomEffect.weight = 1f; 
+        overlayCam.nearClipPlane = zoomNearClipPlane; 
+        while (deltaDist > 0.1)
+        {
+            deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - zoomPos.position);
+            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, zoomPos.position, .5f); 
+            yield return null;
+        }
+        yield return null;
+    }
+
+
+    IEnumerator ZoomOutAction()
+    {
+        deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - gameObject.transform.position);
+        overlayCam.nearClipPlane = normalNearClipPlane;
+        zoomEffect.weight = 0f; 
+        while (deltaDist > 0.1)
+        {
+            deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - gameObject.transform.position); 
+            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, gameObject.transform.position, .45f);
+            yield return null;
+        }
+        yield return null;
+        isZooming = false; 
+        physicalScope.gameObject.SetActive(true);
     }
     //Temporarily turn off 
 }

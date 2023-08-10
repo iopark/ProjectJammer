@@ -27,17 +27,20 @@ namespace ildoo
             camCentrePoint = Vector3.zero;
             if (!photonView.IsMine)
                 return;
-            _camera = Camera.main;
-            _camera.transform.position = cameraRoot.position;
-            _camera.transform.rotation = cameraRoot.rotation;
-            _camera.transform.SetParent(cameraRoot);
+            SetMainCamPos(); 
         }
 
         private void Start()
         {
 
         }
-
+        private void SetMainCamPos()
+        {
+            _camera = Camera.main;
+            _camera.transform.position = cameraRoot.position;
+            _camera.transform.rotation = cameraRoot.rotation;
+            _camera.transform.SetParent(cameraRoot);
+        }
         private void OnEnable()
         {
             Cursor.lockState = CursorLockMode.Locked;
