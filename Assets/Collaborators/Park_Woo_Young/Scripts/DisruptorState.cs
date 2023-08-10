@@ -61,21 +61,17 @@ namespace Park_Woo_Young
 
         }
 
+        private void TestHit(int damage)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Hit(damage);
+            }
+        }
+
         private void Hit(int damage)
         {
-            if (progress >= 0)
-            {
-                progress -= damage;
-                if (progress < -1)
-                {
-                    progress = 0;
-                }
-
-            }
-            if (progress == 0 || currentHP <= maxHP)
-            {
-                currentHP -= damage;
-            }
+            progress -= damage;
             disruptorHit = true;
         }
 
@@ -100,6 +96,7 @@ namespace Park_Woo_Young
             HpGauge();
             ProgressGauge();
             MaxGauge();
+            TestHit(10);
             
 
             switch (state)
@@ -252,13 +249,7 @@ namespace Park_Woo_Young
             }
         }
 
-        private void TestHit(int damage)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                Hit(damage);
-            }
-        }
+
     }
 }
 
