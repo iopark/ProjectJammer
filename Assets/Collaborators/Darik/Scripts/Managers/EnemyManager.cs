@@ -9,27 +9,32 @@ namespace Darik
     public class EnemyManager : MonoBehaviour
     {
         [SerializeField] private bool debug;
-        [SerializeField] float SpawnCoolTime ;
+        [SerializeField] float SpawnCoolTime;
 
-        private List<Enemy> enemyList;
+        private List<int> playerIds;
         private bool isDisruptorActivated;
-        private int targetPlayerID;
+        private int curTargetId;
 
         private void Awake()
         {
-            enemyList = new List<Enemy>();
+            playerIds = new List<int>();
         }
 
         public void ChangeTarget(bool isDisruptorActivated)
         {
             this.isDisruptorActivated = isDisruptorActivated;
+
             if (!isDisruptorActivated)
+                curTargetId = playerIds[Random.Range(0, playerIds.Count)];
+        }
+
+        public void RegistPlayers()
+        {
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            foreach (GameObject player in players)
             {
-                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-                foreach (GameObject player in players)
-                {
-                    targetPlayerID = player.GetComponent<ildoo.Player>().UniquePlayerNumber();
-                }
+                int playerId = player.GetComponent<ildoo.Player>().UniquePlayerNumber();
+                playerIds.Add(playerId);
             }
         }
 
@@ -38,10 +43,13 @@ namespace Darik
             if (isDisruptorActivated)
                 return GameManager.Data.Disruptor;
             else
-            {
-                PhotonView pv = PhotonView.Find(targetPlayerID);
-                return pv.transform;
-            }
+                return PhotonView.Find(curTargetId).transform;
+        }
+
+        public Transform FindPlayer()
+        {
+            int targetId = playerIds[Random.Range(0, playerIds.Count)];
+            return PhotonView.Find(targetId).transform;
         }
 
         public void GenerateEnemy()
@@ -56,10 +64,9 @@ namespace Darik
                 if (debug)
                     Debug.Log("Generate");
 
-                GameObject enemy_blade = PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
-                enemyList.Add(enemy_blade.GetComponent<Enemy>());
-                GameObject enemy_Rifle = PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, 35), Quaternion.identity, 0);
-                enemyList.Add(enemy_Rifle.GetComponent<Enemy>());
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, 35), Quaternion.identity, 0);
+
                 yield return new WaitForSeconds(SpawnCoolTime);
             }
         }
