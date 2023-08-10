@@ -34,9 +34,9 @@ namespace LDW
         }
 
         // Start Button
-        public void StartGame()
+        public void StartGame(string sceneName)
         {
-            PhotonNetwork.LoadLevel("PlayTestSceneVer1");
+            PhotonNetwork.LoadLevel($"{sceneName}");
         }
 
         // Leave Button
