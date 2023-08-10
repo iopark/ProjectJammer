@@ -1,4 +1,5 @@
 using MySql.Data.MySqlClient;
+using Park_Woo_Young;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,12 +9,20 @@ namespace LDW
 {
     public class DataManager : MonoBehaviour
     {
+        public class PlayerData
+        {
+            public int viewId;
+            public int hp;
+            public int ammo;
+        }
+
         public Transform Disruptor;
 
         public MySqlConnection con;
         public MySqlDataReader reader;
 
         public int disruptorHP;
+        public int disruptorProgress;
 
         private void Start()
         {
@@ -40,6 +49,7 @@ namespace LDW
 
         public Dictionary<int, Stat> MonsterStatDict { get; private set; } = new Dictionary<int, Stat>();
         public Dictionary<int, JammerStat> JammerStatDict { get; private set; } = new Dictionary<int, JammerStat>();
+        public Dictionary<int, PlayerData> playerDict { get; private set; } = new Dictionary<int, PlayerData>();
 
         Loader LoadJson<Loader, Key, Value>(string path) where Loader : ILoader<Key, Value>
         {
@@ -50,24 +60,13 @@ namespace LDW
         public void DataInit()
         {
             MonsterStatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
-            JammerStatDict = LoadJson<JammerStatData, int, JammerStat>("JammerData").MakeDict();
 
             disruptorHP = 100;
         }
 
-        public void SetDisruptor()
+        public void SetDisruptorProgress(int progress)
         {
-            
-        }
-
-        public void DataSync()
-        {
-
-        }
-
-        public void SetDisruptorHP(int hp)
-        {
-            disruptorHP = hp;
+            disruptorProgress = progress;
         }
     }
 }

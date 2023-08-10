@@ -1,8 +1,10 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions; 
 
 namespace ildoo
 {
@@ -14,12 +16,13 @@ namespace ildoo
         Animator anim;
         [SerializeField] Rig leftArmRig;
         [SerializeField] Rig rightArmRig;
-        bool isSwinging; 
+        bool isSwinging;
+        bool isRapidFiring; 
+        bool isShooting; 
         public float fireRate { get; private set; }
-        
+        [SerializeField] float rapidFireEval;
         private void OnEnable()
         {
-            nextFire = 0f;
         }
 
         private void Start()
@@ -27,23 +30,48 @@ namespace ildoo
             anim = GetComponent<Animator>();
             fireRate = currentGun.fireRate;
             isSwinging = false;
+            isRapidFiring = false; 
+            isShooting = false;
         }
         private void Update()
         {
-            //if (!photonView.IsMine)
-            //    return;
-            //Shot timing is controlled by LocalClient themselves 
-            //Shot Contest is done by the masterClient, 
-            //Shot effect is done alltogether on sync. 
-            //if (isShooting && Time.time > nextFire)
-            //{
-            //    Fire(); 
-            //}
+            if (photonView.IsMine)
+                ContestForRapidFire(); 
         }
 
-        private void OnFire(InputValue input)
+        private void ContestForRapidFire()
         {
-            //either player is firing 
+            if (!isShooting)
+            {
+                holdTimer = 0f;
+                if (isRapidFiring)
+                {
+                    StopAllCoroutines();
+                    isRapidFiring= false;
+                }
+            }
+            else
+            {
+                holdTimer += Time.deltaTime;
+                if (holdTimer > rapidFireEval)
+                {
+                    StartCoroutine(RapidFire());
+                }
+                else
+                {
+                    Fire(); 
+                }
+            }
+        }
+        float holdTimer = 0f;  
+        private void OnFire(InputValue value)
+        {
+            isShooting = value.isPressed;
+            if (isShooting)
+                Fire(); 
+        }
+        public void Fire()
+        {
             if (currentGun.isReloading)
                 return;
             else if (currentGun.CurrentAmmo <= 0)
@@ -53,17 +81,10 @@ namespace ildoo
                 return;
             }
             else if (isSwinging)
-                return; 
-
-            //TODO: Make Auto Firing Rifle 
-            Fire();
-        }
-        public void Fire()
-        {
+                return;
             nextFire = Time.time + fireRate;
             currentGun.Fire();
         }
-        Coroutine reloading; 
         private void OnReload(InputValue input)
         {
             if (currentGun.isReloading 
@@ -72,7 +93,44 @@ namespace ildoo
                 return;
             currentGun.Reload(); 
         }
-        //Testing 
-        
+        IEnumerator RapidFire()
+        {
+            while (true)
+            {
+                isRapidFiring = true; 
+                Fire();
+                yield return null; 
+            }
+        }
+        #region Deprecated 
+        //public void OnFire(InputAction.CallbackContext context)
+        //{
+        //    //isShooting = value.isPressed;
+        //    //Fire();
+        //    //if (value.Get<>)
+        //    //either player is firing 
+        //    if (context.started)
+        //    {
+        //        //Register, try for fire. 
+        //        //Run the Hold Timer for further analysis on the Rapid Firing 
+        //        if (context.duration >= rapidFireEval && !isRapidFiring)
+        //        {
+        //            isRapidFiring = true;
+        //            StartCoroutine(RapidFire());
+        //        }
+        //        else
+        //        {
+        //            Fire();
+        //        }
+        //    }
+        //    else if (context.canceled)
+        //    {
+        //        isRapidFiring = false;
+        //        holdTimer = 0f;
+        //        StopAllCoroutines();
+        //        //If there has been any 
+        //    }
+        //}
+        #endregion
     }
 }

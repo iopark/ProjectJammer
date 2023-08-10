@@ -31,7 +31,6 @@ namespace ildoo
             _camera.transform.position = cameraRoot.position;
             _camera.transform.rotation = cameraRoot.rotation;
             _camera.transform.SetParent(cameraRoot);
-            //cameraRoot = GetComponent<Transform>(); 
         }
 
         private void Start()
@@ -79,22 +78,6 @@ namespace ildoo
         {
             lookDelta = value.Get<Vector2>();
         }
-
-        #region Deprecated 
-        //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-        //{
-        //    if (stream.IsWriting)
-        //    {
-        //        stream.SendNext(camCentrePoint);
-        //        stream.SendNext(camCentreForward);
-        //    }
-        //    else
-        //    {
-        //        camCentrePoint = (Vector3)stream.ReceiveNext();
-        //        camCentreForward = (Vector3)stream.ReceiveNext();
-        //    }
-        //}
-        #endregion
     }
 }
 

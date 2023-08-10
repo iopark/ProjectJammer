@@ -143,6 +143,8 @@ crashlytics-build.properties
 /ProjectSettings/Packages/com.unity.probuilder/Settings.json
 /ProjectSettings/GraphicsSettings.asset
 /ProjectSettings/NavMeshAreas.asset
+/Assets/Collaborators/Darik/Animations/EnemyBlade/EnemyBlade.controller
+/ProjectSettings/NavMeshAreas.asset
 /Assets/Collaborators/Park_Woo_Young/Scenes/Prefabs/Tunnels (Long).prefab
 /Assets/Collaborators/Park_Woo_Young/Scenes/Prefabs/Tunnels (Long).prefab.meta
 /Assets/Collaborators/Park_Woo_Young/Scenes/TestScene/LobbyScene.unity
