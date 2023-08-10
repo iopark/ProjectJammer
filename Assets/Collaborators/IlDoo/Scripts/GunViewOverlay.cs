@@ -72,10 +72,10 @@ public class GunViewOverlay : MonoBehaviourPun
     IEnumerator GunShake()
     {
         originalPos = overlayCam.transform.position;
-        randomSource = Random.insideUnitCircle.normalized * 0.15f;
-        randomPos.x = gameObject.transform.position.x; //overlayCam.transform.position.x;
-        randomPos.y = overlayCam.transform.position.y + randomSource.y;
-        randomPos.z = overlayCam.transform.position.z + 0.4f;
+        randomSource = Random.insideUnitCircle.normalized * 0.07f;
+        randomPos.x = gameObject.transform.position.x + randomSource.x; //overlayCam.transform.position.x;
+        randomPos.y = overlayCam.transform.position.y;// + randomSource.y;
+        randomPos.z = overlayCam.transform.position.z + 0.2f;
         overlayCam.transform.position = randomPos;
         shakeTimer = 0f;
         while (shakeTimer < returnTime)
