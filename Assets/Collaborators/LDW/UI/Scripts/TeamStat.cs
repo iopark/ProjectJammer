@@ -1,18 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TeamStat : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] TMP_Text teamName;
+    [SerializeField] Slider teamHPvalue;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }
