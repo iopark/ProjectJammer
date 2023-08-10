@@ -42,7 +42,7 @@ namespace ildoo
             originPoint = _cameraMain.ViewportToWorldPoint(middlePoint);
 
             lineRenderer.SetPosition(0, gameObject.transform.position);
-            if (Physics.Raycast(originPoint, _cameraMain.transform.forward, out localHit, distToDistruptor))
+            if (Physics.Raycast(originPoint, _cameraMain.transform.forward, out localHit, distToDistruptor, disruptorMask))
             {
                 //피격이 발생했다면, 
                 lineRenderer.SetPosition(1, localHit.point);

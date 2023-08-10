@@ -7,11 +7,13 @@ namespace LDW
     public class WeaponStat : MonoBehaviour
     {
         [SerializeField] Gun gun;
-        [SerializeField] TMP_Text ammoText;
+        [SerializeField] TMP_Text currentAmmoText;
+        [SerializeField] TMP_Text maxAmmoText;
 
         public void UpdateWeponStatUI()
         {
-            ammoText.text = $"ammo / ammo";
+            currentAmmoText.text = $"current";
+            maxAmmoText.text = $"max";
         }
     }
 }
