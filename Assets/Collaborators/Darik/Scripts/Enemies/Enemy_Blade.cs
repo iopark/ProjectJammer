@@ -21,7 +21,6 @@ namespace Darik
 
         private Vector3 moveDir;
         private bool isMove = false;
-        private int squareDistanceToTarget;
         private bool reload = true;
 
         protected override void Awake()
@@ -53,24 +52,6 @@ namespace Darik
             if (isDie)
                 stateMachine.ChangeState(State.Appear);
             isDie = false;
-        }
-
-        private int SquareDistanceToTarget(Vector3 toTarget)
-        {
-            return (int)(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
-        }
-
-        IEnumerator NavDestinationCoroutine()
-        {
-            agent.isStopped = false;
-            while (true)
-            {
-                SearchTarget();
-                if (target != null)
-                    agent.destination = target.position;
-
-                yield return new WaitForSeconds(0.2f);
-            }
         }
 
         [PunRPC]
