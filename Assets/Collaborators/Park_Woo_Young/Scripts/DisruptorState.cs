@@ -13,8 +13,6 @@ namespace Park_Woo_Young
         [SerializeField] new Renderer renderer;
         [SerializeField] Material hologram_Blue;         // 활성화시 홀로그램 색상(파랑)
         [SerializeField] Material hologram_Red;          // 멈출시 홀로그램 색상(빨강)
-        [SerializeField] Slider hp_Gauge;                // 체력게이지
-        [SerializeField] Slider progress_Gauge;          // 진행도게이지
         
         [SerializeField] int perSecond = 1;              // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
         [SerializeField] float maxHologramRotSpeed = 100;// 홀로그램 최대 회전속도
@@ -75,27 +73,8 @@ namespace Park_Woo_Young
             disruptorHit = true;
         }
 
-        private void MaxGauge()
-        {
-            hp_Gauge.maxValue = maxHP;
-            progress_Gauge.maxValue = maxProgress;
-        }
-        private void HpGauge()
-        {
-
-            hp_Gauge.value = currentHP;
-        }
-        private void ProgressGauge()
-        {
-            progress_Gauge.value = progress;
-        }
-
-
         private void Update()
         {
-            HpGauge();
-            ProgressGauge();
-            MaxGauge();
             TestHit(10);
             
 
