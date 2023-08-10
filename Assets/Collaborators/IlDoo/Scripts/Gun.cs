@@ -14,14 +14,16 @@ namespace ildoo
         [SerializeField] private Transform muzzlePoint;
         Camera _camera;
         Camera _gunCamera;
-        FPSCameraController camController; 
-        [SerializeField] LayerMask targetMask; 
+        FPSCameraController camController;
+        [SerializeField] LayerMask targetMask;
 
         //AMMO
         public int maxAmmo { get; private set; }
         public int maxDistance { get; private set; }
         private int currentAmmo;
-        public int CurrentAmmo{ get { return currentAmmo;}
+        public int CurrentAmmo
+        {
+            get { return currentAmmo; }
             private set
             {
                 currentAmmo = value;
@@ -34,7 +36,7 @@ namespace ildoo
 
         //EFFECTS 
         [SerializeField] private ParticleSystem muzzleEffect;
-        [SerializeField] private TrailRenderer bulletTrail;
+        [SerializeField] private ParticleSystem shellEject;
         [SerializeField] float trailLastingTime;
         WaitForSeconds bulletTrailTime;
         //ANIMATIONS
@@ -43,7 +45,7 @@ namespace ildoo
         public bool isReloading;
         WaitForSeconds reloadYieldInterval;
         [SerializeField] GunData defaultGunInfo;
-        public UnityAction shotFired; 
+        public UnityAction shotFired;
         private void Awake()
         {
             _camera = Camera.main;
@@ -51,7 +53,7 @@ namespace ildoo
             camController = GetComponent<FPSCameraController>();
             anim = GetComponent<Animator>();
             reloadInterval = defaultGunInfo.ReloadRate;
-            reloadYieldInterval = new WaitForSeconds(reloadInterval); 
+            reloadYieldInterval = new WaitForSeconds(reloadInterval);
             bulletTrailTime = new WaitForSeconds(trailLastingTime);
             maxDistance = defaultGunInfo.MaxDistance;
             maxAmmo = defaultGunInfo.MaxAmmo;
@@ -60,7 +62,7 @@ namespace ildoo
             currentAmmo = maxAmmo;
         }
 
-#endregion
+        #endregion
         private void OnEnable()
         {
             currentAmmo = maxAmmo;
@@ -71,17 +73,18 @@ namespace ildoo
         {
             //animation?
             muzzleEffect.Play();
-            shotFired?.Invoke(); 
-            centrePoint = _gunCamera.ViewportToWorldPoint(middlePoint); 
-            localEndPoint = centrePoint +(_gunCamera.transform.forward * maxDistance);
+            shellEject.Play();
+            shotFired?.Invoke();
+            centrePoint = _gunCamera.ViewportToWorldPoint(middlePoint);
+            localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
             PostShotWorkLocal(muzzlePoint.position, localEndPoint);
             photonView.RPC("PlayerShotCalculation", RpcTarget.MasterClient, camController.camCentrePoint, camController.camCentreForward);
         }
 
         Vector3 centrePoint;
         Vector3 middlePoint = new Vector3(0.5f, 0.5f, 0);
-        Vector3 localEndPoint; 
-        Vector3 endPoint; 
+        Vector3 localEndPoint;
+        Vector3 endPoint;
         [PunRPC]
         public void PlayerShotCalculation(Vector3 shotPoint, Vector3 shotPointForward)
         {
@@ -104,25 +107,25 @@ namespace ildoo
         }
 
         const float localEffectDestructionTime = 1.0f;
-        Coroutine localRoutine; 
+        Coroutine localRoutine;
         public void PostShotWorkLocal(Vector3 startPos, Vector3 endPos)
         {
-            anim.SetTrigger("Fire"); 
+            anim.SetTrigger("Fire");
             currentAmmo--;
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSmoke", muzzlePoint.position, Quaternion.identity, true);
             GameManager.Resource.Destroy(trail.gameObject, localEffectDestructionTime);
             if (localRoutine != null)
-                StopCoroutine(localRoutine); 
-            localRoutine = StartCoroutine(ShotEffectLocal(trail, startPos, endPos)); 
+                StopCoroutine(localRoutine);
+            localRoutine = StartCoroutine(ShotEffectLocal(trail, startPos, endPos));
         }
 
-        Coroutine shotEffectSync; 
+        Coroutine shotEffectSync;
         [PunRPC]
         public void PostShotWorkSync(Vector3 startPos, Vector3 endPos)
         {
             if (photonView.IsMine)
             {
-                return; 
+                return;
             }
             anim.SetTrigger("Fire");
             currentAmmo--;
@@ -157,10 +160,10 @@ namespace ildoo
         }
         #endregion
 
-        Coroutine reloadEffect; 
+        Coroutine reloadEffect;
         public void Reload()
         {
-            photonView.RPC("ReloadEffect", RpcTarget.All); 
+            photonView.RPC("ReloadEffect", RpcTarget.All);
         }
 
         [PunRPC]

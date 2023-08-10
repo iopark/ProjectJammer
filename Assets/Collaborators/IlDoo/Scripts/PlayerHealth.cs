@@ -6,12 +6,14 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-namespace ildoo { 
+namespace ildoo
+{
 
     public class PlayerHealth : MonoBehaviourPun, IHittable
     {
-        public UnityAction onDeath; 
-        public int health; 
+        public UnityAction onDeath;
+        public UnityAction<int> onHealthChange; 
+        public int health;
         public int Health
         {
             get
@@ -24,9 +26,9 @@ namespace ildoo {
 
             }
         }
-        public bool isDead; 
-        public const int fixedHealth = 50; 
-    //EFFECTS 
+        public bool isDead;
+        public const int fixedHealth = 50;
+        //EFFECTS 
         [SerializeField] private ParticleSystem afterShot;
         [SerializeField] public PlayerGameSceneUI gameSceneUI;
 
@@ -34,46 +36,47 @@ namespace ildoo {
         {
             gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
         }
-        private void OnEnable() 
+        private void OnEnable()
         {
-            health = fixedHealth; 
-            isDead = false; 
-        } 
+            health = fixedHealth;
+            isDead = false;
+        }
 
         //Debugging Purposes
 
-        public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal) 
-        { 
+        public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
+        {
             //For now, masterclient computes any damage taken first, and then others. 
             if (!PhotonNetwork.IsMasterClient)
                 return;
 
-                // Other client reacts the same after Masterclient 
-            
+            // Other client reacts the same after Masterclient 
+
             photonView.RPC("HealthUpdate", RpcTarget.Others, health);
             health -= damage;
-            health = Mathf.Clamp(health, 0, 100); 
+            health = Mathf.Clamp(health, 0, 100);
             //UI activity? 
             //Sound? 
 
             //ParticleSystem effect = GameManager.Resource.Instantiate(afterShot, hitPoint, Quaternion.LookRotation(normal), true); 
             //effect.transform.SetParent(transform); 
 
-            if (health <= 0) { 
-                Death(); 
+            if (health <= 0)
+            {
+                Death();
             }
         }
         [PunRPC]
         private void HealthUpdate(int health)
         {
-            this.health = health; 
+            this.health = health;
         }
         [PunRPC]
-        private void Death() 
-        { 
-            isDead = true; 
+        private void Death()
+        {
+            isDead = true;
             onDeath?.Invoke();
-            gameObject.SetActive(false); 
+            gameObject.SetActive(false);
         }
 
         //Debugging purposes
@@ -81,6 +84,8 @@ namespace ildoo {
         {
             GetDamage(20);
             gameSceneUI.GameSceneUIUpdate();
+            //TeamHealthManager Update Health 
+
         }
         public void GetDamage(int danage)
         {
