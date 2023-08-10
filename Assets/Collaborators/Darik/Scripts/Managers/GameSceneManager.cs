@@ -135,7 +135,11 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
             
             if (PhotonNetwork.IsMasterClient)
+            {
+                GameManager.Enemy.RegistPlayers();
+
                 GameManager.Enemy.GenerateEnemy();
+            }
         }
 
         private void GameStart()
@@ -151,7 +155,11 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
 
             if (PhotonNetwork.IsMasterClient)
+            {
+                GameManager.Enemy.RegistPlayers();
+
                 GameManager.Enemy.GenerateEnemy();
+            }
         }
 
         private int PlayerLoadCount()
