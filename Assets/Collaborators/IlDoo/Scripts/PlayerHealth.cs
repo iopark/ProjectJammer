@@ -86,5 +86,11 @@ namespace ildoo {
         {
             TakeDamage(danage, Vector3.zero, Vector3.zero);
         }
+        [PunRPC]
+        public void AddHealth(int amount)
+        {
+            health += amount;
+            health = Mathf.Clamp(health, 0, 100);
+        }
     }
 }
