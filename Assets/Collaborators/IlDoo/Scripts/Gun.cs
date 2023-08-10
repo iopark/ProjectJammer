@@ -58,10 +58,6 @@ namespace ildoo
             fireRate = defaultGunInfo.FireRate;
             gunDamage = defaultGunInfo.Damage;
             currentAmmo = maxAmmo;
-
-            //Deprecated Functions. 
-            //smokeLine = defaultGunInfo.gameObject.GetComponent<LineRenderer>();
-            //defaultGunInfo = GetComponent<GunData>();
         }
 
 #endregion
