@@ -38,7 +38,7 @@ namespace Darik
             }
         }
 
-        public Transform FindTarget()
+        public Transform SearchTarget()
         {
             if (isDisruptorActivated)
                 return GameManager.Data.Disruptor;
@@ -46,7 +46,7 @@ namespace Darik
                 return PhotonView.Find(curTargetId).transform;
         }
 
-        public Transform FindPlayer()
+        public Transform SearchPlayer()
         {
             int targetId = playerIds[Random.Range(0, playerIds.Count)];
             return PhotonView.Find(targetId).transform;
@@ -66,6 +66,7 @@ namespace Darik
 
                 PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
                 PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, 35), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-35, 0, 35), Quaternion.identity, 0);
 
                 yield return new WaitForSeconds(SpawnCoolTime);
             }
