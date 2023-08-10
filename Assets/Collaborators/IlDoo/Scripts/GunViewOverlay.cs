@@ -13,6 +13,7 @@ public class GunViewOverlay : MonoBehaviourPun
     [SerializeField] float shakeStrength;
     [SerializeField] float shakeSpeed;
     [SerializeField] Transform zoomPos;
+    [SerializeField] public Transform aimTarget;
     Volume zoomEffect; 
 
     bool isZooming; 
@@ -44,6 +45,10 @@ public class GunViewOverlay : MonoBehaviourPun
 
     }
 
+    private void LateUpdate()
+    {
+
+    }
     #region Called by the User 
     public void ChangeToMeleeCamPos()
     {
@@ -136,6 +141,7 @@ public class GunViewOverlay : MonoBehaviourPun
             overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, zoomPos.position, .1f); 
             yield return null;
         }
+        overlayCam.transform.position = zoomPos.position;
         overlayCam.transform.rotation = zoomPos.rotation;
         yield return null;
     }
