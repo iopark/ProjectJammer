@@ -41,15 +41,7 @@ namespace ildoo {
         } 
 
         //Debugging Purposes
-        public void OnGetHit(InputValue value)
-        {
-            GetDamage(20);
-            gameSceneUI.GameSceneUIUpdate();
-        }
-        public void GetDamage(int danage)
-        {
-            TakeDamage(danage, Vector3.zero, Vector3.zero); 
-        }
+
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal) 
         { 
             //For now, masterclient computes any damage taken first, and then others. 
@@ -82,6 +74,23 @@ namespace ildoo {
             isDead = true; 
             onDeath?.Invoke();
             gameObject.SetActive(false); 
+        }
+
+        //Debugging purposes
+        public void OnGetHit(InputValue value)
+        {
+            GetDamage(20);
+            gameSceneUI.GameSceneUIUpdate();
+        }
+        public void GetDamage(int danage)
+        {
+            TakeDamage(danage, Vector3.zero, Vector3.zero);
+        }
+        [PunRPC]
+        public void AddHealth(int amount)
+        {
+            health += amount;
+            health = Mathf.Clamp(health, 0, 100);
         }
     }
 }
