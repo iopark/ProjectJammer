@@ -1,18 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class PlayerData : MonoBehaviour
+namespace LDW
 {
-    // Start is called before the first frame update
-    void Start()
+    public class PlayerData
     {
-        
-    }
+        private PlayerData instance;
+        public PlayerData Instance { get { return instance; } }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public int viewId;
+        public int hp;
+        public int ammo;
+
+        public PlayerData(int viewId, int hp, int ammo)
+        {
+            this.viewId = viewId;
+            this.hp = hp;
+            this.ammo = ammo;
+        }
     }
 }
+
