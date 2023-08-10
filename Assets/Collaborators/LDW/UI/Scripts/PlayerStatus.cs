@@ -11,7 +11,6 @@ namespace LDW
     {
         [SerializeField] PlayerHealth playerHealth;
         [SerializeField] TMP_Text hpText;
-        [SerializeField] TMP_Text mpText;
         [SerializeField] Slider hpSlider;
 
         public int playerhp;
@@ -29,8 +28,6 @@ namespace LDW
 
             hpText.text = $"{playerhp} / 500";
             hpSlider.value = playerhp;
-
-            mpText.text = $"0 / 500";
         }
     }
 }
