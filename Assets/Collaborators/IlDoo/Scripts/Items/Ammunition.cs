@@ -19,7 +19,7 @@ namespace ildoo
             if (playerShooter != null && playerShooter.currentGun != null)
             {
                 // 총의 남은 탄환 수를 ammo 만큼 더하기, 모든 클라이언트에서 실행
-                playerShooter.currentGun.photonView.RPC("AddAmmo", RpcTarget.All, ammoFillAmount);
+                playerShooter.currentGun.photonView.RPC("AmmoChange", RpcTarget.All, ammoFillAmount);
             }
 
             // 모든 클라이언트에서의 자신을 파괴
