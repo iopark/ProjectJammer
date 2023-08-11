@@ -11,7 +11,7 @@ namespace Darik
         [SerializeField] private bool debug;
         [SerializeField] float SpawnCoolTime;
 
-        private List<int> playerIds;
+        public List<int> playerIds;
         private bool isDisruptorActivated;
         private int curTargetId;
 

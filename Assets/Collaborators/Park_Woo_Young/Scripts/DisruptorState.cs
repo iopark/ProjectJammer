@@ -61,8 +61,8 @@ namespace Park_Woo_Young
 
         private void Hit(int damage)
         {
-            progress -= damage;
-            disruptorHit = true;
+            if (PhotonNetwork.IsMasterClient)
+                photonView.RPC("DisruptorOff", RpcTarget.AllViaServer, damage);
         }
 
         private void Update()
@@ -210,7 +210,8 @@ namespace Park_Woo_Young
         {
             if (disruptorHit)
             {
-                disruptorHit = false;
+                if (PhotonNetwork.IsMasterClient)
+                    photonView.RPC("DisruptorOn", RpcTarget.AllViaServer);
             }
             else
             {
@@ -218,6 +219,18 @@ namespace Park_Woo_Young
             }
         }
 
+        [PunRPC]
+        private void DisruptorOn()
+        {
+            disruptorHit = false;
+        }
+
+        [PunRPC]
+        private void DisruptorOff(int damage)
+        {
+            progress -= damage;
+            disruptorHit = true;
+        }
 
     }
 }
