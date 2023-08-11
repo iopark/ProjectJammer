@@ -80,6 +80,8 @@ namespace ildoo
 
         private void Start()
         {
+            if (!photonView.IsMine)
+                return; 
             gameSceneUI.GameSceneUIUpdate(); 
         }
 
@@ -116,6 +118,7 @@ namespace ildoo
         Vector3 middlePoint = new Vector3(0.5f, 0.5f, 0);
         Vector3 localEndPoint;
         Vector3 endPoint;
+
         [PunRPC]
         public void PlayerShotCalculation(Vector3 shotPoint, Vector3 shotPointForward)
         {
