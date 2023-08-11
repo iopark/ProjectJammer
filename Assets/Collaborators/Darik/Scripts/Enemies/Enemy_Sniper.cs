@@ -58,17 +58,12 @@ namespace Darik
             isDie = false;
         }
 
-        private void SearchPlayer()
-        {
-            target = GameManager.Enemy.SearchPlayer();
-        }
-
         protected override IEnumerator NavDestinationCoroutine(bool isRun = false)
         {
             agent.isStopped = false;
             while (true)
             {
-                SearchPlayer();
+                SearchTarget(true);
                 if (target != null)
                 {
                     if (isRun)
@@ -214,7 +209,7 @@ namespace Darik
 
             public override void Update()
             {
-                owner.SearchPlayer();
+                owner.SearchTarget(true);
                 if (owner.target != null)
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
@@ -304,7 +299,7 @@ namespace Darik
 
             public override void Update()
             {
-                owner.SearchPlayer();
+                owner.SearchTarget(true);
                 if (owner.target != null)
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
@@ -353,7 +348,7 @@ namespace Darik
 
             public override void Update()
             {
-                owner.SearchPlayer();
+                owner.SearchTarget(true);
                 if (owner.target != null)
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
