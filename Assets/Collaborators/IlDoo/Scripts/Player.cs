@@ -8,11 +8,13 @@ using UnityEngine.InputSystem;
 namespace ildoo
 {
     public class Player : MonoBehaviourPun
+
     {
         //Manages 1.Player Color      3.PlayerInput
         private PlayerInput playerInput;
         //=============Non Player Settings 
-        [SerializeField] Transform playerHolder; 
+        [SerializeField] Transform playerHolder;
+        Camera _camera; 
         [SerializeField] GunData nonPlayerGun;
         [SerializeField] List<Color> playerColorList;
         [SerializeField] Renderer playerRender;
@@ -21,8 +23,9 @@ namespace ildoo
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
+            _camera = Camera.main;
             SetPlayerColor();
-            PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0);
+            PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
             GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
             gameObject.name = PhotonNetwork.LocalPlayer.NickName; 
             if (!photonView.IsMine)
@@ -32,7 +35,17 @@ namespace ildoo
                 SetGameLayerRecursive(gameObject, nonOwnerMask);
             }
         }
+        public void MoveCamera()
+        {
+            _camera.transform.SetParent(playerHolder); 
+        }
 
+        [PunRPC]
+        public void RegisterDeath()
+        {
+            if (PhotonNetwork.IsMasterClient)
+                GameManager.Data.playerDict[photonView.ViewID].isAlive = false;
+        }
         private void SetGameLayerRecursive(GameObject gameObject, int layer)
         {
             gameObject.layer = layer;
