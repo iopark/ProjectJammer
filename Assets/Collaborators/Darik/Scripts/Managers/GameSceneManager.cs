@@ -133,7 +133,8 @@ namespace Darik
             Quaternion rotation = Quaternion.Euler(0.0f, angularStart, 0.0f);
 
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
-            
+            PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
+
             if (PhotonNetwork.IsMasterClient)
             {
                 GameManager.Enemy.RegistPlayers();
@@ -153,6 +154,7 @@ namespace Darik
             Quaternion rotation = Quaternion.Euler(0.0f, angularStart, 0.0f);
 
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
+            PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
             if (PhotonNetwork.IsMasterClient)
             {
