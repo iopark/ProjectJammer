@@ -188,6 +188,8 @@ namespace ildoo
             yield return reloadYieldInterval;
             animRig.weight = 1f;
             currentAmmo = maxAmmo;
+            //ammo calculation; 
+
         }
     }
 }
