@@ -19,14 +19,14 @@ namespace LDW
         {
             playerhp = playerHealth.health;
 
-            hpText.text = $"{playerhp} / 500";
+            hpText.text = $"{playerhp}";
         }
 
         public void UpdatePlayerStatusUI()
         {
             playerhp = playerHealth.health;
 
-            hpText.text = $"{playerhp} / 500";
+            hpText.text = $"{playerhp}";
             hpSlider.value = playerhp;
         }
     }

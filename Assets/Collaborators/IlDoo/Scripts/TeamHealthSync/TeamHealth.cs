@@ -9,22 +9,22 @@ namespace ildoo
 {
     public class TeamHealth : MonoBehaviourPun
     {
+        RectTransform teamHealthContainer; 
         PlayerHealth playerHealth;
         [SerializeField] TMP_Text teamName;
         [SerializeField] Slider teamHPvalue;
-
         private void Awake()
         {
             teamHPvalue.minValue = 0; 
             teamHPvalue.maxValue = 100;
-            teamHPvalue.value = 100; 
-            //Add to the Directed Asset 
+            teamHPvalue.value = 100;
+            teamHealthContainer = GameObject.Find("TeamStats").GetComponent<RectTransform>();
+            transform.SetParent(teamHealthContainer, false);
             if (photonView.IsMine)
             {
                 teamName.color = Color.yellow;
             }
         }
-
         private void Start()
         {
             if (!photonView.IsMine)
@@ -43,24 +43,20 @@ namespace ildoo
             teamName.text = playerHealth.gameObject.name;
             photonView.RPC("SyncName", RpcTarget.Others, playerHealth.gameObject.name); 
         }
-
         public void LocalUpdate(int value)
         {
             photonView.RPC("SyncUpdate", RpcTarget.All, value); 
         }
-
         [PunRPC]
         public void SyncUpdate(int value)
         {
             teamHPvalue.value = value;
         }
-
         [PunRPC]
         public void SyncName(string value)
         {
             teamName.text = value;
         }
-
     }
 }
 

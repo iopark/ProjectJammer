@@ -24,6 +24,7 @@ namespace ildoo
             set
             {
                 health = value;
+                gameSceneUI.GameSceneUIUpdate();
                 onHealthChange?.Invoke(health);
             }
         }
@@ -74,7 +75,7 @@ namespace ildoo
         private void Death()
         {
             isDead = true;
-            onDeath?.Invoke();
+            onDeath?.Invoke(); // MainCamera position should be moved else where. 
             gameObject.SetActive(false);
         }
 
@@ -92,8 +93,10 @@ namespace ildoo
         [PunRPC]
         public void AddHealth(int amount)
         {
-            health += amount;
-            health = Mathf.Clamp(health, 0, 100);
+            if (!photonView.IsMine || isDead)
+                return; 
+            Health += amount;
+            Health = Mathf.Clamp(health, 0, 100);
         }
 
         public void Respawn()

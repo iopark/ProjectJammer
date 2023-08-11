@@ -1,3 +1,4 @@
+using LDW;
 using Photon.Pun;
 using System;
 using System.Collections;
@@ -15,6 +16,7 @@ namespace ildoo
 
         public UnityAction<bool> zoomIn; 
         [SerializeField] GunViewOverlay gunCam;
+        Crosshair crossHairUI; 
         [SerializeField] private float nextFire;
         Animator anim;
         [SerializeField] Rig leftArmRig;
@@ -30,6 +32,8 @@ namespace ildoo
 
         private void Start()
         {
+            crossHairUI = GetComponentInChildren<Crosshair>();
+            zoomIn += crossHairUI.ChangeCrosshair; 
             anim = GetComponent<Animator>();
             fireRate = currentGun.fireRate;
             isSwinging = false;
@@ -91,7 +95,7 @@ namespace ildoo
         private void OnReload(InputValue input)
         {
             if (currentGun.isReloading 
-                || currentGun.CurrentAmmo == currentGun.maxAmmo
+                || currentGun.CurrentAmmo == currentGun.magCap
                 || isSwinging)
                 return;
             currentGun.Reload(); 

@@ -4,6 +4,7 @@ using System.Collections;
 using Darik;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Events;
+using LDW;
 
 namespace ildoo
 {
@@ -16,9 +17,22 @@ namespace ildoo
         Camera _gunCamera;
         FPSCameraController camController;
         [SerializeField] LayerMask targetMask;
+        PlayerGameSceneUI gameSceneUI;
 
         //AMMO
-        public int maxAmmo { get; private set; }
+        public int totalAmmo { get;private set; }
+        public int TotalAmmo
+        {
+            get
+            {
+                return totalAmmo;
+            }
+            set
+            {
+                totalAmmo = value;  
+            }
+        }
+        public int magCap { get; private set; }
         public int maxDistance { get; private set; }
         private int currentAmmo;
         public int CurrentAmmo
@@ -56,16 +70,24 @@ namespace ildoo
             reloadYieldInterval = new WaitForSeconds(reloadInterval);
             bulletTrailTime = new WaitForSeconds(trailLastingTime);
             maxDistance = defaultGunInfo.MaxDistance;
-            maxAmmo = defaultGunInfo.MaxAmmo;
+            magCap = defaultGunInfo.MaxAmmo;
             fireRate = defaultGunInfo.FireRate;
             gunDamage = defaultGunInfo.Damage;
-            currentAmmo = maxAmmo;
+            currentAmmo = magCap;
+            totalAmmo = defaultGunInfo.TotalAmmo;
+            gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>(); 
+        }
+
+        private void Start()
+        {
+            gameSceneUI.GameSceneUIUpdate(); 
         }
 
         #endregion
         private void OnEnable()
         {
-            currentAmmo = maxAmmo;
+            currentAmmo = magCap;
+            totalAmmo = defaultGunInfo.TotalAmmo; 
             if (_gunCamera.gameObject.activeSelf)
                 return; 
             _gunCamera.gameObject.SetActive(true);
@@ -121,6 +143,7 @@ namespace ildoo
         {
             anim.SetTrigger("Fire");
             currentAmmo--;
+            gameSceneUI.GameSceneUIUpdate();
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSmoke", muzzlePoint.position, Quaternion.identity, true);
             GameManager.Resource.Destroy(trail.gameObject, localEffectDestructionTime);
             if (localRoutine != null)
@@ -168,7 +191,7 @@ namespace ildoo
             }
         }
         #endregion
-
+        #region Reloading 
         Coroutine reloadEffect;
         public void Reload()
         {
@@ -183,11 +206,39 @@ namespace ildoo
         IEnumerator Reloading()
         {
             //재장전 시작시 weight 재설정 
+            isReloading = true; 
             animRig.weight = 0f;
             anim.SetTrigger("Reload");
             yield return reloadYieldInterval;
             animRig.weight = 1f;
-            currentAmmo = maxAmmo;
+            //currentAmmo = magCap;
+            ReloadCalculation(); 
+            gameSceneUI.GameSceneUIUpdate();
+            isReloading = false; 
+            //ammo calculation; 
         }
+        int reloadAmount; 
+        private void ReloadCalculation()
+        {
+            reloadAmount = magCap - CurrentAmmo;
+            if (reloadAmount == 0)
+                return; 
+            else if (reloadAmount > totalAmmo)
+            {
+                reloadAmount = totalAmmo; 
+            }
+            TotalAmmo -= reloadAmount; 
+            CurrentAmmo += reloadAmount; 
+        }
+        [PunRPC]
+        public void AmmoChange(int addingAmount)
+        {
+            if (!photonView.IsMine)
+                return; 
+            TotalAmmo += addingAmount;
+            TotalAmmo = Mathf.Clamp(TotalAmmo, 0, TotalAmmo);
+            gameSceneUI.GameSceneUIUpdate();
+        }
+        #endregion
     }
 }
