@@ -17,12 +17,14 @@ public class PlayerMelee : MonoBehaviourPun
     [SerializeField] float meleeDistance; 
     [SerializeField] LayerMask targetMask;
     FPSCameraController camController;
+    GunViewOverlay gunCamController;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
         _camera = Camera.main;
         camController = GetComponent<FPSCameraController>();
+        gunCamController = GetComponentInChildren<GunViewOverlay>();
     }
     public void Strike()
     {
@@ -66,9 +68,9 @@ public class PlayerMelee : MonoBehaviourPun
         rightArmRig.weight = 1f;
         anim.SetTrigger("Melee");
         yield return new WaitForSeconds(.25f);
-
         leftArmRig.weight = 1f;
         rightArmRig.weight = 0f;
     }
+
     #endregion
 }

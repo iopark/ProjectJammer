@@ -9,6 +9,7 @@ namespace ildoo
 {
     public class TeamHealth : MonoBehaviourPun
     {
+        RectTransform teamHealthContainer; 
         PlayerHealth playerHealth;
         [SerializeField] TMP_Text teamName;
         [SerializeField] Slider teamHPvalue;
@@ -17,7 +18,9 @@ namespace ildoo
         {
             teamHPvalue.minValue = 0; 
             teamHPvalue.maxValue = 100;
-            teamHPvalue.value = 100; 
+            teamHPvalue.value = 100;
+            teamHealthContainer = GameObject.Find("TeamStats").GetComponent<RectTransform>();
+            transform.SetParent(teamHealthContainer, false);
             //Add to the Directed Asset 
             if (photonView.IsMine)
             {
