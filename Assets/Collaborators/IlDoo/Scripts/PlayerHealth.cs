@@ -24,6 +24,7 @@ namespace ildoo
             set
             {
                 health = value;
+                gameSceneUI.GameSceneUIUpdate();
                 onHealthChange?.Invoke(health);
             }
         }

@@ -12,6 +12,7 @@ namespace ildoo
         //Manages 1.Player Color      3.PlayerInput
         private PlayerInput playerInput;
         //=============Non Player Settings 
+        [SerializeField] Transform playerHolder; 
         [SerializeField] GunData nonPlayerGun;
         [SerializeField] List<Color> playerColorList;
         [SerializeField] Renderer playerRender;
