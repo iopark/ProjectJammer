@@ -3,6 +3,7 @@ using System.Collections;
 using Darik;
 using LDW;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -12,6 +13,7 @@ namespace ildoo
 
     public class PlayerHealth : MonoBehaviourPun, IHittable
     {
+        public ildoo.Player player; 
         public UnityAction onDeath;
         public UnityAction<int> onHealthChange; 
         public int health;
@@ -24,8 +26,9 @@ namespace ildoo
             set
             {
                 health = value;
-                gameSceneUI.GameSceneUIUpdate();
                 onHealthChange?.Invoke(health);
+                if (photonView.IsMine)
+                    gameSceneUI.GameSceneUIUpdate();
             }
         }
         public bool isDead;
@@ -36,6 +39,8 @@ namespace ildoo
 
         private void Awake()
         {
+            player = GetComponent<Player>();
+            onDeath += player.PlayerDeath; 
             gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
         }
         private void OnEnable()
@@ -69,7 +74,7 @@ namespace ildoo
         [PunRPC]
         private void HealthUpdate(int health)
         {
-            this.health = health;
+            this.Health = health;
         }
         [PunRPC]
         private void Death()

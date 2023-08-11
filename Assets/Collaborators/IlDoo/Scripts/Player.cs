@@ -40,11 +40,21 @@ namespace ildoo
             _camera.transform.SetParent(playerHolder); 
         }
 
+        public void PlayerDeath()
+        {
+            photonView.RPC("RegisterDeath", RpcTarget.MasterClient); 
+        }
         [PunRPC]
         public void RegisterDeath()
         {
-            if (PhotonNetwork.IsMasterClient)
                 GameManager.Data.playerDict[photonView.ViewID].isAlive = false;
+                photonView.RPC("FellowUpdate", RpcTarget.Others); 
+        }
+
+        [PunRPC]
+        public void FellowUpdate()
+        {
+            GameManager.Data.playerDict[photonView.ViewID].isAlive = false;
         }
         private void SetGameLayerRecursive(GameObject gameObject, int layer)
         {

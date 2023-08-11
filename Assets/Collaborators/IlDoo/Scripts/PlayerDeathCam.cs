@@ -12,6 +12,7 @@ namespace ildoo
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
+            playerInput.enabled = false;
         }
     }
 }
