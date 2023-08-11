@@ -223,13 +223,15 @@ namespace Park_Woo_Young
         private void DisruptorOn()
         {
             disruptorHit = false;
+            renderer.sharedMaterial = hologram_Blue;
         }
 
         [PunRPC]
         private void DisruptorOff(int damage)
         {
-            progress -= damage;
+            //progress -= damage;
             disruptorHit = true;
+            renderer.sharedMaterial = hologram_Red;
         }
 
     }
