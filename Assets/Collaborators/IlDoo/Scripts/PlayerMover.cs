@@ -43,7 +43,6 @@ namespace ildoo
         private void Update()
         {
             Move();
-            //Jump();
         }
         private void FixedUpdate()
         {
@@ -119,11 +118,6 @@ namespace ildoo
         {
             isRunning = value.isPressed;
         }
-
-
-
-        //===================================================================
-        #region Deprecated
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
             if (stream.IsWriting)
@@ -134,27 +128,16 @@ namespace ildoo
             }
             else
             {
-                rigid.position = (Vector3)stream.ReceiveNext();
-                rigid.rotation = (Quaternion)stream.ReceiveNext();
-                rigid.velocity = (Vector3)stream.ReceiveNext();
-                float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
-                rigid.position += rigid.velocity * lag;
-                //transform.position = rigid.position;
+                try
+                {
+                    rigid.position = (Vector3)stream.ReceiveNext();
+                    rigid.rotation = (Quaternion)stream.ReceiveNext();
+                    rigid.velocity = (Vector3)stream.ReceiveNext();
+                    float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+                    rigid.position += rigid.velocity * lag;
+                }
+                catch { }
             }
         }
-        //private void Jump()
-        //{
-        //    ySpeed += Physics.gravity.y * Time.deltaTime;
-        //    if (GroundCheck() && ySpeed < 0)
-        //    {
-        //        ySpeed = 0;
-        //    }
-        //    // 2. if accerlation == gravity 
-        //    if (ySpeed <= Physics.gravity.y)
-        //        ySpeed = Physics.gravity.y;
-
-        //    rigid.AddForce(Vector3.up * ySpeed, ForceMode.VelocityChange);
-        //}
-        #endregion
     }
 }
