@@ -10,8 +10,10 @@ namespace ildoo
         [SerializeField] int healAmount;
         private void OnTriggerEnter(Collider other)
         {
+            //Only activated by MasterClient 
             if (!photonView.IsMine)
                 return;
+
             PlayerHealth playerHealth= other.gameObject.GetComponent<PlayerHealth>();
 
             // PlayerShooter 컴포넌트가 있으며, 총 오브젝트가 존재하면

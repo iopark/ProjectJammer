@@ -125,6 +125,26 @@ public class GunViewOverlay : MonoBehaviourPun
         SetCamPos();
     }
 
+    IEnumerator ZoomGunShake()
+    {
+        originalPos = overlayCam.transform.position;
+        randomPos.x = overlayCam.transform.localPosition.x;
+        randomPos.y = overlayCam.transform.localPosition.y;// + randomSource.y;
+        randomPos.z = overlayCam.transform.localPosition.z + shakeStrength;// + 0.03f;
+        overlayCam.transform.localPosition = randomPos;
+        overlayCam.transform.rotation = transform.rotation;
+        shakeTimer = 0f;
+        while (shakeTimer < returnTime)
+        {
+            shakeTimer += Time.deltaTime;
+            //overlayCam.transform.rotation = gameObject.transform.rotation; 
+            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, gameObject.transform.position, shakeSpeed);
+            yield return null;
+        }
+        yield return null;
+        SetCamPos();
+    }
+
     float deltaDist;
     const float normalNearClipPlane = .15f;
     const float zoomNearClipPlane = .01f; 
@@ -133,17 +153,18 @@ public class GunViewOverlay : MonoBehaviourPun
         isZooming = true;
         deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - zoomPos.position);
         physicalScope.gameObject.SetActive(false);
-        zoomEffect.weight = 1f; 
         overlayCam.nearClipPlane = zoomNearClipPlane; 
         while (deltaDist > 0.001)
         {
             deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - zoomPos.position);
-            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, zoomPos.position, .1f); 
+            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, zoomPos.position, .1f);
+            zoomEffect.weight = Mathf.Lerp(zoomEffect.weight, 1f, .1f); 
             yield return null;
         }
         overlayCam.transform.position = zoomPos.position;
         overlayCam.transform.rotation = zoomPos.rotation;
-        yield return null;
+        zoomEffect.weight = 1f; 
+       yield return null;
     }
 
 
@@ -156,10 +177,12 @@ public class GunViewOverlay : MonoBehaviourPun
         {
             deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - gameObject.transform.position); 
             overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, gameObject.transform.position, .35f);
+            zoomEffect.weight = Mathf.Lerp(zoomEffect.weight, 0, .35f);
             yield return null;
         }
         yield return null;
-        isZooming = false; 
+        isZooming = false;
+        zoomEffect.weight = 0f; 
         physicalScope.gameObject.SetActive(true);
         SetCamPos(); 
     }
