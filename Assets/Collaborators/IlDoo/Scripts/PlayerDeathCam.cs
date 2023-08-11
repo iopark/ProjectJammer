@@ -11,7 +11,7 @@ namespace ildoo
 
         private void Awake()
         {
-            playerInput
+            playerInput = GetComponent<PlayerInput>();
         }
     }
 }
