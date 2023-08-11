@@ -18,6 +18,7 @@ namespace ildoo
             teamHPvalue.minValue = 0; 
             teamHPvalue.maxValue = 100;
             teamHPvalue.value = 100; 
+            //Add to the Directed Asset 
             if (photonView.IsMine)
             {
                 teamName.color = Color.yellow;

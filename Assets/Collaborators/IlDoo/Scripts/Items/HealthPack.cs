@@ -1,21 +1,28 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace ildoo
 {
-    public class HealthPack : MonoBehaviour
+    public class HealthPack : Item
     {
-        // Start is called before the first frame update
-        void Start()
+        [SerializeField] int healAmount;
+        private void OnTriggerEnter(Collider other)
         {
+            if (!photonView.IsMine)
+                return;
+            PlayerHealth playerHealth= other.gameObject.GetComponent<PlayerHealth>();
 
-        }
+            // PlayerShooter 컴포넌트가 있으며, 총 오브젝트가 존재하면
+            if (playerHealth != null)
+            {
+                // 총의 남은 탄환 수를 ammo 만큼 더하기, 모든 클라이언트에서 실행
+                playerHealth.photonView.RPC("Heal", RpcTarget.All, healAmount);
+            }
 
-        // Update is called once per frame
-        void Update()
-        {
-
+            // 모든 클라이언트에서의 자신을 파괴
+            PhotonNetwork.Destroy(gameObject);
         }
     }
 }
