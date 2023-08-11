@@ -4,6 +4,7 @@ using System.Collections;
 using Darik;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Events;
+using LDW;
 
 namespace ildoo
 {
@@ -16,9 +17,22 @@ namespace ildoo
         Camera _gunCamera;
         FPSCameraController camController;
         [SerializeField] LayerMask targetMask;
+        PlayerGameSceneUI gameSceneUI;
 
         //AMMO
-        public int maxAmmo { get; private set; }
+        public int totalAmmo { get;private set; }
+        public int TotalAmmo
+        {
+            get
+            {
+                return totalAmmo;
+            }
+            set
+            {
+                totalAmmo = value;  
+            }
+        }
+        public int magCap { get; private set; }
         public int maxDistance { get; private set; }
         private int currentAmmo;
         public int CurrentAmmo
@@ -56,16 +70,19 @@ namespace ildoo
             reloadYieldInterval = new WaitForSeconds(reloadInterval);
             bulletTrailTime = new WaitForSeconds(trailLastingTime);
             maxDistance = defaultGunInfo.MaxDistance;
-            maxAmmo = defaultGunInfo.MaxAmmo;
+            magCap = defaultGunInfo.MaxAmmo;
             fireRate = defaultGunInfo.FireRate;
             gunDamage = defaultGunInfo.Damage;
-            currentAmmo = maxAmmo;
+            currentAmmo = magCap;
+            totalAmmo = defaultGunInfo.TotalAmmo;
+            gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>(); 
         }
 
         #endregion
         private void OnEnable()
         {
-            currentAmmo = maxAmmo;
+            currentAmmo = magCap;
+            totalAmmo = defaultGunInfo.TotalAmmo; 
             if (_gunCamera.gameObject.activeSelf)
                 return; 
             _gunCamera.gameObject.SetActive(true);
@@ -187,9 +204,21 @@ namespace ildoo
             anim.SetTrigger("Reload");
             yield return reloadYieldInterval;
             animRig.weight = 1f;
-            currentAmmo = maxAmmo;
+            currentAmmo = magCap;
             //ammo calculation; 
 
+        }
+        int reloadAmount; 
+        private void ReloadCalculation()
+        {
+            reloadAmount = totalAmmo - currentAmmo;
+            
+        }
+        [PunRPC]
+        public void AmmoChange(int addingAmount)
+        {
+            totalAmmo += addingAmount;
+            totalAmmo = Mathf.Clamp(totalAmmo, 0, magCap);
         }
     }
 }
