@@ -16,7 +16,7 @@
                 },
                 {
                     "name": "Fire",
-                    "type": "Button",
+                    "type": "PassThrough",
                     "id": "ccd00800-c52a-446c-a6c0-4ebf20ce08e9",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -60,7 +60,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Quit",
+                    "name": "GetHit",
                     "type": "Button",
                     "id": "245075e9-9077-47b2-8bb7-a255bf5644c2",
                     "expectedControlType": "Button",
@@ -72,6 +72,15 @@
                     "name": "Melee",
                     "type": "Button",
                     "id": "96c03fa8-a92b-4ae9-a83a-8e256fb209f7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Zoom",
+                    "type": "PassThrough",
+                    "id": "2fd7ff43-9075-4b99-8589-f9773998513f",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -192,11 +201,11 @@
                 {
                     "name": "",
                     "id": "d232a558-023f-46fb-adf1-79603dc89b1b",
-                    "path": "<Keyboard>/backquote",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Quit",
+                    "action": "GetHit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -208,6 +217,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Melee",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "35bef253-9da7-4d89-a50d-ebf2a7541c73",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

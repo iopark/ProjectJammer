@@ -17,6 +17,7 @@ namespace Darik
         protected NavMeshAgent agent;
         protected Transform target;
 
+        protected int squareDistanceToTarget;
         protected int curHp;
         protected bool isDie = false;
 
@@ -35,7 +36,25 @@ namespace Darik
 
         protected void SearchTarget()
         {
-            target = GameManager.Enemy.FindTarget();
+            target = GameManager.Enemy.SearchTarget();
+        }
+
+        protected int SquareDistanceToTarget(Vector3 toTarget)
+        {
+            return (int)(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
+        }
+
+        protected virtual IEnumerator NavDestinationCoroutine(bool isRun = false)
+        {
+            agent.isStopped = false;
+            while (true)
+            {
+                SearchTarget();
+                if (target != null)
+                    agent.destination = target.position;
+
+                yield return new WaitForSeconds(0.2f);
+            }
         }
 
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
