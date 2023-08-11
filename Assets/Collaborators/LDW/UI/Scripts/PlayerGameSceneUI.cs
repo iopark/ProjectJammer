@@ -6,19 +6,11 @@ namespace LDW
     {
         [SerializeField] PlayerStatus playerStatus;
         [SerializeField] WeaponStat weaponStat;
-        [SerializeField] GameObject teamStats;
-        [SerializeField] RepairProgress repairProgress;
 
         public void GameSceneUIUpdate()
         {
-            progressUIUpdate();
             playerStatusUIUpdate();
             weaponStatUIUpdate();
-        }
-
-        private void progressUIUpdate()
-        {
-            repairProgress.UpdateProgressUI();
         }
 
         private void playerStatusUIUpdate()
