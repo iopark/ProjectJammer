@@ -49,7 +49,7 @@ namespace ildoo
             if (PhotonNetwork.IsMasterClient)
             {
                 GameManager.Data.playerDict[photonView.ViewID].isAlive = false;
-                GameManager.Enemy.playerIds.Remove(photonView.ViewID);  
+                GameManager.Enemy.playerIds.Remove(photonView.ViewID);
             }
         }
         private void SetGameLayerRecursive(GameObject gameObject, int layer)

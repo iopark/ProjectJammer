@@ -13,7 +13,9 @@ namespace ildoo
     public class PlayerHealth : MonoBehaviourPun, IHittable
     {
         public UnityAction onDeath;
-        public UnityAction<int> onHealthChange; 
+        public UnityAction<int> onHealthChange;
+        [SerializeField] int fixedHealth; 
+
         public int health;
         public int Health
         {
@@ -29,14 +31,14 @@ namespace ildoo
             }
         }
         public bool isDead;
-        public const int fixedHealth = 100;
         //EFFECTS 
         [SerializeField] private ParticleSystem afterShot;
         [SerializeField] public PlayerGameSceneUI gameSceneUI;
 
         private void Awake()
         {
-            gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
+            if (photonView.IsMine)
+                gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
         }
         private void OnEnable()
         {
@@ -79,17 +81,6 @@ namespace ildoo
             gameObject.SetActive(false);
         }
 
-        //Debugging purposes
-        public void OnGetHit(InputValue value)
-        {
-            GetDamage(20);
-            gameSceneUI.GameSceneUIUpdate();
-            //TeamHealthManager Update Health 
-        }
-        public void GetDamage(int damage)
-        {
-            TakeDamage(damage, Vector3.zero, Vector3.zero);
-        }
         [PunRPC]
         public void AddHealth(int amount)
         {
@@ -110,5 +101,19 @@ namespace ildoo
             yield return new WaitForSeconds(5);
             Respawn(); 
         }
+
+        #region Debugging 
+        //Debugging purposes
+        public void OnGetHit(InputValue value)
+        {
+            GetDamage(20);
+            gameSceneUI.GameSceneUIUpdate();
+            //TeamHealthManager Update Health 
+        }
+        public void GetDamage(int damage)
+        {
+            TakeDamage(damage, Vector3.zero, Vector3.zero);
+        }
+        #endregion
     }
 }

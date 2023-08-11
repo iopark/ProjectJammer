@@ -39,6 +39,8 @@ namespace ildoo
         RaycastHit localHit;
         private void Update()
         {
+            if (!photonView.IsMine)
+                return; 
             originPoint = _cameraMain.ViewportToWorldPoint(middlePoint);
 
             lineRenderer.SetPosition(0, gameObject.transform.position);
