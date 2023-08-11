@@ -78,6 +78,11 @@ namespace ildoo
             gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>(); 
         }
 
+        private void Start()
+        {
+            gameSceneUI.GameSceneUIUpdate(); 
+        }
+
         #endregion
         private void OnEnable()
         {
@@ -138,6 +143,7 @@ namespace ildoo
         {
             anim.SetTrigger("Fire");
             currentAmmo--;
+            gameSceneUI.GameSceneUIUpdate();
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSmoke", muzzlePoint.position, Quaternion.identity, true);
             GameManager.Resource.Destroy(trail.gameObject, localEffectDestructionTime);
             if (localRoutine != null)
@@ -185,7 +191,7 @@ namespace ildoo
             }
         }
         #endregion
-
+        #region Reloading 
         Coroutine reloadEffect;
         public void Reload()
         {
@@ -200,25 +206,39 @@ namespace ildoo
         IEnumerator Reloading()
         {
             //재장전 시작시 weight 재설정 
+            isReloading = true; 
             animRig.weight = 0f;
             anim.SetTrigger("Reload");
             yield return reloadYieldInterval;
             animRig.weight = 1f;
-            currentAmmo = magCap;
+            //currentAmmo = magCap;
+            ReloadCalculation(); 
+            gameSceneUI.GameSceneUIUpdate();
+            isReloading = false; 
             //ammo calculation; 
-
         }
         int reloadAmount; 
         private void ReloadCalculation()
         {
-            reloadAmount = totalAmmo - currentAmmo;
-            
+            reloadAmount = magCap - CurrentAmmo;
+            if (reloadAmount == 0)
+                return; 
+            else if (reloadAmount > totalAmmo)
+            {
+                reloadAmount = totalAmmo; 
+            }
+            TotalAmmo -= reloadAmount; 
+            CurrentAmmo += reloadAmount; 
         }
         [PunRPC]
         public void AmmoChange(int addingAmount)
         {
-            totalAmmo += addingAmount;
-            totalAmmo = Mathf.Clamp(totalAmmo, 0, magCap);
+            if (!photonView.IsMine)
+                return; 
+            TotalAmmo += addingAmount;
+            TotalAmmo = Mathf.Clamp(TotalAmmo, 0, TotalAmmo);
+            gameSceneUI.GameSceneUIUpdate();
         }
+        #endregion
     }
 }

@@ -24,6 +24,7 @@ namespace ildoo
             set
             {
                 health = value;
+                gameSceneUI.GameSceneUIUpdate();
                 onHealthChange?.Invoke(health);
             }
         }
@@ -74,7 +75,7 @@ namespace ildoo
         private void Death()
         {
             isDead = true;
-            onDeath?.Invoke();
+            onDeath?.Invoke(); // MainCamera position should be moved else where. 
             gameObject.SetActive(false);
         }
 
