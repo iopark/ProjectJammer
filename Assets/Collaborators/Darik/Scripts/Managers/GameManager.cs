@@ -55,6 +55,6 @@ public class GameManager : MonoBehaviour
         UIObj.transform.SetParent(transform);
         UIManager = UIObj.AddComponent<LDW.UIManager>();
 
-        //enemyManager = resourceManager.Instantiate<Darik.EnemyManager>("Managers/EnemyManager", transform);
+        enemyManager = resourceManager.Instantiate<Darik.EnemyManager>("Managers/EnemyManager", transform);
     }
 }
