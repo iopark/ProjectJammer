@@ -48,10 +48,29 @@ namespace Darik
 
         public Transform SearchPlayer()
         {
-            int targetId = playerIds[Random.Range(0, playerIds.Count)];
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            int targetId = -1;
+
+            if (players.Length > 0)
+            {
+                float shortestDistance = Mathf.Infinity;
+                foreach (GameObject player in players)
+                {
+                    if (player != null)
+                    {
+                        Vector3 toTarget = transform.position - player.transform.position;
+                        float squrDistance = (toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
+                        if (shortestDistance > squrDistance)
+                        {
+                            shortestDistance = squrDistance;
+                            targetId = player.GetComponent<ildoo.Player>().UniquePlayerNumber(); ;
+                        }
+                    }
+                }
+            }
+            
             return PhotonView.Find(targetId).transform;
         }
-
         public void GenerateEnemy()
         {
             StartCoroutine(GenerateEnemyCoroutine());
