@@ -14,7 +14,6 @@ namespace ildoo
             if (!photonView.IsMine)
                 return;
 
-            if (other.)
             PlayerHealth playerHealth= other.gameObject.GetComponent<PlayerHealth>();
 
             // PlayerShooter 컴포넌트가 있으며, 총 오브젝트가 존재하면
