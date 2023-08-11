@@ -9,6 +9,10 @@ namespace ildoo
         [SerializeField] int maxAmmo;
         public int MaxAmmo => maxAmmo;
 
+        [SerializeField] int totalAmmo; 
+        public int TotalAmmo => totalAmmo;
+        //This later requires changes, (ammo into mag, total ammo into ammo). 
+        
         [SerializeField] int damage;
         public int Damage => damage;
 

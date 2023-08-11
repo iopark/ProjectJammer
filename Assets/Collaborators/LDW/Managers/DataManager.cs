@@ -9,13 +9,6 @@ namespace LDW
 {
     public class DataManager : MonoBehaviour
     {
-        public class PlayerData
-        {
-            public int viewId;
-            public int hp;
-            public int ammo;
-        }
-
         public Transform Disruptor;
 
         public MySqlConnection con;
