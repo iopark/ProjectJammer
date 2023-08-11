@@ -24,6 +24,7 @@ namespace Darik
 
         private Vector3 moveDir;
         private bool reload = true;
+        private bool isFireA = true;
 
         protected override void Awake()
         {
@@ -57,17 +58,12 @@ namespace Darik
             isDie = false;
         }
 
-        private void SearchPlayer()
-        {
-            target = GameManager.Enemy.SearchPlayer();
-        }
-
         protected override IEnumerator NavDestinationCoroutine(bool isRun = false)
         {
             agent.isStopped = false;
             while (true)
             {
-                SearchPlayer();
+                SearchTarget(true);
                 if (target != null)
                 {
                     if (isRun)
@@ -95,7 +91,7 @@ namespace Darik
             }
         }
 
-        IEnumerator FireAttackCoroutine()
+        IEnumerator FireCoroutine()
         {
             while (reload)
             {
@@ -111,6 +107,25 @@ namespace Darik
         {
             if (debug)
                 Debug.Log("Fire");
+
+            if (isFireA)
+            {
+                Vector3 dirL = ((target.position + Vector3.up * 1.666f) - muzzleALeftPosition.position).normalized;
+                Vector3 dirR = ((target.position + Vector3.up * 1.666f) - muzzleARightPosition.position).normalized;
+                GameManager.Resource.Instantiate<GameObject>("Prefabs/EnemyBullets/EnemyLaser", muzzleALeftPosition.position, Quaternion.LookRotation(dirL), true);
+                GameManager.Resource.Instantiate<GameObject>("Prefabs/EnemyBullets/EnemyLaser", muzzleARightPosition.position, Quaternion.LookRotation(dirR), true);
+                anim.SetTrigger("OnFireA");
+                isFireA = false;
+            }
+            else
+            {
+                Vector3 dirL = ((target.position + Vector3.up * 1.666f) - muzzleBLeftPosition.position).normalized;
+                Vector3 dirR = ((target.position + Vector3.up * 1.666f) - muzzleBRightPosition.position).normalized;
+                GameManager.Resource.Instantiate<GameObject>("Prefabs/EnemyBullets/EnemyLaser", muzzleBLeftPosition.position, Quaternion.LookRotation(dirL), true);
+                GameManager.Resource.Instantiate<GameObject>("Prefabs/EnemyBullets/EnemyLaser", muzzleBRightPosition.position, Quaternion.LookRotation(dirR), true);
+                anim.SetTrigger("OnFireB");
+                isFireA = true;
+            }
         }
 
         [PunRPC]
@@ -194,7 +209,7 @@ namespace Darik
 
             public override void Update()
             {
-                owner.SearchPlayer();
+                owner.SearchTarget(true);
                 if (owner.target != null)
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
@@ -284,14 +299,13 @@ namespace Darik
 
             public override void Update()
             {
-                owner.SearchPlayer();
+                owner.SearchTarget(true);
                 if (owner.target != null)
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
 
                     owner.moveDir.Normalize();
-                    transform.Translate(owner.moveDir * -2f * Time.deltaTime, Space.World);
                     transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(owner.moveDir), 0.1f);
                 }
             }
@@ -327,12 +341,14 @@ namespace Darik
 
             public override void Enter()
             {
+                owner.reload = true;
+                owner.StartCoroutine(owner.FireCoroutine());
                 owner.stateText.text = "Attack";
             }
 
             public override void Update()
             {
-                owner.SearchPlayer();
+                owner.SearchTarget(true);
                 if (owner.target != null)
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
@@ -357,7 +373,7 @@ namespace Darik
 
             public override void Exit()
             {
-
+                owner.StopAllCoroutines();
             }
         }
 
