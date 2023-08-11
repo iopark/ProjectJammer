@@ -103,13 +103,13 @@ namespace ildoo
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>();
                 hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
-                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, hit.point);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, hit.point);
             }
             else
             {
                 //Where Quaternion.identity means no rotation value at all 
                 endPoint = shotPoint + (muzzlePoint.transform.forward * maxDistance);
-                photonView.RPC("PostShotWorkSync", RpcTarget.All, muzzlePoint.position, endPoint);
+                photonView.RPC("PostShotWorkSync", RpcTarget.All, endPoint);
 
                 //Problem with this => in other's clients, bullet trail should be released from the muzzlepoint => *maxDistance. 
             }
@@ -130,7 +130,7 @@ namespace ildoo
 
         Coroutine shotEffectSync;
         [PunRPC]
-        public void PostShotWorkSync(Vector3 startPos, Vector3 endPos)
+        public void PostShotWorkSync(Vector3 endPos)
         {
             if (photonView.IsMine)
             {
@@ -140,16 +140,16 @@ namespace ildoo
             currentAmmo--;
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
             GameManager.Resource.Destroy(trail.gameObject, 1.2f);
-            shotEffectSync = StartCoroutine(ShotEffectSync(trail, startPos, endPos));
+            shotEffectSync = StartCoroutine(ShotEffectSync(trail, muzzlePoint.position, endPos));
         }
 
 
         IEnumerator ShotEffectLocal(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
             float deltaDist = Vector3.SqrMagnitude(endPos - startPos);
-            while (deltaDist > 1)
+            while (deltaDist > 0.1)
             {
-                trail.transform.position = Vector3.MoveTowards(trail.transform.position, endPos, .85f);
+                trail.transform.position = Vector3.Lerp(trail.transform.position, endPos, .075f);
                 deltaDist = Vector3.SqrMagnitude(endPos - startPos);
                 yield return null;
             }
