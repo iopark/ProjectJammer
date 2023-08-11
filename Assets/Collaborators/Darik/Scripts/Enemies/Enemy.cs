@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using ildoo;
 
 namespace Darik
 {
@@ -34,9 +35,12 @@ namespace Darik
             curHp = maxHp;
         }
 
-        protected void SearchTarget()
+        protected void SearchTarget(bool isTargetPlayer = false)
         {
-            target = GameManager.Enemy.SearchTarget();
+            if (isTargetPlayer)
+                target = GameManager.Enemy.SearchPlayer();
+            else
+                target = GameManager.Enemy.SearchTarget();
         }
 
         protected int SquareDistanceToTarget(Vector3 toTarget)

@@ -48,10 +48,29 @@ namespace Darik
 
         public Transform SearchPlayer()
         {
-            int targetId = playerIds[Random.Range(0, playerIds.Count)];
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            int targetId = -1;
+
+            if (players.Length > 0)
+            {
+                float shortestDistance = Mathf.Infinity;
+                foreach (GameObject player in players)
+                {
+                    if (player != null)
+                    {
+                        Vector3 toTarget = transform.position - player.transform.position;
+                        float squrDistance = (toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
+                        if (shortestDistance > squrDistance)
+                        {
+                            shortestDistance = squrDistance;
+                            targetId = player.GetComponent<ildoo.Player>().UniquePlayerNumber(); ;
+                        }
+                    }
+                }
+            }
+            
             return PhotonView.Find(targetId).transform;
         }
-
         public void GenerateEnemy()
         {
             StartCoroutine(GenerateEnemyCoroutine());
@@ -64,9 +83,21 @@ namespace Darik
                 if (debug)
                     Debug.Log("Generate");
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, 35), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-45, 0, 25), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, -30), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, -35), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-45, 0, -25), Quaternion.identity, 0);
+
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 95), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-45, 0, 90), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-35, 0, 85), Quaternion.identity, 0);
+
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(45, 0, 85), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(35, 0, 95), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(40, 0, 90), Quaternion.identity, 0);
+
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(35, 0, -30), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(40, 0, -25), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(45, 0, -35), Quaternion.identity, 0);
 
                 yield return new WaitForSeconds(SpawnCoolTime);
             }
