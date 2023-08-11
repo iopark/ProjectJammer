@@ -21,7 +21,6 @@ namespace ildoo
             teamHPvalue.value = 100;
             teamHealthContainer = GameObject.Find("TeamStats").GetComponent<RectTransform>();
             transform.SetParent(teamHealthContainer, false);
-            //Add to the Directed Asset 
             if (photonView.IsMine)
             {
                 teamName.color = Color.yellow;
