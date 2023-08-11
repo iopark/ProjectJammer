@@ -91,7 +91,7 @@ namespace ildoo
         private void OnReload(InputValue input)
         {
             if (currentGun.isReloading 
-                || currentGun.CurrentAmmo == currentGun.maxAmmo
+                || currentGun.CurrentAmmo == currentGun.magCap
                 || isSwinging)
                 return;
             currentGun.Reload(); 
