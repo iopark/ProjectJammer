@@ -83,9 +83,21 @@ namespace Darik
                 if (debug)
                     Debug.Log("Generate");
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 30), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, 35), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-45, 0, 25), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, -30), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, -35), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-45, 0, -25), Quaternion.identity, 0);
+
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 95), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-45, 0, 90), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-35, 0, 85), Quaternion.identity, 0);
+
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(45, 0, 85), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(35, 0, 95), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(40, 0, 90), Quaternion.identity, 0);
+
+                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(35, 0, -30), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(40, 0, -25), Quaternion.identity, 0);
+                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(45, 0, -35), Quaternion.identity, 0);
 
                 yield return new WaitForSeconds(SpawnCoolTime);
             }
