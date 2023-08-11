@@ -18,7 +18,7 @@ namespace LDW
         private void Start()
         {
             playerhp = playerHealth.health;
-
+            // hpSlider.value = playerHealth.fixedhealth;
             hpText.text = $"{playerhp}";
         }
 
