@@ -7,6 +7,7 @@ namespace Park_Woo_Young
 {
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable, IInteractable
     {
+        
         [SerializeField] GameObject hologram;            // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] GameObject emp;                 // 클리어시 생기는 이펙트
         [SerializeField] TMP_Text progress_Text;         // 슬라이드를 대체할 텍스트 진행도
@@ -20,7 +21,7 @@ namespace Park_Woo_Young
         [SerializeField] int maxProgress = 100;          // 클리어에 필요한 진행도
         [SerializeField] int progressGoesUp = 1;         // 교란기 진행도에 필요한 시간이 충족되면 진행도가 올라가는 속도
         [SerializeField] int hpRepair = 1;               // 체력감소시 시간에 따른 회복속도
-        
+
         public float interaction = 4;                    // 상호작용 거리
         public float time;                               // 델타타임
         public bool disruptorHit;                        // 공격당했을 때 멈추는 상태로 넘어가게 하기
@@ -40,7 +41,6 @@ namespace Park_Woo_Young
         {
             // 임시로 시작시 바로 실행
             GameStart();
-
         }
 
         private void SetDisruptor()
@@ -59,14 +59,6 @@ namespace Park_Woo_Young
 
         }
 
-        private void TestHit(int damage)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                Hit(damage);
-            }
-        }
-
         private void Hit(int damage)
         {
             progress -= damage;
@@ -75,9 +67,6 @@ namespace Park_Woo_Young
 
         private void Update()
         {
-            TestHit(10);
-            
-
             switch (state)
             {
                 case State.Activate:
@@ -193,6 +182,7 @@ namespace Park_Woo_Young
                 empExplosionTime += Time.deltaTime;
                 EmpRange += 0.8f;
                 emp.transform.localScale = new Vector3(0f + EmpRange, 0f + EmpRange, 0f + EmpRange);
+                
             }
         }
 
