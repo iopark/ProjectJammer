@@ -136,10 +136,12 @@ namespace Park_Woo_Young
                 renderer.sharedMaterial = hologram_Blue;
                 progress_Text.color = Color.white;
             }
-            if (currentHP <= 0)
+            if (progress <= -1)
             {
                 //SceneManager.LoadScene(""); // 교란기 파괴시 여기에서 신을 불러와주기.
                 state = State.Destroyed;
+                progress_Text.color = Color.red;
+                progress_Text.text = "Destruction";
                 print("교란기 파괴");
             }
         }
@@ -203,7 +205,8 @@ namespace Park_Woo_Young
 
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
         {
-            Hit(damage);
+            if(!disruptorHit)
+                Hit(damage);
         }
 
         public void Interact()
@@ -218,12 +221,26 @@ namespace Park_Woo_Young
                 return;
             }
         }
+        private void Hologram()
+        {
+            if (!disruptorHit)
+            {
+                renderer.sharedMaterial = hologram_Blue;
+                progress_Text.color = Color.white;
+            }
+            else
+            {
+                renderer.sharedMaterial = hologram_Red;
+                progress_Text.color = Color.red;
+            }
+        }
 
         [PunRPC]
         private void DisruptorOn()
         {
             disruptorHit = false;
             renderer.sharedMaterial = hologram_Blue;
+            progress_Text.color = Color.white;
         }
 
         [PunRPC]
@@ -232,6 +249,7 @@ namespace Park_Woo_Young
             //progress -= damage;
             disruptorHit = true;
             renderer.sharedMaterial = hologram_Red;
+            progress_Text.color = Color.red;
         }
 
     }
