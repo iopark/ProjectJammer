@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace ildoo
 {
-    public class Consumable : Item
+    public interface IConsumable
     {
-        void Test() { }
+        public abstract void Consume(GameObject target); 
     }
 }
 

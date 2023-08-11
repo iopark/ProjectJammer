@@ -147,9 +147,9 @@ namespace ildoo
         IEnumerator ShotEffectLocal(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
             float deltaDist = Vector3.SqrMagnitude(endPos - startPos);
-            while (deltaDist > 0.01)
+            while (deltaDist > 0.1)
             {
-                trail.transform.position = Vector3.Lerp(trail.transform.position, endPos, .85f);
+                trail.transform.position = Vector3.Lerp(trail.transform.position, endPos, .075f);
                 deltaDist = Vector3.SqrMagnitude(endPos - startPos);
                 yield return null;
             }
