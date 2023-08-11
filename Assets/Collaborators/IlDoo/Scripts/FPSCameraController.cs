@@ -10,9 +10,10 @@ namespace ildoo
     {
         [SerializeField] float mouseSensitivity;
         [SerializeField] Transform cameraRoot;
-        [SerializeField] Transform aimTarget;
+        [SerializeField] public Transform aimTarget;
         public Vector3 camCentrePoint;
-        public Vector3 camCentreForward; 
+        public Vector3 camCentreForward;
+        Camera overlayCam; 
         Camera _camera;
 
 
@@ -27,17 +28,21 @@ namespace ildoo
             camCentrePoint = Vector3.zero;
             if (!photonView.IsMine)
                 return;
-            _camera = Camera.main;
-            _camera.transform.position = cameraRoot.position;
-            _camera.transform.rotation = cameraRoot.rotation;
-            _camera.transform.SetParent(cameraRoot);
+            SetMainCamPos();
+            overlayCam = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
         }
 
         private void Start()
         {
 
         }
-
+        private void SetMainCamPos()
+        {
+            _camera = Camera.main;
+            _camera.transform.position = cameraRoot.position;
+            _camera.transform.rotation = cameraRoot.rotation;
+            _camera.transform.SetParent(cameraRoot);
+        }
         private void OnEnable()
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -68,8 +73,9 @@ namespace ildoo
             cameraRoot.localRotation = Quaternion.Euler(xRotation, 0, 0);
             transform.localRotation = Quaternion.Euler(0, yRotation, 0);
 
-            Vector3 setAimTarget = _camera.transform.position + _camera.transform.forward * 50;
+            Vector3 setAimTarget = _camera.transform.position + _camera.transform.forward * 30;
             aimTarget.position = setAimTarget;
+            setAimTarget.y += 10f; 
             camCentrePoint = _camera.ViewportToWorldPoint(camFOVCentre);
             camCentreForward = _camera.transform.forward; 
         }

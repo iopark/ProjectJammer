@@ -6,37 +6,35 @@ using UnityEngine;
 
 namespace Darik
 {
-    public class Enemy_Rifle : Enemy
+    public class Enemy_Sniper : Enemy
     {
-        public enum State { Appear, Idle, Move, FireAttack, BashAttack, Die }
-        StateMachine<State, Enemy_Rifle> stateMachine;
+        public enum State { Appear, Idle, MoveForward, MoveBackward, Attack, Die }
+        StateMachine<State, Enemy_Sniper> stateMachine;
 
         [SerializeField] private TMP_Text stateText;
-        [SerializeField] private float appearTime = 3f;
-        [SerializeField] private float fireAttackRange = 10f;
-        [SerializeField] private float bashAttackRange = 1f;
-        [SerializeField] private float bashAttackTiming = 0.1f;
+        [SerializeField] private float appearTime = 2f;
+        [SerializeField] private float attackRange = 20f;
+        [SerializeField] private float runRange = 10f;
 
-        [SerializeField] Transform muzzlePosition;
+        [SerializeField] Transform muzzleALeftPosition;
+        [SerializeField] Transform muzzleARightPosition;
+        [SerializeField] Transform muzzleBLeftPosition;
+        [SerializeField] Transform muzzleBRightPosition;
         [SerializeField] private float fireCoolTime = 0.5f;
-        [SerializeField] private float bashCoolTime = 3f;
-        [SerializeField] private int bashAttackDamage = 1;
 
         private Vector3 moveDir;
-        private bool isMove = false;
-        private bool fireReload = true;
-        private bool bashReload = true;
+        private bool reload = true;
 
         protected override void Awake()
         {
             base.Awake();
 
-            stateMachine = new StateMachine<State, Enemy_Rifle>(this);
+            stateMachine = new StateMachine<State, Enemy_Sniper>(this);
             stateMachine.AddState(State.Appear, new AppearState(this, stateMachine));
             stateMachine.AddState(State.Idle, new IdleState(this, stateMachine));
-            stateMachine.AddState(State.Move, new MoveState(this, stateMachine));
-            stateMachine.AddState(State.FireAttack, new FireAttackState(this, stateMachine));
-            stateMachine.AddState(State.BashAttack, new BashAttackState(this, stateMachine));
+            stateMachine.AddState(State.MoveForward, new MoveForwardState(this, stateMachine));
+            stateMachine.AddState(State.MoveBackward, new MoveBackwardState(this, stateMachine));
+            stateMachine.AddState(State.Attack, new AttackState(this, stateMachine));
             stateMachine.AddState(State.Die, new DieState(this, stateMachine));
         }
 
@@ -59,6 +57,29 @@ namespace Darik
             isDie = false;
         }
 
+        private void SearchPlayer()
+        {
+            target = GameManager.Enemy.SearchPlayer();
+        }
+
+        protected override IEnumerator NavDestinationCoroutine(bool isRun = false)
+        {
+            agent.isStopped = false;
+            while (true)
+            {
+                SearchPlayer();
+                if (target != null)
+                {
+                    if (isRun)
+                        agent.destination = transform.position + (transform.position - target.position);
+                    else
+                        agent.destination = target.position;
+                }
+
+                yield return new WaitForSeconds(0.2f);
+            }
+        }
+
         [PunRPC]
         public override void Hit(int damage, Vector3 hitPoint, Vector3 normal)
         {
@@ -72,19 +93,16 @@ namespace Darik
                 isDie = true;
                 stateMachine.ChangeState(State.Die);
             }
-
-            if (!isMove)
-                anim.SetTrigger("OnHit");
         }
 
         IEnumerator FireAttackCoroutine()
         {
-            while (fireReload)
+            while (reload)
             {
-                fireReload = false;
+                reload = false;
                 photonView.RPC("Fire", RpcTarget.AllViaServer);
                 yield return new WaitForSeconds(fireCoolTime);
-                fireReload = true;
+                reload = true;
             }
         }
 
@@ -93,32 +111,12 @@ namespace Darik
         {
             if (debug)
                 Debug.Log("Fire");
-
-            Vector3 dir = ((target.position + Vector3.up * 1.666f) - muzzlePosition.position).normalized;
-            GameManager.Resource.Instantiate<GameObject>("Prefabs/EnemyBullets/EnemyBullet", muzzlePosition.position, Quaternion.LookRotation(dir), true);
-            anim.SetTrigger("OnFireAttack");
-        }
-
-        IEnumerator BashAttackCoroutine()
-        {
-            while (bashReload)
-            {
-                bashReload = false;
-                photonView.RPC("SetTriggerBashAttack", RpcTarget.AllViaServer);
-                yield return new WaitForSeconds(bashAttackTiming);
-
-                if (debug)
-                    Debug.Log("Bash");
-                target.gameObject.GetComponent<IHittable>()?.TakeDamage(bashAttackDamage, Vector3.zero, transform.forward);
-                yield return new WaitForSeconds(bashCoolTime - bashAttackTiming);
-                bashReload = true;
-            }
         }
 
         [PunRPC]
-        public void SetTriggerBashAttack()
+        public void SetFloatAnimSpeed(int animSpeed)
         {
-            anim.SetTrigger("OnBashAttack");
+            anim.SetFloat("AnimSpeed", animSpeed);
         }
 
         [PunRPC]
@@ -128,7 +126,7 @@ namespace Darik
         }
 
         #region State
-        private abstract class Enemy_RifleState : StateBase<State, Enemy_Rifle>
+        private abstract class Enemy_SniperState : StateBase<State, Enemy_Sniper>
         {
             protected GameObject gameObject => owner.gameObject;
             protected Transform transform => owner.transform;
@@ -136,16 +134,16 @@ namespace Darik
             protected Animator anim => owner.anim;
             protected Collider collider => owner.collider;
 
-            protected Enemy_RifleState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            protected Enemy_SniperState(Enemy_Sniper owner, StateMachine<State, Enemy_Sniper> stateMachine) : base(owner, stateMachine)
             {
             }
         }
 
-        private class AppearState : Enemy_RifleState
+        private class AppearState : Enemy_SniperState
         {
             private float curTime;
 
-            public AppearState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public AppearState(Enemy_Sniper owner, StateMachine<State, Enemy_Sniper> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -177,9 +175,9 @@ namespace Darik
             }
         }
 
-        private class IdleState : Enemy_RifleState
+        private class IdleState : Enemy_SniperState
         {
-            public IdleState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public IdleState(Enemy_Sniper owner, StateMachine<State, Enemy_Sniper> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -190,29 +188,40 @@ namespace Darik
 
             public override void Enter()
             {
+                owner.photonView.RPC("SetFloatAnimSpeed", RpcTarget.AllViaServer, 0);
                 owner.stateText.text = "Idle";
             }
 
             public override void Update()
             {
-                owner.SearchTarget();
+                owner.SearchPlayer();
+                if (owner.target != null)
+                {
+                    owner.moveDir = owner.target.transform.position - transform.position;
+                    owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
+                }
             }
 
             public override void Transition()
             {
                 if (owner.target != null)
-                    stateMachine.ChangeState(State.Move);
+                {
+                    if (owner.squareDistanceToTarget <= (owner.runRange * owner.runRange))
+                        stateMachine.ChangeState(State.MoveBackward);
+                    else
+                        stateMachine.ChangeState(State.MoveForward);
+                }
             }
 
             public override void Exit()
             {
-
+                owner.photonView.RPC("SetFloatAnimSpeed", RpcTarget.AllViaServer, 1);
             }
         }
 
-        private class MoveState : Enemy_RifleState
+        private class MoveForwardState : Enemy_SniperState
         {
-            public MoveState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public MoveForwardState(Enemy_Sniper owner, StateMachine<State, Enemy_Sniper> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -224,9 +233,8 @@ namespace Darik
             public override void Enter()
             {
                 owner.StartCoroutine(owner.NavDestinationCoroutine());
-                owner.isMove = true;
                 owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, true);
-                owner.stateText.text = "Walk";
+                owner.stateText.text = "Forward";
             }
 
             public override void Update()
@@ -243,22 +251,21 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget <= (owner.fireAttackRange * owner.fireAttackRange))
-                    stateMachine.ChangeState(State.FireAttack);
+                if (owner.squareDistanceToTarget <= (owner.attackRange * owner.attackRange))
+                    stateMachine.ChangeState(State.Attack);
             }
 
             public override void Exit()
             {
                 owner.agent.isStopped = true;
                 owner.StopAllCoroutines();
-                owner.isMove = false;
                 owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, false);
             }
         }
 
-        private class FireAttackState : Enemy_RifleState
+        private class MoveBackwardState : Enemy_SniperState
         {
-            public FireAttackState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public MoveBackwardState(Enemy_Sniper owner, StateMachine<State, Enemy_Sniper> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -269,20 +276,22 @@ namespace Darik
 
             public override void Enter()
             {
-                owner.fireReload = true;
-                owner.StartCoroutine(owner.FireAttackCoroutine());
-                owner.stateText.text = "FireAttack";
+                owner.StartCoroutine(owner.NavDestinationCoroutine(true));
+                owner.photonView.RPC("SetFloatAnimSpeed", RpcTarget.AllViaServer, -1);
+                owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, true);
+                owner.stateText.text = "Backward";
             }
 
             public override void Update()
             {
-                owner.SearchTarget();
+                owner.SearchPlayer();
                 if (owner.target != null)
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
                     owner.squareDistanceToTarget = owner.SquareDistanceToTarget(owner.moveDir);
-                    
+
                     owner.moveDir.Normalize();
+                    transform.Translate(owner.moveDir * -2f * Time.deltaTime, Space.World);
                     transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(owner.moveDir), 0.1f);
                 }
             }
@@ -292,22 +301,22 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget <= (owner.bashAttackRange * owner.bashAttackRange))
-                    stateMachine.ChangeState(State.BashAttack);
-
-                if (owner.squareDistanceToTarget > (owner.fireAttackRange * owner.fireAttackRange))
-                    stateMachine.ChangeState(State.Move);
+                if (owner.squareDistanceToTarget > (owner.runRange * owner.runRange))
+                    stateMachine.ChangeState(State.Attack);
             }
 
             public override void Exit()
             {
+                owner.agent.isStopped = true;
                 owner.StopAllCoroutines();
+                owner.photonView.RPC("SetBoolMove", RpcTarget.AllViaServer, false);
+                owner.photonView.RPC("SetFloatAnimSpeed", RpcTarget.AllViaServer, 1);
             }
         }
 
-        private class BashAttackState : Enemy_RifleState
+        private class AttackState : Enemy_SniperState
         {
-            public BashAttackState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public AttackState(Enemy_Sniper owner, StateMachine<State, Enemy_Sniper> stateMachine) : base(owner, stateMachine)
             {
             }
 
@@ -318,14 +327,12 @@ namespace Darik
 
             public override void Enter()
             {
-                owner.bashReload = true;
-                owner.StartCoroutine(owner.BashAttackCoroutine());
-                owner.stateText.text = "BashAttack";
+                owner.stateText.text = "Attack";
             }
 
             public override void Update()
             {
-                owner.SearchTarget();
+                owner.SearchPlayer();
                 if (owner.target != null)
                 {
                     owner.moveDir = owner.target.transform.position - transform.position;
@@ -341,21 +348,24 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget > (owner.bashAttackRange * owner.bashAttackRange))
-                    stateMachine.ChangeState(State.FireAttack);
+                if (owner.squareDistanceToTarget <= (owner.runRange * owner.runRange))
+                    stateMachine.ChangeState(State.MoveBackward);
+
+                if (owner.squareDistanceToTarget > (owner.attackRange * owner.attackRange))
+                    stateMachine.ChangeState(State.MoveForward);
             }
 
             public override void Exit()
             {
-                owner.StopAllCoroutines();
+
             }
         }
 
-        private class DieState : Enemy_RifleState
+        private class DieState : Enemy_SniperState
         {
             private float curTime;
 
-            public DieState(Enemy_Rifle owner, StateMachine<State, Enemy_Rifle> stateMachine) : base(owner, stateMachine)
+            public DieState(Enemy_Sniper owner, StateMachine<State, Enemy_Sniper> stateMachine) : base(owner, stateMachine)
             {
             }
 

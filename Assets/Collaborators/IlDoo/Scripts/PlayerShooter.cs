@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions; 
 
@@ -11,6 +12,8 @@ namespace ildoo
     public class PlayerShooter : MonoBehaviourPun
     {
         public Gun currentGun;
+
+        public UnityAction<bool> zoomIn; 
         [SerializeField] GunViewOverlay gunCam;
         [SerializeField] private float nextFire;
         Animator anim;
@@ -88,7 +91,7 @@ namespace ildoo
         private void OnReload(InputValue input)
         {
             if (currentGun.isReloading 
-                || currentGun.CurrentAmmo == currentGun.maxAmmo
+                || currentGun.CurrentAmmo == currentGun.magCap
                 || isSwinging)
                 return;
             currentGun.Reload(); 
@@ -101,6 +104,11 @@ namespace ildoo
                 Fire();
                 yield return null; 
             }
+        }
+
+        private void OnZoom(InputValue input)
+        {
+            zoomIn?.Invoke(input.isPressed); 
         }
         #region Deprecated 
         //public void OnFire(InputAction.CallbackContext context)
