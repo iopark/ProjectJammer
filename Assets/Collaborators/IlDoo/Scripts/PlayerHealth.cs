@@ -26,8 +26,9 @@ namespace ildoo
             set
             {
                 health = value;
-                gameSceneUI.GameSceneUIUpdate();
                 onHealthChange?.Invoke(health);
+                if (photonView.IsMine)
+                    gameSceneUI.GameSceneUIUpdate();
             }
         }
         public bool isDead;
@@ -37,6 +38,7 @@ namespace ildoo
 
         private void Awake()
         {
+            health = fixedHealth; 
             if (photonView.IsMine)
                 gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
         }
@@ -72,6 +74,8 @@ namespace ildoo
         private void HealthUpdate(int health)
         {
             this.health = health;
+            if (photonView.IsMine)
+                gameSceneUI.GameSceneUIUpdate();
         }
         [PunRPC]
         private void Death()
@@ -101,7 +105,6 @@ namespace ildoo
             yield return new WaitForSeconds(5);
             Respawn(); 
         }
-
         #region Debugging 
         //Debugging purposes
         public void OnGetHit(InputValue value)

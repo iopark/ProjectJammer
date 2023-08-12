@@ -173,25 +173,29 @@ namespace ildoo
         IEnumerator ShotEffectLocal(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
             float deltaDist = Vector3.SqrMagnitude(endPos - startPos);
+            trail.Clear();
             while (deltaDist > 0.1)
             {
                 trail.transform.position = Vector3.Lerp(trail.transform.position, endPos, .075f);
                 deltaDist = Vector3.SqrMagnitude(endPos - startPos);
                 yield return null;
             }
+            trail.Clear();
         }
 
         IEnumerator ShotEffectSync(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
             float totalTime = Vector2.Distance(startPos, endPos) / maxDistance;
             float time = 0;
+            trail.Clear();
             while (time < 1)
             {
                 trail.transform.position = Vector3.Lerp(startPos, endPos, time);
                 time += Time.deltaTime / totalTime;
-
                 yield return null;
             }
+            trail.Clear(); 
+            yield return null;
         }
         #endregion
         #region Reloading 
@@ -205,6 +209,8 @@ namespace ildoo
         public void ReloadEffect()
         {
             reloadEffect = StartCoroutine(Reloading());
+            if (photonView.IsMine)
+                gameSceneUI.GameSceneUIUpdate();
         }
         IEnumerator Reloading()
         {
@@ -216,7 +222,6 @@ namespace ildoo
             animRig.weight = 1f;
             //currentAmmo = magCap;
             ReloadCalculation(); 
-            gameSceneUI.GameSceneUIUpdate();
             isReloading = false; 
             //ammo calculation; 
         }
