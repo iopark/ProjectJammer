@@ -12,9 +12,8 @@ namespace Darik
         StateMachine<State, Enemy_Blade> stateMachine;
 
         [SerializeField] private TMP_Text stateText;
-        [SerializeField] private LayerMask layerMask;
         [SerializeField] private float appearTime = 2f;
-        [SerializeField] private int attackRange;
+        [SerializeField] private float attackRange;
         [SerializeField] private float attackCoolTime = 3f;
         [SerializeField] private float attackTiming = 0.2f;
         [SerializeField] private int damage = 1;
@@ -215,7 +214,7 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget <= owner.attackRange)
+                if (owner.CheckInOfRange(owner.attackRange))
                     stateMachine.ChangeState(State.Attack);
             }
 
@@ -261,7 +260,7 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget > owner.attackRange)
+                if (owner.CheckOutOfRange(owner.attackRange))
                     stateMachine.ChangeState(State.Move);
             }
 

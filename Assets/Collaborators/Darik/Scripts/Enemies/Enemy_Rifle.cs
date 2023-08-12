@@ -243,7 +243,7 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget <= (owner.fireAttackRange * owner.fireAttackRange))
+                if (!owner.CheckIsBlocked(owner.fireAttackRange) && owner.CheckInOfRange(owner.fireAttackRange))
                     stateMachine.ChangeState(State.FireAttack);
             }
 
@@ -292,10 +292,15 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget <= (owner.bashAttackRange * owner.bashAttackRange))
-                    stateMachine.ChangeState(State.BashAttack);
+                if (!owner.CheckIsBlocked(Vector3.Distance(transform.position, owner.target.position)))
+                {
+                    if (owner.CheckInOfRange(owner.bashAttackRange))
+                        stateMachine.ChangeState(State.BashAttack);
 
-                if (owner.squareDistanceToTarget > (owner.fireAttackRange * owner.fireAttackRange))
+                    if (owner.CheckOutOfRange(owner.fireAttackRange))
+                        stateMachine.ChangeState(State.Move);
+                }
+                else
                     stateMachine.ChangeState(State.Move);
             }
 
@@ -341,8 +346,13 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget > (owner.bashAttackRange * owner.bashAttackRange))
-                    stateMachine.ChangeState(State.FireAttack);
+                if (!owner.CheckIsBlocked(Vector3.Distance(transform.position, owner.target.position)))
+                {
+                    if (owner.CheckOutOfRange(owner.bashAttackRange))
+                        stateMachine.ChangeState(State.FireAttack);
+                }
+                else
+                    stateMachine.ChangeState(State.Move);
             }
 
             public override void Exit()

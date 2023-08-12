@@ -11,14 +11,16 @@ namespace Darik
     {
         [SerializeField] protected bool debug;
         [SerializeField] protected int maxHp = 10;
+        [SerializeField] protected LayerMask blockLayer;
 
         protected Rigidbody rb;
         protected Animator anim;
         protected new Collider collider;
         protected NavMeshAgent agent;
         protected Transform target;
+        private RaycastHit hit;
 
-        protected int squareDistanceToTarget;
+        protected float squareDistanceToTarget;
         protected int curHp;
         protected bool isDie = false;
 
@@ -35,17 +37,25 @@ namespace Darik
             curHp = maxHp;
         }
 
-        protected void SearchTarget(bool isTargetPlayer = false)
+        protected float SquareDistanceToTarget(Vector3 toTarget)
         {
-            if (isTargetPlayer)
-                target = GameManager.Enemy.SearchPlayer();
-            else
-                target = GameManager.Enemy.SearchTarget();
+            return (toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
         }
 
-        protected int SquareDistanceToTarget(Vector3 toTarget)
+        protected bool CheckInOfRange(float range)
         {
-            return (int)(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
+            if (squareDistanceToTarget <= (range * range))
+                return true;
+            else
+                return false;
+        }
+
+        protected bool CheckOutOfRange(float range)
+        {
+            if (squareDistanceToTarget > (range * range))
+                return true;
+            else
+                return false;
         }
 
         protected virtual IEnumerator NavDestinationCoroutine(bool isRun = false)
@@ -58,6 +68,38 @@ namespace Darik
                     agent.destination = target.position;
 
                 yield return new WaitForSeconds(0.2f);
+            }
+        }
+
+        protected void SearchTarget(bool isTargetPlayer = false)
+        {
+            if (isTargetPlayer)
+                target = GameManager.Enemy.SearchPlayer();
+            else
+                target = GameManager.Enemy.SearchTarget();
+        }
+
+        protected bool CheckIsBlocked(float range)
+        {
+            if (Physics.Raycast(transform.position, (target.position - transform.position), out hit, range))
+            {
+                Debug.Log(hit.transform.gameObject.name);
+
+                if (blockLayer.Contain(hit.transform.gameObject.layer))
+                {
+                    Debug.Log(true);
+                    return true;
+                }
+                else
+                {
+                    Debug.Log(false);
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.Log(false);
+                return false;
             }
         }
 
