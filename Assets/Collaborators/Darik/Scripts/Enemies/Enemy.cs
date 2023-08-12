@@ -83,24 +83,13 @@ namespace Darik
         {
             if (Physics.Raycast(transform.position, (target.position - transform.position), out hit, range))
             {
-                Debug.Log(hit.transform.gameObject.name);
-
                 if (blockLayer.Contain(hit.transform.gameObject.layer))
-                {
-                    Debug.Log(true);
                     return true;
-                }
                 else
-                {
-                    Debug.Log(false);
                     return false;
-                }
             }
             else
-            {
-                Debug.Log(false);
                 return false;
-            }
         }
 
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
