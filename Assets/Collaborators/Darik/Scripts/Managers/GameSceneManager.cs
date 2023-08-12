@@ -12,6 +12,13 @@ namespace Darik
 {
     public class GameSceneManager : MonoBehaviourPunCallbacks
     {
+        [SerializeField] Transform enemySpawnPointAt2oClock;
+        [SerializeField] Transform enemySpawnPointAt4oClock;
+        [SerializeField] Transform enemySpawnPointAt6oClock;
+        [SerializeField] Transform enemySpawnPointAt10oClock;
+        [SerializeField] Transform enemySpawnPointAt11oClock;
+        [SerializeField] Transform itemSpawnPoint;
+
         [SerializeField] TMP_Text infoText;
         [SerializeField] float countDownTimer = 5;
 
