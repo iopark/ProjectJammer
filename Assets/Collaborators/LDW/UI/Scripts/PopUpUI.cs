@@ -1,18 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class PopUpUI : MonoBehaviour
+namespace LDW
 {
-    // Start is called before the first frame update
-    void Start()
+    public class PopUpUI : BaseUI
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        protected override void Awake()
+        {
+            base.Awake();
+        }
     }
 }

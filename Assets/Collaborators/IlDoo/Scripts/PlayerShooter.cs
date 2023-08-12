@@ -32,6 +32,8 @@ namespace ildoo
 
         private void Start()
         {
+            if (!photonView.IsMine)
+                return; 
             crossHairUI = GetComponentInChildren<Crosshair>();
             zoomIn += crossHairUI.ChangeCrosshair; 
             anim = GetComponent<Animator>();

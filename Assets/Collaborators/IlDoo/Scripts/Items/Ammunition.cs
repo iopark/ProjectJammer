@@ -20,10 +20,9 @@ namespace ildoo
             {
                 // 총의 남은 탄환 수를 ammo 만큼 더하기, 모든 클라이언트에서 실행
                 playerShooter.currentGun.photonView.RPC("AmmoChange", RpcTarget.All, ammoFillAmount);
+                PhotonNetwork.Destroy(gameObject);
             }
-
             // 모든 클라이언트에서의 자신을 파괴
-            PhotonNetwork.Destroy(gameObject);
         }
     }
 }
