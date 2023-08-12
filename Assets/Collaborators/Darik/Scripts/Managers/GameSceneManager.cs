@@ -12,15 +12,30 @@ namespace Darik
 {
     public class GameSceneManager : MonoBehaviourPunCallbacks
     {
-        [SerializeField] Transform enemySpawnPointAt2oClock;
-        [SerializeField] Transform enemySpawnPointAt4oClock;
-        [SerializeField] Transform enemySpawnPointAt6oClock;
-        [SerializeField] Transform enemySpawnPointAt10oClock;
-        [SerializeField] Transform enemySpawnPointAt11oClock;
-        [SerializeField] Transform itemSpawnPoint;
+        [SerializeField] Transform enemySpawnPointAt2oClock = null;
+        [SerializeField] Transform enemySpawnPointAt4oClock = null;
+        [SerializeField] Transform enemySpawnPointAt6oClock = null;
+        [SerializeField] Transform enemySpawnPointAt10oClock = null;
+        [SerializeField] Transform enemySpawnPointAt11oClock = null;
+        [SerializeField] Transform[] AmmoPackSpawnPoints;
+        [SerializeField] Transform[] CurePackSpawnPoints;
 
         [SerializeField] TMP_Text infoText;
         [SerializeField] float countDownTimer = 5;
+
+        private void Awake()
+        {
+            if (enemySpawnPointAt2oClock != null)
+                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt2oClock);
+            if (enemySpawnPointAt4oClock != null)
+                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt4oClock);
+            if (enemySpawnPointAt6oClock != null)
+                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt6oClock);
+            if (enemySpawnPointAt10oClock != null)
+                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt10oClock);
+            if (enemySpawnPointAt11oClock != null)
+                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt11oClock);
+        }
 
         private void Start()
         {
