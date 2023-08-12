@@ -17,8 +17,8 @@ namespace Darik
         [SerializeField] Transform enemySpawnPointAt6oClock = null;
         [SerializeField] Transform enemySpawnPointAt10oClock = null;
         [SerializeField] Transform enemySpawnPointAt11oClock = null;
-        [SerializeField] Transform AmmoPackSpawnPoint;
-        [SerializeField] Transform CurePackSpawnPoint;
+        [SerializeField] Transform[] AmmoPackSpawnPoints;
+        [SerializeField] Transform[] CurePackSpawnPoints;
 
         [SerializeField] TMP_Text infoText;
         [SerializeField] float countDownTimer = 5;
