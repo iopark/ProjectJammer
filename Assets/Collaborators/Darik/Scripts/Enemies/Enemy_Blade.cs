@@ -13,7 +13,7 @@ namespace Darik
 
         [SerializeField] private TMP_Text stateText;
         [SerializeField] private LayerMask layerMask;
-        [SerializeField] private float appearTime = 3f;
+        [SerializeField] private float appearTime = 2f;
         [SerializeField] private int attackRange;
         [SerializeField] private float attackCoolTime = 3f;
         [SerializeField] private float attackTiming = 0.2f;

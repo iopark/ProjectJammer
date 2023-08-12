@@ -9,14 +9,18 @@ namespace Darik
     public class EnemyManager : MonoBehaviour
     {
         [SerializeField] private bool debug;
-        [SerializeField] float SpawnCoolTime;
+        [SerializeField] float spawnBladeCoolTime = 20f;
+        [SerializeField] float spawnRifleCoolTime = 20f;
+        [SerializeField] float spawnSniperCoolTime = 20f;
 
+        public List<Transform> enemySpawnPoints;
         public List<int> playerIds;
         private bool isDisruptorActivated;
         private int curTargetId;
 
         private void Awake()
         {
+            enemySpawnPoints = new List<Transform>();
             playerIds = new List<int>();
         }
 
@@ -71,35 +75,68 @@ namespace Darik
             
             return PhotonView.Find(targetId).transform;
         }
+
         public void GenerateEnemy()
         {
-            StartCoroutine(GenerateEnemyCoroutine());
+            StartCoroutine(GenerateEnemyBladeCoroutine());
+            StartCoroutine(GenerateEnemyRifleCoroutine());
+            StartCoroutine(GenerateEnemySniperCoroutine());
         }
 
-        IEnumerator GenerateEnemyCoroutine()
+        IEnumerator GenerateEnemyBladeCoroutine()
         {
             while (true)
             {
-                if (debug)
-                    Debug.Log("Generate");
+                if (enemySpawnPoints.Count > 0)
+                {
+                    int randomIndex = Random.Range(0, enemySpawnPoints.Count);
+                    Vector3 randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, -30), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, -35), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-45, 0, -25), Quaternion.identity, 0);
+                    PhotonNetwork.InstantiateRoomObject("Enemy_Blade", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 95), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-45, 0, 90), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-35, 0, 85), Quaternion.identity, 0);
+                    if (debug)
+                        Debug.Log("GenerateBlade");
+                }
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(45, 0, 85), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(35, 0, 95), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(40, 0, 90), Quaternion.identity, 0);
+                yield return new WaitForSeconds(spawnBladeCoolTime);
+            }
+        }
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(35, 0, -30), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(40, 0, -25), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(45, 0, -35), Quaternion.identity, 0);
+        IEnumerator GenerateEnemyRifleCoroutine()
+        {
+            while (true)
+            {
+                if (enemySpawnPoints.Count > 0)
+                {
+                    int randomIndex = Random.Range(0, enemySpawnPoints.Count);
+                    Vector3 randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
 
-                yield return new WaitForSeconds(SpawnCoolTime);
+                    PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
+
+                    if (debug)
+                        Debug.Log("GenerateRifle");
+                }
+
+                yield return new WaitForSeconds(spawnRifleCoolTime);
+            }
+        }
+
+        IEnumerator GenerateEnemySniperCoroutine()
+        {
+            while (true)
+            {
+                if (enemySpawnPoints.Count > 0)
+                {
+                    int randomIndex = Random.Range(0, enemySpawnPoints.Count);
+                    Vector3 randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
+
+                    PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
+
+                    if (debug)
+                        Debug.Log("GenerateSniper");
+                }
+
+                yield return new WaitForSeconds(spawnSniperCoolTime);
             }
         }
     }

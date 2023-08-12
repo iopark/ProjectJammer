@@ -12,7 +12,7 @@ namespace Darik
         StateMachine<State, Enemy_Rifle> stateMachine;
 
         [SerializeField] private TMP_Text stateText;
-        [SerializeField] private float appearTime = 3f;
+        [SerializeField] private float appearTime = 2f;
         [SerializeField] private float fireAttackRange = 10f;
         [SerializeField] private float bashAttackRange = 1f;
         [SerializeField] private float bashAttackTiming = 0.1f;
