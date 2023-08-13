@@ -79,20 +79,19 @@ public class GunViewOverlay : MonoBehaviourPun
     }
     #endregion
 
-    private void Strike()
-    {
-
-    }
-
     public void ShakeCam()
     {
         if (isZooming)
-            return; 
-        StopAllCoroutines();
-        StartCoroutine(GunShake());
+        {
+            StopAllCoroutines();
+            StartCoroutine(ZoomGunShake()); 
+        }
+        else
+        {
+            StopAllCoroutines();
+            StartCoroutine(GunShake());
+        }
     }
-
-
     //Transform originalPos;
 
     //float timer; 
@@ -138,7 +137,8 @@ public class GunViewOverlay : MonoBehaviourPun
         {
             shakeTimer += Time.deltaTime;
             //overlayCam.transform.rotation = gameObject.transform.rotation; 
-            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, gameObject.transform.position, shakeSpeed);
+            overlayCam.transform.rotation = zoomPos.rotation;
+            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, zoomPos.position, shakeSpeed);
             yield return null;
         }
         yield return null;
@@ -157,7 +157,7 @@ public class GunViewOverlay : MonoBehaviourPun
         while (deltaDist > 0.001)
         {
             deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - zoomPos.position);
-            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, zoomPos.position, .1f);
+            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, zoomPos.position, .35f);
             zoomEffect.weight = Mathf.Lerp(zoomEffect.weight, 1f, .1f); 
             yield return null;
         }
@@ -166,8 +166,6 @@ public class GunViewOverlay : MonoBehaviourPun
         zoomEffect.weight = 1f; 
        yield return null;
     }
-
-
     IEnumerator ZoomOutAction()
     {
         deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - gameObject.transform.position);
@@ -176,12 +174,13 @@ public class GunViewOverlay : MonoBehaviourPun
         while (deltaDist > 0.001)
         {
             deltaDist = Vector3.SqrMagnitude(overlayCam.transform.position - gameObject.transform.position); 
-            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, gameObject.transform.position, .35f);
-            zoomEffect.weight = Mathf.Lerp(zoomEffect.weight, 0, .35f);
+            overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, gameObject.transform.position, .45f);
+            isZooming = false;
+            physicalScope.gameObject.SetActive(true);
+            zoomEffect.weight = Mathf.Lerp(zoomEffect.weight, 0, .45f);
             yield return null;
         }
         yield return null;
-        isZooming = false;
         zoomEffect.weight = 0f; 
         physicalScope.gameObject.SetActive(true);
         SetCamPos(); 

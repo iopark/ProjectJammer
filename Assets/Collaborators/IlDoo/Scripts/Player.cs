@@ -4,6 +4,7 @@ using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.VisualScripting;
 
 namespace ildoo
 {
@@ -13,7 +14,7 @@ namespace ildoo
         //Manages 1.Player Color      3.PlayerInput
         private PlayerInput playerInput;
         //=============Non Player Settings 
-        [SerializeField] Transform playerHolder;
+        [SerializeField] Transform deathCamHolder;
         Camera _camera;
         PlayerGameSceneUI gameSceneUI;
         [SerializeField] GunData nonPlayerGun;
@@ -40,7 +41,11 @@ namespace ildoo
         }
         public void MoveCamera()
         {
-            _camera.transform.SetParent(playerHolder); 
+            if (photonView.IsMine)
+            {
+                _camera.transform.parent = transform.parent;
+
+            }
         }
 
         [PunRPC]
@@ -49,7 +54,7 @@ namespace ildoo
             if (PhotonNetwork.IsMasterClient)
             {
                 GameManager.Data.playerDict[photonView.ViewID].isAlive = false;
-                GameManager.Enemy.playerIds.Remove(photonView.ViewID);
+                GameManager.Data.DeathCount(); 
             }
         }
         private void SetGameLayerRecursive(GameObject gameObject, int layer)
@@ -80,6 +85,7 @@ namespace ildoo
             if (playerInput == null || playerInput.enabled)
                 return;
             playerInput.enabled = true;
+            GameManager.Data.playerDict[photonView.ViewID].isAlive = true; 
         }
 
         private void OnDisable()

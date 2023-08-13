@@ -26,17 +26,21 @@ namespace ildoo
             set
             {
                 health = value;
-                gameSceneUI.GameSceneUIUpdate();
                 onHealthChange?.Invoke(health);
+                if (photonView.IsMine)
+                    gameSceneUI.GameSceneUIUpdate();
             }
         }
         public bool isDead;
         //EFFECTS 
         [SerializeField] private ParticleSystem afterShot;
         [SerializeField] public PlayerGameSceneUI gameSceneUI;
+        Animator anim; 
 
         private void Awake()
         {
+            anim = GetComponent<Animator>();
+            health = fixedHealth; 
             if (photonView.IsMine)
                 gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
         }
@@ -72,15 +76,22 @@ namespace ildoo
         private void HealthUpdate(int health)
         {
             this.health = health;
+            if (photonView.IsMine)
+                gameSceneUI.GameSceneUIUpdate();
         }
         [PunRPC]
         private void Death()
         {
             isDead = true;
+            anim.SetTrigger("PlayerDeath"); 
             onDeath?.Invoke(); // MainCamera position should be moved else where. 
             gameObject.SetActive(false);
         }
 
+        public bool isFullHealth()
+        {
+            return health == 100; 
+        }
         [PunRPC]
         public void AddHealth(int amount)
         {
@@ -101,7 +112,6 @@ namespace ildoo
             yield return new WaitForSeconds(5);
             Respawn(); 
         }
-
         #region Debugging 
         //Debugging purposes
         public void OnGetHit(InputValue value)
