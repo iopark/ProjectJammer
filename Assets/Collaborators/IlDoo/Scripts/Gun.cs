@@ -18,7 +18,6 @@ namespace ildoo
         FPSCameraController camController;
         [SerializeField] LayerMask targetMask;
         PlayerGameSceneUI gameSceneUI;
-
         //AMMO
         public int totalAmmo { get;private set; }
         public int TotalAmmo
@@ -32,6 +31,7 @@ namespace ildoo
                 totalAmmo = value;  
             }
         }
+        public int maxCarryRounds { get;private set; }
         public int magCap { get; private set; }
         public int maxDistance { get; private set; }
         private int currentAmmo;
@@ -75,9 +75,9 @@ namespace ildoo
             gunDamage = defaultGunInfo.Damage;
             currentAmmo = magCap;
             totalAmmo = defaultGunInfo.TotalAmmo;
+            maxCarryRounds = defaultGunInfo.TotalAmmo; 
             gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>(); 
         }
-
         private void Start()
         {
             if (!photonView.IsMine)
@@ -100,7 +100,6 @@ namespace ildoo
             anim.Rebind(); 
             _gunCamera.gameObject.SetActive(false);
         }
-
         #region Shooting
         public void Fire()
         {
@@ -123,8 +122,10 @@ namespace ildoo
         public void PlayerShotCalculation(Vector3 shotPoint, Vector3 shotPointForward)
         {
             RaycastHit hit;
-            if (Physics.Raycast(shotPoint, shotPointForward, out hit, maxDistance, targetMask))
+            if (Physics.Raycast(shotPoint, shotPointForward, out hit, maxDistance))
             {
+                if (!targetMask.Contain(hit.collider.gameObject.layer))
+                    return;
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>();
                 hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
@@ -153,7 +154,6 @@ namespace ildoo
                 StopCoroutine(localRoutine);
             localRoutine = StartCoroutine(ShotEffectLocal(trail, startPos, endPos));
         }
-
         Coroutine shotEffectSync;
         [PunRPC]
         public void PostShotWorkSync(Vector3 endPos)
@@ -238,13 +238,20 @@ namespace ildoo
             TotalAmmo -= reloadAmount; 
             CurrentAmmo += reloadAmount; 
         }
+
+        public bool hasMaxCarry()
+        {
+            return totalAmmo == maxCarryRounds; 
+        }
+        int newAmount;
         [PunRPC]
         public void AmmoChange(int addingAmount)
         {
             if (!photonView.IsMine)
-                return; 
-            TotalAmmo += addingAmount;
-            TotalAmmo = Mathf.Clamp(TotalAmmo, 0, TotalAmmo);
+                return;
+            
+            newAmount = totalAmmo + addingAmount;
+            totalAmmo = Mathf.Clamp(newAmount, 0, maxCarryRounds);
             gameSceneUI.GameSceneUIUpdate();
         }
         #endregion
