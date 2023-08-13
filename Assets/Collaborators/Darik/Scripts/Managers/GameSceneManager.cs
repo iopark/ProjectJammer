@@ -157,10 +157,10 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
             PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
+            GameManager.Enemy.RenewalTargetPlayer();
+
             if (PhotonNetwork.IsMasterClient)
             {
-                GameManager.Enemy.RegistPlayers();
-
                 GameManager.Enemy.GenerateEnemy();
             }
         }
@@ -178,10 +178,10 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
             PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
+            GameManager.Enemy.RenewalTargetPlayer();
+
             if (PhotonNetwork.IsMasterClient)
             {
-                GameManager.Enemy.RegistPlayers();
-
                 GameManager.Enemy.GenerateEnemy();
             }
         }
