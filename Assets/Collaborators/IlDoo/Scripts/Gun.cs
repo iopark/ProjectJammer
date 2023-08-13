@@ -209,8 +209,6 @@ namespace ildoo
         public void ReloadEffect()
         {
             reloadEffect = StartCoroutine(Reloading());
-            if (photonView.IsMine)
-                gameSceneUI.GameSceneUIUpdate();
         }
         IEnumerator Reloading()
         {
@@ -222,8 +220,9 @@ namespace ildoo
             animRig.weight = 1f;
             //currentAmmo = magCap;
             ReloadCalculation(); 
-            isReloading = false; 
-            //ammo calculation; 
+            isReloading = false;
+            if (photonView.IsMine)
+                gameSceneUI.GameSceneUIUpdate();
         }
         int reloadAmount; 
         private void ReloadCalculation()

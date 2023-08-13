@@ -43,9 +43,8 @@ public class ItemSpawner : MonoBehaviourPun
         if (itemCounter >= itemLimit)
             return;
 
-        randomSeed = Random.insideUnitCircle * 2f;
-        randomSpawnPos = new Vector3(randomSeed.x, 0.5f, randomSeed.y);
-        newSpawningPos += randomSpawnPos; 
+        newSpawningPos = transform.position;
+        newSpawningPos.y = 0.5f; 
         photonView.RPC("SyncRespawn", RpcTarget.AllViaServer, newSpawningPos); 
     }
     //이게 생성
