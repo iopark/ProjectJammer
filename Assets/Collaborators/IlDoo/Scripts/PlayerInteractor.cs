@@ -33,7 +33,8 @@ namespace ildoo
         }
         private void OnDisable()
         {
-            lineRenderer.enabled = false;
+            if (lineRenderer != null)
+                lineRenderer.enabled = false;
         }
 
         RaycastHit localHit;
