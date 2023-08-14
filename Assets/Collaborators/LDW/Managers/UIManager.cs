@@ -45,6 +45,8 @@ namespace LDW
             ui.transform.SetParent(popUpCanvas.transform, false);
             popUpStack.Push(ui);
 
+            // Cursor.lockState = CursorLockMode.None;
+
             // 시간 정지
             //Time.timeScale = 0f;
             return ui;
