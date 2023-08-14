@@ -6552,6 +6552,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2e0639de4d88e64289fbcbe8257b567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemySpawnPoints:
+  - {fileID: 1718102198}
+  itemSpawnPoints: []
   infoText: {fileID: 306600363}
   countDownTimer: 5
 --- !u!4 &1156664078
@@ -9641,6 +9644,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1735025851582225635, guid: f570b6de47c11594e92cbe2df49e80ec,
+        type: 3}
+      propertyPath: m_Cameras.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2656576990957026481, guid: f570b6de47c11594e92cbe2df49e80ec,
         type: 3}
       propertyPath: m_Cameras.Array.size

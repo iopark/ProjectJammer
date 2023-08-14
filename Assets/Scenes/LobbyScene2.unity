@@ -114108,10 +114108,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debug: 0
   maxHp: 100
-  stateText: {fileID: 470559261077424812}
-  layerMask:
+  blockLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
+  stateText: {fileID: 470559261077424812}
   appearTime: 2
   attackRange: 9
   attackCoolTime: 3

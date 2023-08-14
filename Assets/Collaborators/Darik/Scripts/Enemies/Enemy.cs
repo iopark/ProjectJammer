@@ -66,8 +66,11 @@ namespace Darik
                 SearchTarget();
                 if (target != null)
                     agent.destination = target.position;
-
-                yield return new WaitForSeconds(0.2f);
+                
+                if (SquareDistanceToTarget(target.position - transform.position) < 200f)
+                    yield return new WaitForSeconds(0.2f);
+                else
+                    yield return new WaitForSeconds(3f);
             }
         }
 
@@ -81,7 +84,7 @@ namespace Darik
 
         protected bool CheckIsBlocked(float range)
         {
-            if (Physics.Raycast(transform.position, (target.position - transform.position), out hit, range))
+            if (Physics.Raycast(transform.position + Vector3.up * 1f, (target.position - transform.position) + Vector3.up * 1f, out hit, range))
             {
                 if (blockLayer.Contain(hit.transform.gameObject.layer))
                     return true;
