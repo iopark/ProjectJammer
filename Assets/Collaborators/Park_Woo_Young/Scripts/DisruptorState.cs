@@ -8,18 +8,20 @@ namespace Park_Woo_Young
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable, IInteractable
     {
         
+
         [SerializeField] GameObject hologram;            // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] GameObject emp;                 // 클리어시 생기는 이펙트
-        [SerializeField] TMP_Text progress_Text;         // 슬라이드를 대체할 텍스트 진행도
         [SerializeField] new Renderer renderer;
         [SerializeField] Material hologram_Blue;         // 활성화시 홀로그램 색상(파랑)
         [SerializeField] Material hologram_Red;          // 멈출시 홀로그램 색상(빨강)
-        
+
+        [SerializeField] GameObject empobj;
+        [SerializeField] Collider empCollider;
+
         [SerializeField] int perSecond = 1;              // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
         [SerializeField] float maxHologramRotSpeed = 100;// 홀로그램 최대 회전속도
         [SerializeField] int maxHP = 100;                // 최대 체력
         [SerializeField] int maxProgress = 100;          // 클리어에 필요한 진행도
-        [SerializeField] int progressGoesUp = 1;         // 교란기 진행도에 필요한 시간이 충족되면 진행도가 올라가는 속도
         [SerializeField] int hpRepair = 1;               // 체력감소시 시간에 따른 회복속도
 
         public float interaction = 4;                    // 상호작용 거리
@@ -34,6 +36,7 @@ namespace Park_Woo_Young
         private float smallSwellingRange;                // 업데이트 한번당 확장범위
         private float Range;                             // 업데이트 한번당 수축 범위
         private float EmpRange;                          // 수축된뒤 확장하는 범위
+        
 
         public enum State { Activate, Stop, Success }
         State state = State.Activate;
@@ -54,7 +57,6 @@ namespace Park_Woo_Young
             renderer.sharedMaterial = hologram_Blue;
             hologramRotSpeed = maxHologramRotSpeed;
             currentHP = maxHP;
-            perSecond = 1;
             SetDisruptor();
 
         }
@@ -85,45 +87,60 @@ namespace Park_Woo_Young
         {
             Rotate();
             time += Time.deltaTime;
-            progress_Text.text = $"current Progress : {progress}/{maxProgress}";
+
+            progress = GameManager.Data.DisruptorProgress++;
+
+
             if (time > perSecond)
             {
-                if (progress >= 0 && currentHP == 100)
+                if (PhotonNetwork.IsMasterClient)
                 {
-                    time = 0;
-                    progress += progressGoesUp;
-                    currentHP = maxHP;
+                    photonView.RPC("ProgressGoesUp", RpcTarget.AllViaServer);
+                    //progress = GameManager.Data.DisruptorProgress;
+
                 }
-                else if (progress <= 0 && currentHP < 99)
-                {
-                    time = 0;
-                    progress = 0;
-                    currentHP += hpRepair;
-                }
+                time = 0;
             }
+
             if (progress >= maxProgress)
             {
                 //SceneManager.LoadScene(""); // 교란기 성공 여기에서 신을 불러와주기.
+                photonView.RPC("GameClear", RpcTarget.AllViaServer);
+
                 state = State.Success;
                 print("교란기 완전가동");
-                progress_Text.color = Color.blue;
-                progress_Text.text = "Success";
             }
+
             if (disruptorHit)
             {
                 hologramRotSpeed = 0;
                 state = State.Stop;
                 GameManager.Enemy.ChangeTarget(false);
                 renderer.sharedMaterial = hologram_Red;
-                progress_Text.color = Color.red;
 
             }
+        }
+
+        [PunRPC]
+        public void GameClear()
+        {
+            if(!PhotonNetwork.IsMasterClient)
+                SuccessEffect();
+
+            GameManager.Data.GameClear();
+        }
+
+
+        [PunRPC]
+        public void ProgressGoesUp()
+        {
+            // time = 0;                   // 시간을 0으로 초기화
+            GameManager.Data.DisruptorProgress++;
         }
         // 교란기 재가동
         private void StopDisruptor()
         {
             time = 0;
-            progress_Text.text = $"current Progress : {progress}/{maxProgress}";
             
             if (!disruptorHit)
             {
@@ -131,7 +148,6 @@ namespace Park_Woo_Young
                 hologramRotSpeed = maxHologramRotSpeed;
                 state = State.Activate;
                 renderer.sharedMaterial = hologram_Blue;
-                progress_Text.color = Color.white;
             }
         }
 
@@ -210,12 +226,10 @@ namespace Park_Woo_Young
             if (!disruptorHit)
             {
                 renderer.sharedMaterial = hologram_Blue;
-                progress_Text.color = Color.white;
             }
             else
             {
                 renderer.sharedMaterial = hologram_Red;
-                progress_Text.color = Color.red;
             }
         }
 
@@ -224,7 +238,6 @@ namespace Park_Woo_Young
         {
             disruptorHit = false;
             renderer.sharedMaterial = hologram_Blue;
-            progress_Text.color = Color.white;
         }
 
         [PunRPC]
@@ -232,7 +245,6 @@ namespace Park_Woo_Young
         {
             disruptorHit = true;
             renderer.sharedMaterial = hologram_Red;
-            progress_Text.color = Color.red;
         }
 
     }
