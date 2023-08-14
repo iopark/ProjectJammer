@@ -13,7 +13,9 @@ namespace ildoo
     public class PlayerHealth : MonoBehaviourPun, IHittable
     {
         public UnityAction onDeath;
-        public UnityAction<int> onHealthChange; 
+        public UnityAction<int> onHealthChange;
+        [SerializeField] int fixedHealth; 
+
         public int health;
         public int Health
         {
@@ -24,19 +26,23 @@ namespace ildoo
             set
             {
                 health = value;
-                gameSceneUI.GameSceneUIUpdate();
                 onHealthChange?.Invoke(health);
+                if (photonView.IsMine)
+                    gameSceneUI.GameSceneUIUpdate();
             }
         }
         public bool isDead;
-        public const int fixedHealth = 100;
         //EFFECTS 
         [SerializeField] private ParticleSystem afterShot;
         [SerializeField] public PlayerGameSceneUI gameSceneUI;
+        Animator anim; 
 
         private void Awake()
         {
-            gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
+            anim = GetComponent<Animator>();
+            health = fixedHealth; 
+            if (photonView.IsMine)
+                gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
         }
         private void OnEnable()
         {
@@ -70,25 +76,26 @@ namespace ildoo
         private void HealthUpdate(int health)
         {
             this.health = health;
+            if (photonView.IsMine)
+                gameSceneUI.GameSceneUIUpdate();
         }
-        [PunRPC]
         private void Death()
         {
             isDead = true;
-            onDeath?.Invoke(); // MainCamera position should be moved else where. 
-            gameObject.SetActive(false);
+            if (photonView.IsMine)
+                onDeath?.Invoke(); // Preceeding disabling gameobj; 
+            photonView.RPC("DeathSync", RpcTarget.AllViaServer); 
         }
 
-        //Debugging purposes
-        public void OnGetHit(InputValue value)
+        [PunRPC]
+        public void DeathSync()
         {
-            GetDamage(20);
-            gameSceneUI.GameSceneUIUpdate();
-            //TeamHealthManager Update Health 
+            StartCoroutine(DeathRoutine());
         }
-        public void GetDamage(int damage)
+
+        public bool isFullHealth()
         {
-            TakeDamage(damage, Vector3.zero, Vector3.zero);
+            return health == 100; 
         }
         [PunRPC]
         public void AddHealth(int amount)
@@ -105,10 +112,30 @@ namespace ildoo
             gameObject.SetActive(true); 
         }
 
+        IEnumerator DeathRoutine()
+        {
+            anim.SetTrigger("PlayerDeath");
+            yield return new WaitForSeconds(3f); 
+            gameObject.SetActive(false);
+        }
+
         IEnumerator RespawnRoutine()
         {
             yield return new WaitForSeconds(5);
             Respawn(); 
         }
+        #region Debugging 
+        //Debugging purposes
+        public void OnGetHit(InputValue value)
+        {
+            GetDamage(20);
+            gameSceneUI.GameSceneUIUpdate();
+            //TeamHealthManager Update Health 
+        }
+        public void GetDamage(int damage)
+        {
+            TakeDamage(damage, Vector3.zero, Vector3.zero);
+        }
+        #endregion
     }
 }

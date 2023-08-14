@@ -1,3 +1,4 @@
+using LDW;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
@@ -9,15 +10,42 @@ namespace Darik
     public class EnemyManager : MonoBehaviour
     {
         [SerializeField] private bool debug;
-        [SerializeField] float SpawnCoolTime;
+        [SerializeField] float spawnBladeCoolTime = 20f;
+        [SerializeField] float spawnRifleCoolTime = 20f;
+        [SerializeField] float spawnSniperCoolTime = 20f;
 
-        private List<int> playerIds;
+        public List<Transform> enemySpawnPoints;
+        private List<int> alivePlayerIds;
         private bool isDisruptorActivated;
-        private int curTargetId;
+        private int curTargetId = -1;
 
         private void Awake()
         {
-            playerIds = new List<int>();
+            enemySpawnPoints = new List<Transform>();
+            alivePlayerIds = new List<int>();
+        }
+
+        private void OnEnable()
+        {
+            GameManager.Data.OnPlayerDied += RenewalTargetPlayer;
+        }
+
+        private void OnDisable()
+        {
+            GameManager.Data.OnPlayerDied -= RenewalTargetPlayer;
+        }
+
+        public void RenewalTargetPlayer()
+        {
+            alivePlayerIds.Clear();
+
+            foreach (KeyValuePair<int, PlayerData> entry in GameManager.Data.playerDict)
+            {
+                if (entry.Value.isAlive)
+                    alivePlayerIds.Add(entry.Value.viewId);
+            }
+            Debug.Log(alivePlayerIds.Count);
+            SetTargetId();
         }
 
         public void ChangeTarget(bool isDisruptorActivated)
@@ -25,17 +53,15 @@ namespace Darik
             this.isDisruptorActivated = isDisruptorActivated;
 
             if (!isDisruptorActivated)
-                curTargetId = playerIds[Random.Range(0, playerIds.Count)];
+                SetTargetId();
         }
 
-        public void RegistPlayers()
+        private void SetTargetId()
         {
-            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-            foreach (GameObject player in players)
-            {
-                int playerId = player.GetComponent<ildoo.Player>().UniquePlayerNumber();
-                playerIds.Add(playerId);
-            }
+            if (alivePlayerIds.Count > 0)
+                curTargetId = alivePlayerIds[Random.Range(0, alivePlayerIds.Count)];
+            else
+                curTargetId = -1;
         }
 
         public Transform SearchTarget()
@@ -43,63 +69,100 @@ namespace Darik
             if (isDisruptorActivated)
                 return GameManager.Data.Disruptor;
             else
-                return PhotonView.Find(curTargetId).transform;
+            {
+                if (curTargetId != -1)
+                    return PhotonView.Find(curTargetId).transform;
+                else
+                    return null;
+            }
         }
 
         public Transform SearchPlayer()
         {
-            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-            int targetId = -1;
-
-            if (players.Length > 0)
+            Transform target = null;
+            if (alivePlayerIds.Count > 0)
             {
                 float shortestDistance = Mathf.Infinity;
-                foreach (GameObject player in players)
+                foreach (int playerId in alivePlayerIds)
                 {
-                    if (player != null)
+                    Transform player = PhotonView.Find(playerId).transform;
+                    Vector3 toTarget = transform.position - player.transform.position;
+                    float squrDistance = (toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
+                    if (shortestDistance > squrDistance)
                     {
-                        Vector3 toTarget = transform.position - player.transform.position;
-                        float squrDistance = (toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
-                        if (shortestDistance > squrDistance)
-                        {
-                            shortestDistance = squrDistance;
-                            targetId = player.GetComponent<ildoo.Player>().UniquePlayerNumber(); ;
-                        }
+                        shortestDistance = squrDistance;
+                        target = player;
                     }
                 }
             }
-            
-            return PhotonView.Find(targetId).transform;
-        }
-        public void GenerateEnemy()
-        {
-            StartCoroutine(GenerateEnemyCoroutine());
+
+            return target != null ? target : null;
         }
 
-        IEnumerator GenerateEnemyCoroutine()
+        public void GenerateEnemy()
+        {
+            StartCoroutine(GenerateEnemyBladeCoroutine());
+            StartCoroutine(GenerateEnemyRifleCoroutine());
+            StartCoroutine(GenerateEnemySniperCoroutine());
+        }
+
+        IEnumerator GenerateEnemyBladeCoroutine()
         {
             while (true)
             {
-                if (debug)
-                    Debug.Log("Generate");
+                if (enemySpawnPoints.Count > 0)
+                {
+                    int randomIndex = Random.Range(0, enemySpawnPoints.Count);
+                    Vector3 randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, -30), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-35, 0, -35), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-45, 0, -25), Quaternion.identity, 0);
+                    GameObject blade = PhotonNetwork.InstantiateRoomObject("Enemy_Blade", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
+                    //blade.GetComponent<PhotonView>().ViewID = 900;
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(-40, 0, 95), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(-45, 0, 90), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(-35, 0, 85), Quaternion.identity, 0);
+                    if (debug)
+                        Debug.Log("GenerateBlade");
+                }
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(45, 0, 85), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(35, 0, 95), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(40, 0, 90), Quaternion.identity, 0);
+                yield return new WaitForSeconds(spawnBladeCoolTime);
+            }
+        }
 
-                PhotonNetwork.InstantiateRoomObject("Enemy_Blade", new Vector3(35, 0, -30), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", new Vector3(40, 0, -25), Quaternion.identity, 0);
-                PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", new Vector3(45, 0, -35), Quaternion.identity, 0);
+        IEnumerator GenerateEnemyRifleCoroutine()
+        {
+            while (true)
+            {
+                if (enemySpawnPoints.Count > 0)
+                {
+                    int randomIndex = Random.Range(0, enemySpawnPoints.Count);
+                    Vector3 randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
 
-                yield return new WaitForSeconds(SpawnCoolTime);
+                    GameObject rifle = PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
+                    //rifle.GetComponent<PhotonView>().ViewID = 910;
+
+                    if (debug)
+                        Debug.Log("GenerateRifle");
+                }
+
+                yield return new WaitForSeconds(spawnRifleCoolTime);
+            }
+        }
+
+        IEnumerator GenerateEnemySniperCoroutine()
+        {
+            while (true)
+            {
+                if (enemySpawnPoints.Count > 0)
+                {
+                    int randomIndex = Random.Range(0, enemySpawnPoints.Count);
+                    Vector3 randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
+
+                    GameObject sniper = PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
+                    //sniper.GetComponent<PhotonView>().ViewID = 920;
+
+                    if (debug)
+                        Debug.Log("GenerateSniper");
+                }
+
+                yield return new WaitForSeconds(spawnSniperCoolTime);
             }
         }
     }

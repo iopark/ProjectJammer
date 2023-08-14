@@ -18,7 +18,6 @@ namespace ildoo
         FPSCameraController camController;
         [SerializeField] LayerMask targetMask;
         PlayerGameSceneUI gameSceneUI;
-
         //AMMO
         public int totalAmmo { get;private set; }
         public int TotalAmmo
@@ -32,6 +31,7 @@ namespace ildoo
                 totalAmmo = value;  
             }
         }
+        public int maxCarryRounds { get;private set; }
         public int magCap { get; private set; }
         public int maxDistance { get; private set; }
         private int currentAmmo;
@@ -49,6 +49,8 @@ namespace ildoo
         public int gunDamage { get; private set; }
 
         //EFFECTS 
+        [SerializeField] Sound gunShot;
+        [SerializeField] Sound reloadSound; 
         [SerializeField] private ParticleSystem muzzleEffect;
         [SerializeField] private ParticleSystem shellEject;
         [SerializeField] float trailLastingTime;
@@ -75,11 +77,13 @@ namespace ildoo
             gunDamage = defaultGunInfo.Damage;
             currentAmmo = magCap;
             totalAmmo = defaultGunInfo.TotalAmmo;
+            maxCarryRounds = defaultGunInfo.TotalAmmo; 
             gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>(); 
         }
-
         private void Start()
         {
+            if (!photonView.IsMine)
+                return; 
             gameSceneUI.GameSceneUIUpdate(); 
         }
 
@@ -98,7 +102,6 @@ namespace ildoo
             anim.Rebind(); 
             _gunCamera.gameObject.SetActive(false);
         }
-
         #region Shooting
         public void Fire()
         {
@@ -116,12 +119,15 @@ namespace ildoo
         Vector3 middlePoint = new Vector3(0.5f, 0.5f, 0);
         Vector3 localEndPoint;
         Vector3 endPoint;
+
         [PunRPC]
         public void PlayerShotCalculation(Vector3 shotPoint, Vector3 shotPointForward)
         {
             RaycastHit hit;
-            if (Physics.Raycast(shotPoint, shotPointForward, out hit, maxDistance, targetMask))
+            if (Physics.Raycast(shotPoint, shotPointForward, out hit, maxDistance))
             {
+                if (!targetMask.Contain(hit.collider.gameObject.layer))
+                    return;
                 //이펙트에 대해서 오브젝트 풀링으로 구현 
                 IHittable hittableObj = hit.transform.GetComponent<IHittable>();
                 hittableObj?.TakeDamage(gunDamage, hit.point, hit.normal);
@@ -142,6 +148,7 @@ namespace ildoo
         public void PostShotWorkLocal(Vector3 startPos, Vector3 endPos)
         {
             anim.SetTrigger("Fire");
+            //GameManager.AudioManager.PlaySound(gunShot); 
             currentAmmo--;
             gameSceneUI.GameSceneUIUpdate();
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSmoke", muzzlePoint.position, Quaternion.identity, true);
@@ -150,7 +157,6 @@ namespace ildoo
                 StopCoroutine(localRoutine);
             localRoutine = StartCoroutine(ShotEffectLocal(trail, startPos, endPos));
         }
-
         Coroutine shotEffectSync;
         [PunRPC]
         public void PostShotWorkSync(Vector3 endPos)
@@ -170,25 +176,29 @@ namespace ildoo
         IEnumerator ShotEffectLocal(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
             float deltaDist = Vector3.SqrMagnitude(endPos - startPos);
+            trail.Clear();
             while (deltaDist > 0.1)
             {
                 trail.transform.position = Vector3.Lerp(trail.transform.position, endPos, .075f);
                 deltaDist = Vector3.SqrMagnitude(endPos - startPos);
                 yield return null;
             }
+            trail.Clear();
         }
 
         IEnumerator ShotEffectSync(TrailRenderer trail, Vector3 startPos, Vector3 endPos)
         {
             float totalTime = Vector2.Distance(startPos, endPos) / maxDistance;
             float time = 0;
+            trail.Clear();
             while (time < 1)
             {
                 trail.transform.position = Vector3.Lerp(startPos, endPos, time);
                 time += Time.deltaTime / totalTime;
-
                 yield return null;
             }
+            trail.Clear(); 
+            yield return null;
         }
         #endregion
         #region Reloading 
@@ -208,14 +218,15 @@ namespace ildoo
             //재장전 시작시 weight 재설정 
             isReloading = true; 
             animRig.weight = 0f;
+            //GameManager.AudioManager.PlaySound(reloadSound); 
             anim.SetTrigger("Reload");
             yield return reloadYieldInterval;
             animRig.weight = 1f;
             //currentAmmo = magCap;
             ReloadCalculation(); 
-            gameSceneUI.GameSceneUIUpdate();
-            isReloading = false; 
-            //ammo calculation; 
+            isReloading = false;
+            if (photonView.IsMine)
+                gameSceneUI.GameSceneUIUpdate();
         }
         int reloadAmount; 
         private void ReloadCalculation()
@@ -230,13 +241,20 @@ namespace ildoo
             TotalAmmo -= reloadAmount; 
             CurrentAmmo += reloadAmount; 
         }
+
+        public bool hasMaxCarry()
+        {
+            return totalAmmo == maxCarryRounds; 
+        }
+        int newAmount;
         [PunRPC]
         public void AmmoChange(int addingAmount)
         {
             if (!photonView.IsMine)
-                return; 
-            TotalAmmo += addingAmount;
-            TotalAmmo = Mathf.Clamp(TotalAmmo, 0, TotalAmmo);
+                return;
+            
+            newAmount = totalAmmo + addingAmount;
+            totalAmmo = Mathf.Clamp(newAmount, 0, maxCarryRounds);
             gameSceneUI.GameSceneUIUpdate();
         }
         #endregion

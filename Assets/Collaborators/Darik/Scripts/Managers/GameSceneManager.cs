@@ -12,8 +12,21 @@ namespace Darik
 {
     public class GameSceneManager : MonoBehaviourPunCallbacks
     {
+        [SerializeField] Transform[] enemySpawnPoints;
+        [SerializeField] Transform[] AmmoPackSpawnPoints;
+        [SerializeField] Transform[] CurePackSpawnPoints;
+
         [SerializeField] TMP_Text infoText;
         [SerializeField] float countDownTimer = 5;
+
+        private void Awake()
+        {
+            foreach (Transform spawnPoint in enemySpawnPoints)
+            {
+                if (spawnPoint != null)
+                    GameManager.Enemy.enemySpawnPoints.Add(spawnPoint);
+            }
+        }
 
         private void Start()
         {
@@ -135,10 +148,10 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
             PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
+            GameManager.Enemy.RenewalTargetPlayer();
+
             if (PhotonNetwork.IsMasterClient)
             {
-                GameManager.Enemy.RegistPlayers();
-
                 GameManager.Enemy.GenerateEnemy();
             }
         }
@@ -156,10 +169,10 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
             PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
+            GameManager.Enemy.RenewalTargetPlayer();
+
             if (PhotonNetwork.IsMasterClient)
             {
-                GameManager.Enemy.RegistPlayers();
-
                 GameManager.Enemy.GenerateEnemy();
             }
         }

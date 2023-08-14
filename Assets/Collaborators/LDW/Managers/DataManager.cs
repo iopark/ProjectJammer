@@ -10,12 +10,12 @@ namespace LDW
     public class DataManager : MonoBehaviour
     {
         public Transform Disruptor;
+        public Transform MedicalRoom;
 
         public MySqlConnection con;
         public MySqlDataReader reader;
 
-        public int disruptorHP;
-        public int disruptorProgress;
+        public UnityAction OnPlayerDied;
 
         private void Start()
         {
@@ -53,13 +53,22 @@ namespace LDW
         public void DataInit()
         {
             MonsterStatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
-
-            disruptorHP = 100;
         }
 
-        public void SetDisruptorProgress(int progress)
+        public void DeathCount()
         {
-            disruptorProgress = progress;
+            int deathCount = 0;
+
+            foreach(KeyValuePair<int, PlayerData> entry in playerDict)
+            {
+                if(!entry.Value.isAlive)
+                    deathCount++;
+            }
+
+            if (deathCount == playerDict.Count)
+                GameManager.UI.ShowPopUpUI<GameOver>("GameOver");
+
+            OnPlayerDied?.Invoke();
         }
     }
 }
