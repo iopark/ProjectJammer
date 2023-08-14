@@ -43,6 +43,8 @@ namespace ildoo
             }
             if (!photonView.IsMine)
             {
+                PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
+                GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
                 int nonOwnerMask = LayerMask.NameToLayer("Default");
                 Destroy(playerInput);
                 SetGameLayerRecursive(gameObject, nonOwnerMask);

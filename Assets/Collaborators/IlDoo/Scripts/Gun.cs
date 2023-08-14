@@ -49,8 +49,10 @@ namespace ildoo
         public int gunDamage { get; private set; }
 
         //EFFECTS 
-        [SerializeField] Sound gunShot;
-        [SerializeField] Sound reloadSound; 
+        [SerializeField] AudioSource gunShot;
+        [SerializeField] AudioSource reloadSound;
+        AudioClip gunShotClip;
+        AudioClip reloadSoundClip; 
         [SerializeField] private ParticleSystem muzzleEffect;
         [SerializeField] private ParticleSystem shellEject;
         [SerializeField] float trailLastingTime;
@@ -64,6 +66,8 @@ namespace ildoo
         public UnityAction shotFired;
         private void Awake()
         {
+            gunShotClip = gunShot.clip; 
+            reloadSoundClip = reloadSound.clip;
             _camera = Camera.main;
             _gunCamera = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
             camController = GetComponent<FPSCameraController>();
@@ -109,6 +113,7 @@ namespace ildoo
             muzzleEffect.Play();
             shellEject.Play();
             shotFired?.Invoke();
+            gunShot.PlayOneShot(gunShotClip); 
             centrePoint = _gunCamera.ViewportToWorldPoint(middlePoint);
             localEndPoint = centrePoint + (_gunCamera.transform.forward * maxDistance);
             PostShotWorkLocal(muzzlePoint.position, localEndPoint);
