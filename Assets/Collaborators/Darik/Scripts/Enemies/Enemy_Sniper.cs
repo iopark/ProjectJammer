@@ -71,8 +71,11 @@ namespace Darik
                     else
                         agent.destination = target.position;
                 }
-
-                yield return new WaitForSeconds(0.2f);
+                
+                if (SquareDistanceToTarget(target.position - transform.position) < attackRange)
+                    yield return new WaitForSeconds(0.2f);
+                else
+                    yield return new WaitForSeconds(3f);
             }
         }
 

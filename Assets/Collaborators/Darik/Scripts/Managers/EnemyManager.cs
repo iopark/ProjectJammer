@@ -104,6 +104,22 @@ namespace Darik
             StartCoroutine(GenerateEnemyBladeCoroutine());
             StartCoroutine(GenerateEnemyRifleCoroutine());
             StartCoroutine(GenerateEnemySniperCoroutine());
+            //TestGenerate();
+        }
+
+        private void TestGenerate()
+        {
+            int randomIndex = Random.Range(0, enemySpawnPoints.Count);
+            Vector3 randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
+            PhotonNetwork.InstantiateRoomObject("Enemy_Blade", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
+
+            randomIndex = Random.Range(0, enemySpawnPoints.Count);
+            randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
+            PhotonNetwork.InstantiateRoomObject("Enemy_Rifle", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
+
+            randomIndex = Random.Range(0, enemySpawnPoints.Count);
+            randomRange = new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
+            PhotonNetwork.InstantiateRoomObject("Enemy_Sniper", enemySpawnPoints[randomIndex].position + randomRange, Quaternion.identity, 0);
         }
 
         IEnumerator GenerateEnemyBladeCoroutine()
