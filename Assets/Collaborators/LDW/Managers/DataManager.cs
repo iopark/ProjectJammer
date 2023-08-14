@@ -1,5 +1,6 @@
 using MySql.Data.MySqlClient;
 using Park_Woo_Young;
+using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace LDW
 
         public UnityAction OnPlayerDied;
 
+        public int disruptorProgress;
+
         private void Start()
         {
             ConnectDataBase();
@@ -27,7 +30,7 @@ namespace LDW
         {
             try
             {
-                string serverInfo = "Server=15.164.251.21; DataBase=userdata; Uid=root; Pwd=1234; Port=3306; CharSet=utf8; ";
+                string serverInfo = "Server=15.164.251.21; DataBase=userdata; Uid=root; Pwd=kga4794050; Port=3306; CharSet=utf8; ";
                 con = new MySqlConnection(serverInfo);
                 con.Open();
 
@@ -63,6 +66,7 @@ namespace LDW
             {
                 if(!entry.Value.isAlive)
                     deathCount++;
+                Debug.Log($"deathCount : {deathCount}");
             }
 
             if (deathCount == playerDict.Count)
@@ -70,5 +74,6 @@ namespace LDW
 
             OnPlayerDied?.Invoke();
         }
+
     }
 }
