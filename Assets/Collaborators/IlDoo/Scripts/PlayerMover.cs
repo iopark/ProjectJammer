@@ -24,9 +24,11 @@ namespace ildoo
         [SerializeField] float runSpeed;
         [SerializeField] private float jumpSpeed;
 
+        //Movement Animation Sync 
         private void Awake()
         {
             //PlayerInput managed through Player Class 
+            moveDir = Vector3.zero; 
             anim = GetComponent<Animator>();
             rigid = GetComponent<Rigidbody>();
         }
@@ -34,7 +36,6 @@ namespace ildoo
         {
             
         }
-
         private void OnDisable()
         {
             anim.Rebind();
@@ -47,8 +48,15 @@ namespace ildoo
         private void FixedUpdate()
         {
             GroundCheck();
+            if (!photonView.IsMine)
+                SyncAnim(); 
         }
-
+        private void SyncAnim()
+        {
+            anim.SetFloat("ZSpeed", moveDir.z, 0.1f, Time.deltaTime);
+            anim.SetFloat("XSpeed", moveDir.x, 0.1f, Time.deltaTime);
+            anim.SetFloat("Speed", moveSpeed);
+        }
         //=========================Movement data===============================
         const float deltaThreshhold = 0.05f;
         float delta;
@@ -122,21 +130,13 @@ namespace ildoo
         {
             if (stream.IsWriting)
             {
-                stream.SendNext(rigid.position);
-                stream.SendNext(rigid.rotation);
-                stream.SendNext(rigid.velocity);
+                stream.SendNext(moveSpeed);
+                stream.SendNext(moveDir);
             }
             else
             {
-                try
-                {
-                    rigid.position = (Vector3)stream.ReceiveNext();
-                    rigid.rotation = (Quaternion)stream.ReceiveNext();
-                    rigid.velocity = (Vector3)stream.ReceiveNext();
-                    float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
-                    rigid.position += rigid.velocity * lag;
-                }
-                catch { }
+                moveSpeed = (float)stream.ReceiveNext();
+                moveDir = (Vector3)stream.ReceiveNext();
             }
         }
     }

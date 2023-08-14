@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,8 +20,8 @@ namespace LDW
 
         public void LobbyButton()
         {
-            GameManager.UI.ClosePopUpUI();
-            GameManager.UI.ShowPopUpUI<PopUpUI>("GameOver");
+            GameManager.UI.ClosePopUpUI();  // 팝업 닫기(GameOverPanel)
+            PhotonNetwork.LeaveRoom();      // 로비로 돌아가기 (방에서 나가기)
         }
     }
 }

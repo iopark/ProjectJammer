@@ -4,6 +4,7 @@ using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.VisualScripting;
 
 namespace ildoo
 {
@@ -13,7 +14,7 @@ namespace ildoo
         //Manages 1.Player Color      3.PlayerInput
         private PlayerInput playerInput;
         //=============Non Player Settings 
-        [SerializeField] Transform playerHolder;
+        [SerializeField] Transform deathCamHolder;
         Camera _camera;
         PlayerGameSceneUI gameSceneUI;
         [SerializeField] GunData nonPlayerGun;
@@ -21,15 +22,25 @@ namespace ildoo
         [SerializeField] Renderer playerRender;
 
         //OnDeathSettings 
+        PlayerHealth playerHealth;
+        PlayerDeathCam postDeathCam; 
         private void Awake()
         {
-            playerInput = GetComponent<PlayerInput>();
-            gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
-            _camera = Camera.main;
-            SetPlayerColor();
-            PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
-            GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
-            gameObject.name = PhotonNetwork.LocalPlayer.NickName; 
+            if (photonView.IsMine)
+            {
+                playerInput = GetComponent<PlayerInput>();
+                gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
+                playerHealth = GetComponent<PlayerHealth>();
+                playerHealth.onDeath += ProceedingDeath; 
+                _camera = Camera.main;
+                postDeathCam = _camera.transform.GetComponent<PlayerDeathCam>();
+                playerHealth.onDeath += postDeathCam.ActivateUponDeath; 
+                SetPlayerColor();
+                PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
+                GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
+                gameObject.name = PhotonNetwork.LocalPlayer.NickName;
+
+            }
             if (!photonView.IsMine)
             {
                 int nonOwnerMask = LayerMask.NameToLayer("Default");
@@ -38,20 +49,20 @@ namespace ildoo
                 gameSceneUI.gameObject.SetActive(false);
             }
         }
-        public void MoveCamera()
+        public void ProceedingDeath()
         {
-            _camera.transform.SetParent(playerHolder); 
+            playerInput.enabled = false;
+            _camera.transform.parent = deathCamHolder.transform;
+            photonView.RPC("RegisterDeath", RpcTarget.AllViaServer); 
         }
 
         [PunRPC]
         public void RegisterDeath()
         {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                GameManager.Data.playerDict[photonView.ViewID].isAlive = false;
-                GameManager.Enemy.playerIds.Remove(photonView.ViewID);
-            }
+             GameManager.Data.playerDict[photonView.ViewID].isAlive = false;
+             GameManager.Data.DeathCount();
         }
+
         private void SetGameLayerRecursive(GameObject gameObject, int layer)
         {
             gameObject.layer = layer;
@@ -80,6 +91,7 @@ namespace ildoo
             if (playerInput == null || playerInput.enabled)
                 return;
             playerInput.enabled = true;
+            //GameManager.Data.playerDict[photonView.ViewID].isAlive = true; 
         }
 
         private void OnDisable()
