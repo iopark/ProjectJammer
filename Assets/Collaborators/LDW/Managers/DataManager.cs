@@ -72,6 +72,11 @@ namespace LDW
             disruptorProgress = 0;
         }
 
+        public void ProgressReset()
+        {
+            disruptorProgress = 0;
+        }
+
         public void DeathCount()
         {
             int deathCount = 0;
@@ -87,6 +92,7 @@ namespace LDW
             {
                 GameOver?.Invoke();
                 GameManager.UI.ShowPopUpUI<PopUpUI>("GameOver");
+                ProgressReset();
             }
             else
                 OnPlayerDied?.Invoke();
@@ -97,6 +103,7 @@ namespace LDW
             // Game Clear
             GameOver?.Invoke();
             GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
+            ProgressReset();
         }
     }
 }

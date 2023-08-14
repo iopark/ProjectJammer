@@ -18,6 +18,11 @@ namespace LDW
 
         public void LobbyButton()
         {
+            PhotonNetwork.AutomaticallySyncScene = false;
+            // PhotonNetwork.LocalPlayer.SetLoad(false);
+
+            PhotonNetwork.LeaveRoom();
+
             SceneManager.LoadScene("LobbySceneLDW");
             GameManager.UI.ClosePopUpUI();  // ÆË¾÷ ´Ý±â(GameOverPanel)
         }
