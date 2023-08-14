@@ -18,6 +18,8 @@ namespace LDW
 
         public UnityAction OnPlayerDied;
 
+        public UnityAction GameOver;
+
         public UnityAction<int> disruptorUpdate;
         private int disruptorProgress;
         public int DisruptorProgress
@@ -82,6 +84,7 @@ namespace LDW
             }
 
             if (deathCount == playerDict.Count)
+                // GameOver
                 GameManager.UI.ShowPopUpUI<GameOver>("GameOver");
             else
                 OnPlayerDied?.Invoke();
