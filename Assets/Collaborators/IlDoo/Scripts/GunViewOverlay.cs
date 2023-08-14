@@ -18,7 +18,8 @@ public class GunViewOverlay : MonoBehaviourPun
 
     bool isZooming; 
     Gun playerGun;
-    PlayerShooter playerShooter; 
+    PlayerShooter playerShooter;
+    PlayerHealth playerHealth; 
     Camera overlayCam;
     private void Awake()
     {
@@ -27,11 +28,19 @@ public class GunViewOverlay : MonoBehaviourPun
         overlayCam = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
         SetCamPos();
         zoomEffect = Camera.main.GetComponent<Volume>();
-        playerShooter = GetComponentInParent<PlayerShooter>(); 
+        playerShooter = GetComponentInParent<PlayerShooter>();
+        playerHealth = GetComponentInParent<PlayerHealth>();
+        playerHealth.onDeath += ActivateUponDeath; 
         playerGun = GetComponentInParent<Gun>();
         playerShooter.zoomIn += ZoomInAction;
         playerGun.shotFired += ShakeCam;
     }
+
+    private void ActivateUponDeath()
+    {
+        overlayCam.gameObject.SetActive(false);
+    }
+
     private void SetCamPos()
     {
         overlayCam.gameObject.transform.SetParent(transform);

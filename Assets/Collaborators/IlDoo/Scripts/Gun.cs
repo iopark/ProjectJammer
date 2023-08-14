@@ -49,6 +49,8 @@ namespace ildoo
         public int gunDamage { get; private set; }
 
         //EFFECTS 
+        [SerializeField] Sound gunShot;
+        [SerializeField] Sound reloadSound; 
         [SerializeField] private ParticleSystem muzzleEffect;
         [SerializeField] private ParticleSystem shellEject;
         [SerializeField] float trailLastingTime;
@@ -146,6 +148,7 @@ namespace ildoo
         public void PostShotWorkLocal(Vector3 startPos, Vector3 endPos)
         {
             anim.SetTrigger("Fire");
+            //GameManager.AudioManager.PlaySound(gunShot); 
             currentAmmo--;
             gameSceneUI.GameSceneUIUpdate();
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSmoke", muzzlePoint.position, Quaternion.identity, true);
@@ -215,6 +218,7 @@ namespace ildoo
             //재장전 시작시 weight 재설정 
             isReloading = true; 
             animRig.weight = 0f;
+            //GameManager.AudioManager.PlaySound(reloadSound); 
             anim.SetTrigger("Reload");
             yield return reloadYieldInterval;
             animRig.weight = 1f;
