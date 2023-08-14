@@ -31,10 +31,10 @@ namespace LDW
             weaponStat.UpdateWeponStatUI();
         }
         
-        // 발전기 진행도 갱신
-        public void ProgressUIUpdate()
-        {
-            progress.UpdateProgressUI();
-        }
+        //// 발전기 진행도 갱신
+        //public void ProgressUIUpdate()
+        //{
+        //    progress.UpdateProgressUI();
+        //}
     }
 }
