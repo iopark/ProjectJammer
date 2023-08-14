@@ -244,10 +244,9 @@ namespace ildoo
             {
                 reloadAmount = totalAmmo; 
             }
-            TotalAmmo -= reloadAmount; 
-            CurrentAmmo += reloadAmount; 
+            TotalAmmo -= reloadAmount;
+            CurrentAmmo += reloadAmount;
         }
-
         public bool hasMaxCarry()
         {
             return totalAmmo == maxCarryRounds; 
