@@ -150,6 +150,7 @@ namespace Darik
             PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
             GameManager.Enemy.RenewalTargetPlayer();
+            GameManager.Data.ProgressReset();
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -173,6 +174,7 @@ namespace Darik
             PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
             GameManager.Enemy.RenewalTargetPlayer();
+            GameManager.Data.ProgressReset();
 
             if (PhotonNetwork.IsMasterClient)
             {
