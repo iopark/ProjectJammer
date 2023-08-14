@@ -15,7 +15,7 @@ namespace LDW
         public MySqlConnection con;
         public MySqlDataReader reader;
 
-        public UnityEvent OnPlayerDied;
+        public UnityAction OnPlayerDied;
 
         private void Start()
         {
