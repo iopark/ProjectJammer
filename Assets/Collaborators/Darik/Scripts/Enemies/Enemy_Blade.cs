@@ -1,3 +1,4 @@
+using ildoo;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Darik
         StateMachine<State, Enemy_Blade> stateMachine;
 
         [SerializeField] private TMP_Text stateText;
+        [SerializeField] private LayerMask disruptorLayer;
         [SerializeField] private float appearTime = 2f;
         [SerializeField] private float attackRange;
         [SerializeField] private float attackCoolTime = 3f;
@@ -214,8 +216,17 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.CheckInOfRange(owner.attackRange))
-                    stateMachine.ChangeState(State.Attack);
+                if (owner.disruptorLayer.Contain(owner.target.gameObject.layer))
+                {
+                    if (owner.CheckInOfRange(owner.attackRange))
+                        stateMachine.ChangeState(State.Attack);
+                }
+                else
+                {
+                    if (owner.CheckInOfRange(1))
+                        stateMachine.ChangeState(State.Attack);
+                }
+                
             }
 
             public override void Exit()
