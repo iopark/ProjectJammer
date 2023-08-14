@@ -51,6 +51,11 @@ namespace ildoo
                 gameSceneUI.gameObject.SetActive(false);
             }
         }
+
+        private void Start()
+        {
+            GameManager.Data.GameOver += UnLockCursor; 
+        }
         public void ProceedingDeath()
         {
             playerInput.enabled = false;
@@ -96,6 +101,10 @@ namespace ildoo
             //GameManager.Data.playerDict[photonView.ViewID].isAlive = true; 
         }
 
+        public void UnLockCursor()
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
         private void OnDisable()
         {
             if (playerInput == null)
