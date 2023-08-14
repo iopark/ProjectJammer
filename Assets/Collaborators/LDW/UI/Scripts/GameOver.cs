@@ -7,15 +7,20 @@ namespace LDW
 {
     public class GameOver : PopUpUI
     {
-        private Animator anim;
+        private Animation anim;
 
         protected override void Awake()
         {
             base.Awake();
 
-            anim = GetComponent<Animator>();
+            anim = GetComponent<Animation>();
 
             buttons["LobbyButton"].onClick.AddListener(() => { LobbyButton(); });
+        }
+
+        private void OnEnable()
+        {
+            anim.Play("GameOver");
         }
 
         public void LobbyButton()

@@ -46,7 +46,7 @@ namespace LDW
             popUpStack.Push(ui);
 
             // 시간 정지
-            Time.timeScale = 0f;
+            //Time.timeScale = 0f;
             return ui;
         }
 
