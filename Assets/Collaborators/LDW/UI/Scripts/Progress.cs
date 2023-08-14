@@ -14,6 +14,6 @@ public class Progress : MonoBehaviour
 
     public void UpdateProgressUI()
     {
-        progress.text = $"진행도 : {GameManager.Data.disruptorProgress} %";
+        progress.text = $"진행도 : {GameManager.Data.DisruptorProgress} %";
     }
 }
