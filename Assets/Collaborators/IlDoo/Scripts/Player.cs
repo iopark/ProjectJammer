@@ -36,16 +36,31 @@ namespace ildoo
                 playerHealth.onDeath += ProceedingDeath; 
                 _camera = Camera.main;
                 postDeathCam = _camera.transform.GetComponent<PlayerDeathCam>();
-                playerHealth.onDeath += postDeathCam.ActivateUponDeath; 
-                PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
-                GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
+                playerHealth.onDeath += postDeathCam.ActivateUponDeath;
+
+                if (!GameManager.Data.playerDict.ContainsKey(photonView.ViewID))
+                {
+                    PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
+                    GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
+                }
+                else
+                {
+                    GameManager.Data.playerDict[photonView.ViewID].isAlive = true;
+                }
                 gameObject.name = PhotonNetwork.LocalPlayer.NickName;
             }
             if (!photonView.IsMine)
             {
                 Destroy(playerInput);
-                PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
-                GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
+                if (!GameManager.Data.playerDict.ContainsKey(photonView.ViewID))
+                {
+                    PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
+                    GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
+                }
+                else
+                {
+                    GameManager.Data.playerDict[photonView.ViewID].isAlive = true;
+                }
                 int nonOwnerMask = LayerMask.NameToLayer("Default");
                 SetGameLayerRecursive(gameObject, nonOwnerMask);
                 gameObject.name = PhotonNetwork.LocalPlayer.NickName;
@@ -104,7 +119,8 @@ namespace ildoo
 
         public void UnLockCursor()
         {
-            Cursor.lockState = CursorLockMode.None;
+            if (photonView.IsMine)
+                Cursor.lockState = CursorLockMode.None;
         }
         private void OnDisable()
         {
