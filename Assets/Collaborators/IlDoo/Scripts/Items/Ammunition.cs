@@ -16,6 +16,8 @@ namespace ildoo
             // PlayerShooter 컴포넌트가 있으며, 총 오브젝트가 존재하면
             if (playerShooter != null && playerShooter.currentGun != null)
             {
+                if (playerShooter.currentGun.hasMaxCarry())
+                    return; 
                 // 총의 남은 탄환 수를 ammo 만큼 더하기, 모든 클라이언트에서 실행
                 if (PhotonNetwork.IsMasterClient)
                 {
