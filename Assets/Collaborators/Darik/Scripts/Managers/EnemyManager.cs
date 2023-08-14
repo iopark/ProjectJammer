@@ -104,7 +104,7 @@ namespace Darik
             StartCoroutine(GenerateEnemyBladeCoroutine());
             StartCoroutine(GenerateEnemyRifleCoroutine());
             StartCoroutine(GenerateEnemySniperCoroutine());
-            /TestGenerate();
+            TestGenerate();
         }
 
         private void TestGenerate()
