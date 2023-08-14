@@ -20,15 +20,12 @@ namespace Park_Woo_Young
 
         [SerializeField] int perSecond = 1;              // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
         [SerializeField] float maxHologramRotSpeed = 100;// 홀로그램 최대 회전속도
-        [SerializeField] int maxHP = 100;                // 최대 체력
         [SerializeField] int maxProgress = 100;          // 클리어에 필요한 진행도
-        [SerializeField] int hpRepair = 1;               // 체력감소시 시간에 따른 회복속도
 
         public float interaction = 4;                    // 상호작용 거리
         public float time;                               // 델타타임
         public bool disruptorHit;                        // 공격당했을 때 멈추는 상태로 넘어가게 하기
         private float hologramRotSpeed = 0;              // 홀로그램 현재 회전속도
-        public int currentHP;                            // 현재 HP(시작시 maxHp랑 같게 설정함)
         public int progress = 0;                         // 현재 진행도
         private float smallSwellingTime;                 // 처음 작은 범위로 확장하는 시간 
         private float shrinkageTime;                     // 처음 확장한걸 다시 0으로 만드는데 걸리는 시간
@@ -42,7 +39,6 @@ namespace Park_Woo_Young
         State state = State.Activate;
         private void Start()
         {
-            // 임시로 시작시 바로 실행
             GameStart();
         }
 
@@ -56,7 +52,6 @@ namespace Park_Woo_Young
         {
             renderer.sharedMaterial = hologram_Blue;
             hologramRotSpeed = maxHologramRotSpeed;
-            currentHP = maxHP;
             SetDisruptor();
 
         }
@@ -87,16 +82,13 @@ namespace Park_Woo_Young
         {
             Rotate();
             time += Time.deltaTime;
-
-            progress = GameManager.Data.DisruptorProgress++;
-
-
+            
             if (time > perSecond)
             {
                 if (PhotonNetwork.IsMasterClient)
                 {
                     photonView.RPC("ProgressGoesUp", RpcTarget.AllViaServer);
-                    //progress = GameManager.Data.DisruptorProgress;
+                    progress = GameManager.Data.DisruptorProgress;
 
                 }
                 time = 0;
