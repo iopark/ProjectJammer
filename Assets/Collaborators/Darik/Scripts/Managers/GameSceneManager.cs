@@ -13,8 +13,7 @@ namespace Darik
     public class GameSceneManager : MonoBehaviourPunCallbacks
     {
         [SerializeField] Transform[] enemySpawnPoints;
-        [SerializeField] Transform[] AmmoPackSpawnPoints;
-        [SerializeField] Transform[] CurePackSpawnPoints;
+        [SerializeField] ildoo.ItemSpawner[] itemSpawnPoints;
 
         [SerializeField] TMP_Text infoText;
         [SerializeField] float countDownTimer = 5;
@@ -68,13 +67,13 @@ namespace Darik
         public override void OnDisconnected(DisconnectCause cause)
         {
             Debug.Log($"Disconnected : {cause}");
-            SceneManager.LoadScene("LobbyScene");
+            SceneManager.LoadScene("LobbyScene2");
         }
 
         public override void OnLeftRoom()
         {
             Debug.Log("LeftRoom");
-            PhotonNetwork.LoadLevel("LobbyScene");
+            PhotonNetwork.LoadLevel("LobbyScene2");
         }
 
         public override void OnMasterClientSwitched(Player newMasterClient)
@@ -83,6 +82,8 @@ namespace Darik
             {
                 // TODO : 방장이 이어서 해야 할 일
                 GameManager.Enemy.GenerateEnemy();
+
+                GenerateItemSpawners();
             }
         }
 
@@ -153,6 +154,8 @@ namespace Darik
             if (PhotonNetwork.IsMasterClient)
             {
                 GameManager.Enemy.GenerateEnemy();
+
+                GenerateItemSpawners();
             }
         }
 
@@ -174,6 +177,8 @@ namespace Darik
             if (PhotonNetwork.IsMasterClient)
             {
                 GameManager.Enemy.GenerateEnemy();
+
+                GenerateItemSpawners();
             }
         }
 
@@ -186,6 +191,14 @@ namespace Darik
                     loadCount++;
             }
             return loadCount;
+        }
+
+        private void GenerateItemSpawners()
+        {
+            foreach (ildoo.ItemSpawner itemSpawner in itemSpawnPoints)
+            {
+                itemSpawner.StartSpawning();
+            }
         }
     }
 }
