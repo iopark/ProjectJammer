@@ -220,12 +220,7 @@ namespace Darik
             public override void Transition()
             {
                 if (owner.target != null)
-                {
-                    if (owner.squareDistanceToTarget <= (owner.runRange * owner.runRange))
-                        stateMachine.ChangeState(State.MoveBackward);
-                    else
-                        stateMachine.ChangeState(State.MoveForward);
-                }
+                    stateMachine.ChangeState(State.MoveForward);
             }
 
             public override void Exit()
@@ -266,7 +261,7 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget <= (owner.attackRange * owner.attackRange))
+                if (!owner.CheckIsBlocked(owner.attackRange) && owner.CheckInOfRange(owner.attackRange))
                     stateMachine.ChangeState(State.Attack);
             }
 
@@ -315,7 +310,7 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget > (owner.runRange * owner.runRange))
+                if (!owner.CheckIsBlocked(Vector3.Distance(transform.position, owner.target.position)) && owner.CheckOutOfRange(owner.runRange))
                     stateMachine.ChangeState(State.Attack);
             }
 
@@ -364,10 +359,15 @@ namespace Darik
                 if (owner.target == null)
                     stateMachine.ChangeState(State.Idle);
 
-                if (owner.squareDistanceToTarget <= (owner.runRange * owner.runRange))
-                    stateMachine.ChangeState(State.MoveBackward);
+                if (!owner.CheckIsBlocked(Vector3.Distance(transform.position, owner.target.position)))
+                {
+                    if (owner.CheckInOfRange(owner.runRange))
+                        stateMachine.ChangeState(State.MoveBackward);
 
-                if (owner.squareDistanceToTarget > (owner.attackRange * owner.attackRange))
+                    if (owner.CheckOutOfRange(owner.attackRange))
+                        stateMachine.ChangeState(State.MoveForward);
+                }
+                else
                     stateMachine.ChangeState(State.MoveForward);
             }
 
