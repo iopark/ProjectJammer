@@ -4535,7 +4535,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh127822
+  m_Name: pb_Mesh116752
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -6552,6 +6552,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2e0639de4d88e64289fbcbe8257b567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemySpawnPoints: []
+  itemSpawnPoints: []
   infoText: {fileID: 306600363}
   countDownTimer: 5
 --- !u!4 &1156664078
@@ -9641,6 +9643,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 394228614615046739, guid: f570b6de47c11594e92cbe2df49e80ec,
+        type: 3}
+      propertyPath: m_Cameras.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 394228614615046739, guid: f570b6de47c11594e92cbe2df49e80ec,
+        type: 3}
+      propertyPath: m_Cameras.Array.data[0]
+      value: 
+      objectReference: {fileID: 274012763}
+    - target: {fileID: 1735025851582225639, guid: f570b6de47c11594e92cbe2df49e80ec,
+        type: 3}
+      propertyPath: m_DefaultActionMap
+      value: 85ae51c5-bdcc-4f1c-9577-7248a0d9d3c1
+      objectReference: {fileID: 0}
     - target: {fileID: 2656576990957026481, guid: f570b6de47c11594e92cbe2df49e80ec,
         type: 3}
       propertyPath: m_Cameras.Array.size
