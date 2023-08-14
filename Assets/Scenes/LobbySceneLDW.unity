@@ -24582,7 +24582,7 @@ PrefabInstance:
     - target: {fileID: 6413715897555328093, guid: aa9d17700908b5447a6fa3a3caddfd0b,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
-      value: PlayTestSceneVer3
+      value: GameScene
       objectReference: {fileID: 0}
     - target: {fileID: 6744243981747221670, guid: aa9d17700908b5447a6fa3a3caddfd0b,
         type: 3}
@@ -112933,20 +112933,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hologram: {fileID: 4003015337406522077}
   emp: {fileID: 0}
-  progress_Text: {fileID: 1807091188983425581}
   renderer: {fileID: 4003015337406522075}
   hologram_Blue: {fileID: 2100000, guid: d0327ae5a15017149b4be24d249b5bf2, type: 2}
   hologram_Red: {fileID: 2100000, guid: 0cae16b0eccb4034fbb622baeaf1bd42, type: 2}
   perSecond: 1
   maxHologramRotSpeed: 100
-  maxHP: 100
   maxProgress: 100
-  progressGoesUp: 1
-  hpRepair: 1
   interaction: 4
   time: 0
   disruptorHit: 0
-  currentHP: 0
   progress: 0
 --- !u!4 &4003015338944702924
 Transform:
@@ -114406,6 +114401,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   stateText: {fileID: 470559261077424812}
+  disruptorLayer:
+    serializedVersion: 2
+    m_Bits: 0
   appearTime: 2
   attackRange: 9
   attackCoolTime: 3
