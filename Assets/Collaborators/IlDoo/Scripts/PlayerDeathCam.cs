@@ -15,12 +15,18 @@ namespace ildoo
         [SerializeField] float mouseSensitivity;
         private float xRotation;
         private float yRotation;
+        Vector3 heightValue; 
         Vector3 moveDir; 
-        Vector2 lookDelta; 
+        Vector2 lookDelta;
+
+        Vector3 elevateVector;
+        Vector3 dropVector; 
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
             playerInput.enabled = false;
+            elevateVector = new Vector3(0, 1f, 0);
+            dropVector = new Vector3(0, -1f, 0); 
         }
 
         private void LateUpdate()
@@ -28,7 +34,8 @@ namespace ildoo
             if (!playerInput.enabled)
                 return;
             Look();
-            Move(); 
+            Move();
+            HeightControl(); 
         }
         private void OnLook(InputValue value)
         {
@@ -40,6 +47,27 @@ namespace ildoo
             Vector2 input = value.Get<Vector2>();
 
             moveDir = new Vector3(input.x, 0, input.y);
+        }
+
+        private void OnElevate(InputValue value)
+        {
+            if (value.isPressed)
+                heightValue = moveDir + elevateVector;
+            else
+                heightValue = Vector3.zero; 
+        }
+
+        private void OnDrop(InputValue value)
+        {
+            if (value.isPressed)
+                heightValue = moveDir + dropVector;
+            else
+                heightValue = Vector3.zero;
+        }
+
+        private void HeightControl()
+        {
+            transform.Translate(heightValue * moveSpeed * Time.deltaTime, Space.Self);
         }
 
         public void ActivateUponDeath()
