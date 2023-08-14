@@ -76,7 +76,7 @@ namespace ildoo
         [PunRPC]
         private void HealthUpdate(int health)
         {
-            this.health = health;
+            this.Health = health;
             if (photonView.IsMine)
                 gameSceneUI.GameSceneUIUpdate();
         }
