@@ -35,7 +35,7 @@ namespace ildoo
                 return;
             Look();
             Move();
-            HeightControl(); 
+            HeightControl();
         }
         private void OnLook(InputValue value)
         {

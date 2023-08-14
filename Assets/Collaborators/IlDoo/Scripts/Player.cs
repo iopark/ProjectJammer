@@ -26,11 +26,11 @@ namespace ildoo
         PlayerDeathCam postDeathCam; 
         private void Awake()
         {
+            gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
+            playerInput = GetComponent<PlayerInput>();
+            playerHealth = GetComponent<PlayerHealth>();
             if (photonView.IsMine)
             {
-                playerInput = GetComponent<PlayerInput>();
-                gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
-                playerHealth = GetComponent<PlayerHealth>();
                 playerHealth.onDeath += ProceedingDeath; 
                 _camera = Camera.main;
                 postDeathCam = _camera.transform.GetComponent<PlayerDeathCam>();
@@ -39,15 +39,15 @@ namespace ildoo
                 PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
                 GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
                 gameObject.name = PhotonNetwork.LocalPlayer.NickName;
-
             }
             if (!photonView.IsMine)
             {
+                Destroy(playerInput);
                 PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
                 GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
                 int nonOwnerMask = LayerMask.NameToLayer("Default");
-                Destroy(playerInput);
                 SetGameLayerRecursive(gameObject, nonOwnerMask);
+                gameObject.name = PhotonNetwork.LocalPlayer.NickName;
                 gameSceneUI.gameObject.SetActive(false);
             }
         }

@@ -103,8 +103,8 @@ namespace ildoo
 
         private void OnDisable()
         {
-            anim.Rebind(); 
-            _gunCamera.gameObject.SetActive(false);
+            //anim.Rebind(); 
+            //_gunCamera.gameObject.SetActive(false);
         }
         #region Shooting
         public void Fire()
@@ -170,6 +170,7 @@ namespace ildoo
             {
                 return;
             }
+            gunShot.PlayOneShot(gunShotClip);
             anim.SetTrigger("Fire");
             currentAmmo--;
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
@@ -223,7 +224,7 @@ namespace ildoo
             //재장전 시작시 weight 재설정 
             isReloading = true; 
             animRig.weight = 0f;
-            //GameManager.AudioManager.PlaySound(reloadSound); 
+            reloadSound.PlayOneShot(reloadSoundClip); 
             anim.SetTrigger("Reload");
             yield return reloadYieldInterval;
             animRig.weight = 1f;
