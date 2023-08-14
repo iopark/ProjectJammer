@@ -28,6 +28,7 @@ namespace ildoo
         [SerializeField] float rapidFireEval;
         private void OnEnable()
         {
+
         }
 
         private void Start()
