@@ -92,7 +92,7 @@ namespace LDW
         public void GameClear()
         {
             // Game Clear
-            GameManager.UI.ShowPopUpUI<PopUpUI>("GameOver");
+            GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
         }
     }
 }
