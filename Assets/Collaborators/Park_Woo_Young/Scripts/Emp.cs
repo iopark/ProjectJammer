@@ -1,3 +1,4 @@
+using Darik;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Park_Woo_Young
         {
             if (other.gameObject.layer == targetEnemy)
             {
-
+               //gameObject
             }
             else
             {
