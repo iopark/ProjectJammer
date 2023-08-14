@@ -1,11 +1,16 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using ildoo; 
 using UnityEngine;
-using static AudioManager;
 
 namespace ildoo
 {
+    public enum Soundtype
+    {
+        Master,
+        BGM,
+        SFX,
+        Size
+    }
     public class AudioHelper
     {
     }

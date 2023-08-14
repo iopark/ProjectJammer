@@ -79,13 +79,18 @@ namespace ildoo
             if (photonView.IsMine)
                 gameSceneUI.GameSceneUIUpdate();
         }
-        [PunRPC]
         private void Death()
         {
             isDead = true;
-            anim.SetTrigger("PlayerDeath"); 
-            onDeath?.Invoke(); // MainCamera position should be moved else where. 
-            gameObject.SetActive(false);
+            if (photonView.IsMine)
+                onDeath?.Invoke(); // Preceeding disabling gameobj; 
+            photonView.RPC("DeathSync", RpcTarget.AllViaServer); 
+        }
+
+        [PunRPC]
+        public void DeathSync()
+        {
+            StartCoroutine(DeathRoutine());
         }
 
         public bool isFullHealth()
@@ -105,6 +110,13 @@ namespace ildoo
         {
             //transform.position = Respawn Position. 
             gameObject.SetActive(true); 
+        }
+
+        IEnumerator DeathRoutine()
+        {
+            anim.SetTrigger("PlayerDeath");
+            yield return new WaitForSeconds(3f); 
+            gameObject.SetActive(false);
         }
 
         IEnumerator RespawnRoutine()
