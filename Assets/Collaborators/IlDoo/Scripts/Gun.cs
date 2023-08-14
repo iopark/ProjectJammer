@@ -260,7 +260,7 @@ namespace ildoo
                 return;
             
             newAmount = totalAmmo + addingAmount;
-            totalAmmo = Mathf.Clamp(newAmount, 0, maxCarryRounds);
+            TotalAmmo = Mathf.Clamp(newAmount, 0, maxCarryRounds);
             gameSceneUI.GameSceneUIUpdate();
         }
         #endregion

@@ -29,13 +29,14 @@ namespace ildoo
             gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
             playerInput = GetComponent<PlayerInput>();
             playerHealth = GetComponent<PlayerHealth>();
+            SetPlayerColor();
+
             if (photonView.IsMine)
             {
                 playerHealth.onDeath += ProceedingDeath; 
                 _camera = Camera.main;
                 postDeathCam = _camera.transform.GetComponent<PlayerDeathCam>();
                 playerHealth.onDeath += postDeathCam.ActivateUponDeath; 
-                SetPlayerColor();
                 PlayerData playerthis = new PlayerData(photonView.ViewID, 100, 0, true);
                 GameManager.Data.playerDict.Add(photonView.ViewID, playerthis);
                 gameObject.name = PhotonNetwork.LocalPlayer.NickName;

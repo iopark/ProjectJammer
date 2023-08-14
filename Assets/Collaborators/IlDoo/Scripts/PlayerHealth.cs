@@ -56,7 +56,7 @@ namespace ildoo
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
         {
             //For now, masterclient computes any damage taken first, and then others. 
-            if (!PhotonNetwork.IsMasterClient)
+            if (!photonView.IsMine)
                 return;
 
             // Other client reacts the same after Masterclient 
@@ -76,7 +76,7 @@ namespace ildoo
         [PunRPC]
         private void HealthUpdate(int health)
         {
-            this.health = health;
+            this.Health = health;
             if (photonView.IsMine)
                 gameSceneUI.GameSceneUIUpdate();
         }
