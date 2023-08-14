@@ -18,7 +18,17 @@ namespace LDW
 
         public UnityAction OnPlayerDied;
 
-        public int disruptorProgress;
+        public UnityAction<int> disruptorUpdate;
+        private int disruptorProgress;
+        public int DisruptorProgress
+        {
+            get { return disruptorProgress; }
+            set
+            {
+                disruptorProgress = value;
+                disruptorUpdate?.Invoke(disruptorProgress);
+            }
+        }
 
         private void Start()
         {
@@ -56,6 +66,8 @@ namespace LDW
         public void DataInit()
         {
             MonsterStatDict = LoadJson<StatData, int, Stat>("StatData").MakeDict();
+
+            disruptorProgress = 0;
         }
 
         public void DeathCount()
