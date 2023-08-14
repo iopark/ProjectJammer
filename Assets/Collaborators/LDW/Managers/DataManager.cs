@@ -84,10 +84,15 @@ namespace LDW
             }
 
             if (deathCount == playerDict.Count)
-                // GameOver
-                GameManager.UI.ShowPopUpUI<GameOver>("GameOver");
+                GameManager.UI.ShowPopUpUI<PopUpUI>("GameOver");
             else
                 OnPlayerDied?.Invoke();
+        }
+
+        public void GameClear()
+        {
+            // Game Clear
+            GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
         }
     }
 }
