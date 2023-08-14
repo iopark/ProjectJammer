@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 
 public class GunViewOverlay : MonoBehaviourPun
 {
+    [SerializeField] Transform deathCamHolder;
     [SerializeField] Transform MeleeStrikeView;
     [SerializeField] GameObject gunToShake;
     [SerializeField] GameObject physicalScope; 
@@ -38,7 +39,11 @@ public class GunViewOverlay : MonoBehaviourPun
 
     private void ActivateUponDeath()
     {
-        overlayCam.gameObject.SetActive(false);
+        if (photonView.IsMine)
+        {
+            overlayCam.transform.parent = deathCamHolder.transform;
+            overlayCam.gameObject.SetActive(false);
+        }
     }
 
     private void SetCamPos()
@@ -145,7 +150,6 @@ public class GunViewOverlay : MonoBehaviourPun
         while (shakeTimer < returnTime)
         {
             shakeTimer += Time.deltaTime;
-            //overlayCam.transform.rotation = gameObject.transform.rotation; 
             overlayCam.transform.rotation = zoomPos.rotation;
             overlayCam.transform.position = Vector3.Lerp(overlayCam.transform.position, zoomPos.position, shakeSpeed);
             yield return null;

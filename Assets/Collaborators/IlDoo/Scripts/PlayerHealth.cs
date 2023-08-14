@@ -35,8 +35,9 @@ namespace ildoo
         //EFFECTS 
         [SerializeField] private ParticleSystem afterShot;
         [SerializeField] public PlayerGameSceneUI gameSceneUI;
-        Animator anim; 
+        Animator anim;
 
+        Renderer[] playerRenderer;
         private void Awake()
         {
             anim = GetComponent<Animator>();
@@ -109,6 +110,8 @@ namespace ildoo
         public void Respawn()
         {
             //transform.position = Respawn Position. 
+            //Turn off the Renderer ONLY 
+
             gameObject.SetActive(true); 
         }
 
