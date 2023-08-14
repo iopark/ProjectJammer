@@ -12,11 +12,7 @@ namespace Darik
 {
     public class GameSceneManager : MonoBehaviourPunCallbacks
     {
-        [SerializeField] Transform enemySpawnPointAt2oClock = null;
-        [SerializeField] Transform enemySpawnPointAt4oClock = null;
-        [SerializeField] Transform enemySpawnPointAt6oClock = null;
-        [SerializeField] Transform enemySpawnPointAt10oClock = null;
-        [SerializeField] Transform enemySpawnPointAt11oClock = null;
+        [SerializeField] Transform[] enemySpawnPoints;
         [SerializeField] Transform[] AmmoPackSpawnPoints;
         [SerializeField] Transform[] CurePackSpawnPoints;
 
@@ -25,16 +21,11 @@ namespace Darik
 
         private void Awake()
         {
-            if (enemySpawnPointAt2oClock != null)
-                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt2oClock);
-            if (enemySpawnPointAt4oClock != null)
-                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt4oClock);
-            if (enemySpawnPointAt6oClock != null)
-                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt6oClock);
-            if (enemySpawnPointAt10oClock != null)
-                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt10oClock);
-            if (enemySpawnPointAt11oClock != null)
-                GameManager.Enemy.enemySpawnPoints.Add(enemySpawnPointAt11oClock);
+            foreach (Transform spawnPoint in enemySpawnPoints)
+            {
+                if (spawnPoint != null)
+                    GameManager.Enemy.enemySpawnPoints.Add(spawnPoint);
+            }
         }
 
         private void Start()
@@ -157,10 +148,10 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
             PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
+            GameManager.Enemy.RenewalTargetPlayer();
+
             if (PhotonNetwork.IsMasterClient)
             {
-                GameManager.Enemy.RegistPlayers();
-
                 GameManager.Enemy.GenerateEnemy();
             }
         }
@@ -178,10 +169,10 @@ namespace Darik
             PhotonNetwork.Instantiate("PlayerHolder", position, rotation);
             PhotonNetwork.Instantiate("TeamStatPrefab", Vector3.zero, Quaternion.identity);
 
+            GameManager.Enemy.RenewalTargetPlayer();
+
             if (PhotonNetwork.IsMasterClient)
             {
-                GameManager.Enemy.RegistPlayers();
-
                 GameManager.Enemy.GenerateEnemy();
             }
         }
