@@ -15,7 +15,7 @@ namespace LDW
 
             anim = GetComponent<Animator>();
 
-            buttons["SettingButton"].onClick.AddListener(() => { LobbyButton(); });
+            buttons["LobbyButton"].onClick.AddListener(() => { LobbyButton(); });
         }
 
         public void LobbyButton()
