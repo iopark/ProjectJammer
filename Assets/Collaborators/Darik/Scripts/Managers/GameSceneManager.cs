@@ -12,6 +12,7 @@ namespace Darik
 {
     public class GameSceneManager : MonoBehaviourPunCallbacks
     {
+        [SerializeField] Park_Woo_Young.DisruptorState disruptor;
         [SerializeField] Transform[] enemySpawnPoints;
         [SerializeField] ildoo.ItemSpawner[] itemSpawnPoints;
 
@@ -140,6 +141,8 @@ namespace Darik
         {
             Debug.Log("Debug Mode Game Started");
 
+            disruptor.GameStart();
+
             float angularStart = (360.0f / 8f) * PhotonNetwork.LocalPlayer.GetPlayerNumber();
             float x = 5.0f * Mathf.Sin(angularStart * Mathf.Deg2Rad);
             float z = 5.0f * Mathf.Cos(angularStart * Mathf.Deg2Rad);
@@ -163,6 +166,8 @@ namespace Darik
         private void GameStart()
         {
             Debug.Log("Normal Game Mode Started");
+
+            disruptor.GameStart();
 
             float angularStart = (360.0f / 8f) * PhotonNetwork.LocalPlayer.GetPlayerNumber();
             float x = 5.0f * Mathf.Sin(angularStart * Mathf.Deg2Rad);
