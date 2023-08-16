@@ -2,6 +2,7 @@ using MySql.Data.MySqlClient;
 using Park_Woo_Young;
 using Photon.Pun;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -91,7 +92,8 @@ namespace LDW
             if (deathCount == playerDict.Count)
             {
                 GameOver?.Invoke();
-                GameManager.UI.ShowPopUpUI<PopUpUI>("GameOver");
+                // GameManager.UI.ShowPopUpUI<PopUpUI>("GameOver");
+                StartCoroutine(PopUpRoutine());
                 ProgressReset();
             }
             else
@@ -102,8 +104,18 @@ namespace LDW
         {
             // Game Clear
             GameOver?.Invoke();
-            GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
+            // GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
+            StartCoroutine(PopUpRoutine());
             ProgressReset();
+        }
+
+        IEnumerator PopUpRoutine()
+        {
+            yield return new WaitForSeconds(5f);
+
+            GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
+
+            yield return null;
         }
     }
 }
