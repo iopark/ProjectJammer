@@ -28362,6 +28362,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e644e82a3690c04da5841b5564b25e9, type: 3}
+--- !u!114 &1693117056 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3801432507471769318, guid: 9e644e82a3690c04da5841b5564b25e9,
+    type: 3}
+  m_PrefabInstance: {fileID: 1693117055}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6700a351055c5b41a2615719443df8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1696119152
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29106,6 +29118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2e0639de4d88e64289fbcbe8257b567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  disruptor: {fileID: 1693117056}
   enemySpawnPoints:
   - {fileID: 1161207055}
   - {fileID: 973174641}
