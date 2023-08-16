@@ -119,7 +119,7 @@ namespace Park_Woo_Young
         {
             Rotate();
             GameManager.Enemy.StopSpawnEnemy();
-            SuccessEffect();
+            photonView.RPC("SuccessEffect", RpcTarget.AllViaServer);
         }
 
         private void Hologram()
@@ -163,7 +163,8 @@ namespace Park_Woo_Young
             if(!disruptorHit)
                 Hit(damage);
         }
-        
+
+        [PunRPC]
         private void SuccessEffect()
         {
             smallSwellingTime += Time.deltaTime;

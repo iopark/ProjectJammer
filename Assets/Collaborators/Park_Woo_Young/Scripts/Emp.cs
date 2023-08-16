@@ -6,16 +6,13 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Park_Woo_Young
 {
-    public class Emp : MonoBehaviourPunCallbacks
+    public class Emp : MonoBehaviourPun
     {
         [SerializeField] LayerMask targetEnemy;
 
         public void OnTriggerEnter(Collider other)
         {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                photonView.RPC("EmpEnemy", RpcTarget.AllViaServer, other);
-            }
+            photonView.RPC("EmpEnemy", RpcTarget.AllViaServer, other);
         }
 
         [PunRPC]
