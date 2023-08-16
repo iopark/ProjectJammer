@@ -7,8 +7,6 @@ namespace Park_Woo_Young
 {
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable, IInteractable
     {
-        
-
         [SerializeField] GameObject hologram;            // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] GameObject emp;                 // 클리어시 생기는 이펙트
         [SerializeField] new Renderer renderer;
@@ -32,9 +30,9 @@ namespace Park_Woo_Young
         private float EmpRange;                          // 수축된뒤 확장하는 범위
 
         public enum State { Activate, Stop, Success }
-        State state = State.Activate;
-        
-        private void Start()
+        State state = State.Stop;
+
+        public void AwakeDisruptor()
         {
             GameStart();
         }
@@ -43,8 +41,10 @@ namespace Park_Woo_Young
         {
             renderer.sharedMaterial = hologram_Blue;
             hologramRotSpeed = maxHologramRotSpeed;
-            SetDisruptor();
 
+            state = State.Activate;
+
+            SetDisruptor();
         }
         
         private void SetDisruptor()
@@ -68,6 +68,7 @@ namespace Park_Woo_Young
                     break;
             }
         }
+
 
         public void ActivateUpdate()
         {
@@ -104,7 +105,6 @@ namespace Park_Woo_Young
             }
         }
 
-        // 교란기 재가동
         private void StopDisruptor()
         {
             time = 0;

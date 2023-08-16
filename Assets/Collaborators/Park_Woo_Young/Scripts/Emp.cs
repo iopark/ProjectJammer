@@ -6,24 +6,18 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Park_Woo_Young
 {
-    public class Emp : MonoBehaviourPunCallbacks //, Darik.IHittable
+    public class Emp : MonoBehaviourPunCallbacks
     {
-
         [SerializeField] LayerMask targetEnemy;
 
         public void OnTriggerEnter(Collider other)
         {
             if (targetEnemy.Contain(other.gameObject.layer))
             {
-                //other.gameObject.GetComponent<IHittable>();
-                Debug.Log("sdsds");
+                Darik.IHittable obj = other.gameObject.GetComponent<Darik.IHittable>();
+                obj?.TakeDamage(9999, Vector3.zero, Vector3.zero);
             }      
         }
-
-        /*public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
-        {
-            
-        }*/
     }
 }
 
