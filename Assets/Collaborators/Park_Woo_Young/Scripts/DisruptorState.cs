@@ -163,7 +163,7 @@ namespace Park_Woo_Young
             if(!disruptorHit)
                 Hit(damage);
         }
-    
+
         private void SuccessEffect()
         {
             smallSwellingTime += Time.deltaTime;
@@ -230,8 +230,9 @@ namespace Park_Woo_Young
         [PunRPC]
         public void GameClear()
         {
-            if(!PhotonNetwork.IsMasterClient)
+            if (!PhotonNetwork.IsMasterClient)
                 SuccessEffect();
+
 
             GameManager.Data.GameClear();
         }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Park_Woo_Young
 {
-    public class Emp : MonoBehaviourPunCallbacks
+    public class Emp : MonoBehaviourPun
     {
         [SerializeField] LayerMask targetEnemy;
 
@@ -16,7 +16,7 @@ namespace Park_Woo_Young
             {
                 Darik.IHittable obj = other.gameObject.GetComponent<Darik.IHittable>();
                 obj?.TakeDamage(9999, Vector3.zero, Vector3.zero);
-            }      
+            }
         }
     }
 }
