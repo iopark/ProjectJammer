@@ -128,5 +128,15 @@ namespace ildoo
                 return;
             playerInput.enabled = false;
         }
+
+        public void OnPauseAttempt(InputValue value)
+        {
+            if (Cursor.lockState == CursorLockMode.Locked)
+                Cursor.lockState = CursorLockMode.None;
+            else
+                Cursor.lockState = CursorLockMode.Locked; 
+
+
+        }
     }
 }

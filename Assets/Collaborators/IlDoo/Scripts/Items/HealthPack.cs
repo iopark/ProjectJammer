@@ -25,6 +25,7 @@ namespace ildoo
                 if (PhotonNetwork.IsMasterClient)
                     playerHealth.photonView.RPC("AddHealth", RpcTarget.All, healAmount);
 
+                //PhotonNetwork.Destroy(gameObject); 
                 GameManager.Resource.Destroy(gameObject);
                 //photonView.RPC("SyncHealthPack", RpcTarget.Others); 
                 //GameManager.Resource.Destroy(gameObject);
