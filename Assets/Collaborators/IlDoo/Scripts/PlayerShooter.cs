@@ -26,10 +26,6 @@ namespace ildoo
         bool isShooting; 
         public float fireRate { get; private set; }
         [SerializeField] float rapidFireEval;
-        private void OnEnable()
-        {
-
-        }
 
         private void Start()
         {
