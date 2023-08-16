@@ -12,10 +12,16 @@ namespace LDW
         {
             base.Awake();
 
-            buttons["ResumeButton"].onClick.AddListener(() => { GameManager.UI.ClosePopUpUI(); });
+            buttons["ResumeButton"].onClick.AddListener(() => { Continue(); });
             buttons["LeaveButton"].onClick.AddListener(() => { LeaveButton(); });
         }
 
+        public void Continue()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            GameManager.UI.ClosePopUpUI(); 
+        }
+        
         public void LeaveButton()
         {
             PhotonNetwork.AutomaticallySyncScene = false;
@@ -25,17 +31,6 @@ namespace LDW
 
             SceneManager.LoadScene("LobbySceneLDW-0816-1620");
             GameManager.UI.ClosePopUpUI();  // ÆË¾÷ ´Ý±â(GameOverPanel)
-        }
-
-        public void Test()
-        {
-            if (GameManager.Data.DisruptorProgress == 100)
-                return;
-
-            if (GameManager.UI.popUp_Stack.Count > 0)
-                GameManager.UI.ClosePopUpUI();
-
-            GameManager.UI.ShowPopUpUI<PopUpUI>("PausePopUpUI");
         }
     }
 }

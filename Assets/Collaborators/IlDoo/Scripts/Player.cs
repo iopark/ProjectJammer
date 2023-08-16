@@ -134,9 +134,15 @@ namespace ildoo
             if (Cursor.lockState == CursorLockMode.Locked)
                 Cursor.lockState = CursorLockMode.None;
             else
-                Cursor.lockState = CursorLockMode.Locked; 
+                Cursor.lockState = CursorLockMode.Locked;
 
+            if (GameManager.Data.DisruptorProgress == 100)
+                return;
 
+            if (GameManager.UI.popUp_Stack.Count > 0)
+                GameManager.UI.ClosePopUpUI();
+
+            GameManager.UI.ShowPopUpUI<PopUpUI>("PausePopUpUI");
         }
     }
 }

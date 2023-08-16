@@ -11,8 +11,8 @@ namespace ildoo
         [SerializeField] int ammoFillAmount; 
         private void OnTriggerEnter(Collider other)
         {
-            //if (!PhotonNetwork.IsMasterClient)
-            //    return;
+            if (!PhotonNetwork.IsMasterClient)
+                return;
 
             PlayerShooter playerShooter = other.gameObject.GetComponent<PlayerShooter>();
 
@@ -22,11 +22,11 @@ namespace ildoo
                 if (playerShooter.currentGun.hasMaxCarry())
                     return; 
                 // 총의 남은 탄환 수를 ammo 만큼 더하기, 모든 클라이언트에서 실행
-                if (PhotonNetwork.IsMasterClient)
+                //if (PhotonNetwork.IsMasterClient)
                     playerShooter.currentGun.photonView.RPC("AmmoChange", RpcTarget.All, ammoFillAmount);
-                //photonView.RPC("SyncAmmoPack", RpcTarget.Others);h
-                //PhotonNetwork.Destroy(gameObject); 
-                GameManager.Resource.Destroy(gameObject);
+                PhotonNetwork.Destroy(gameObject);
+                //photonView.RPC("SyncAmmoPack", RpcTarget.Others);
+                //GameManager.Resource.Destroy(gameObject);
             }
             // 모든 클라이언트에서의 자신을 파괴
         }
