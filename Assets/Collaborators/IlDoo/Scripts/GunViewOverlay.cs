@@ -54,15 +54,6 @@ public class GunViewOverlay : MonoBehaviourPun
     }
 
     //Gun Shake 
-    private void Start()
-    {
-
-    }
-
-    private void LateUpdate()
-    {
-
-    }
     #region Called by the User 
     public void ChangeToMeleeCamPos()
     {

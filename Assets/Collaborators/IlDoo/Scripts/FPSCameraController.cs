@@ -32,10 +32,6 @@ namespace ildoo
             overlayCam = GameObject.FindGameObjectWithTag("GunCamera").GetComponent<Camera>();
         }
 
-        private void Start()
-        {
-
-        }
         private void SetMainCamPos()
         {
             _camera = Camera.main;
@@ -47,13 +43,6 @@ namespace ildoo
         {
             Cursor.lockState = CursorLockMode.Locked;
             //lock back to the player's sight location; 
-        }
-
-        private void OnDisable()
-        {
-            //freeroaming camera 
-            //temporailty disable camera stacking 
-            Cursor.lockState = CursorLockMode.None;
         }
 
         private void LateUpdate()

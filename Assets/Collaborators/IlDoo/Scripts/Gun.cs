@@ -174,7 +174,7 @@ namespace ildoo
             anim.SetTrigger("Fire");
             currentAmmo--;
             TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("GunRelated/BulletTrailSync", muzzlePoint.position, Quaternion.identity, true);
-            GameManager.Resource.Destroy(trail.gameObject, 1.2f);
+            GameManager.Resource.Destroy(trail.gameObject, 1f);
             shotEffectSync = StartCoroutine(ShotEffectSync(trail, muzzlePoint.position, endPos));
         }
 
@@ -244,10 +244,9 @@ namespace ildoo
             {
                 reloadAmount = totalAmmo; 
             }
-            TotalAmmo -= reloadAmount; 
-            CurrentAmmo += reloadAmount; 
+            TotalAmmo -= reloadAmount;
+            CurrentAmmo += reloadAmount;
         }
-
         public bool hasMaxCarry()
         {
             return totalAmmo == maxCarryRounds; 
@@ -256,11 +255,10 @@ namespace ildoo
         [PunRPC]
         public void AmmoChange(int addingAmount)
         {
-            if (!photonView.IsMine)
-                return;
-            
             newAmount = totalAmmo + addingAmount;
             TotalAmmo = Mathf.Clamp(newAmount, 0, maxCarryRounds);
+            if (!photonView.IsMine)
+                return;
             gameSceneUI.GameSceneUIUpdate();
         }
         #endregion

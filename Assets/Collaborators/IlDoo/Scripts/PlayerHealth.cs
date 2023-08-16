@@ -40,6 +40,7 @@ namespace ildoo
         Renderer[] playerRenderer;
         private void Awake()
         {
+            isDead = false;
             anim = GetComponent<Animator>();
             health = fixedHealth; 
             if (photonView.IsMine)
@@ -56,7 +57,7 @@ namespace ildoo
         public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
         {
             //For now, masterclient computes any damage taken first, and then others. 
-            if (!photonView.IsMine)
+            if (!PhotonNetwork.IsMasterClient)
                 return;
 
             // Other client reacts the same after Masterclient 
@@ -68,7 +69,7 @@ namespace ildoo
             //ParticleSystem effect = GameManager.Resource.Instantiate(afterShot, hitPoint, Quaternion.LookRotation(normal), true); 
             //effect.transform.SetParent(transform); 
 
-            if (health <= 0)
+            if (health <= 0 && !isDead)
             {
                 Death();
             }
@@ -83,14 +84,14 @@ namespace ildoo
         private void Death()
         {
             isDead = true;
-            if (photonView.IsMine)
-                onDeath?.Invoke(); // Preceeding disabling gameobj; 
-            photonView.RPC("DeathSync", RpcTarget.AllViaServer); 
+            photonView.RPC("DeathSync", RpcTarget.All); 
         }
 
         [PunRPC]
         public void DeathSync()
         {
+            if (photonView.IsMine)
+                onDeath?.Invoke();
             StartCoroutine(DeathRoutine());
         }
 
@@ -107,31 +108,17 @@ namespace ildoo
             Health = Mathf.Clamp(health, 0, 100);
         }
 
-        public void Respawn()
-        {
-            //transform.position = Respawn Position. 
-            //Turn off the Renderer ONLY 
-
-            gameObject.SetActive(true); 
-        }
-
         IEnumerator DeathRoutine()
         {
             anim.SetTrigger("PlayerDeath");
             yield return new WaitForSeconds(3f); 
             gameObject.SetActive(false);
         }
-
-        IEnumerator RespawnRoutine()
-        {
-            yield return new WaitForSeconds(5);
-            Respawn(); 
-        }
         #region Debugging 
         //Debugging purposes
         public void OnGetHit(InputValue value)
         {
-            GetDamage(20);
+            Death(); 
             gameSceneUI.GameSceneUIUpdate();
             //TeamHealthManager Update Health 
         }
