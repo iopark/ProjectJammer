@@ -10,8 +10,8 @@ namespace ildoo
         [SerializeField] int healAmount;
         private void OnTriggerEnter(Collider other)
         {
-            //if (!PhotonNetwork.IsMasterClient)
-            //    return;
+            if (!PhotonNetwork.IsMasterClient)
+                return;
 
             PlayerHealth playerHealth = other.gameObject.GetComponent<PlayerHealth>();
 
@@ -22,10 +22,11 @@ namespace ildoo
                     return;
                 // 총의 남은 탄환 수를 ammo 만큼 더하기, 모든 클라이언트에서 실행
                 
-                if (PhotonNetwork.IsMasterClient)
-                    playerHealth.photonView.RPC("AddHealth", RpcTarget.All, healAmount);
+                playerHealth.photonView.RPC("AddHealth", RpcTarget.All, healAmount);
+                PhotonNetwork.Destroy(gameObject);
 
-                GameManager.Resource.Destroy(gameObject);
+                //if (PhotonNetwork.IsMasterClient)
+                //GameManager.Resource.Destroy(gameObject);
                 //photonView.RPC("SyncHealthPack", RpcTarget.Others); 
                 //GameManager.Resource.Destroy(gameObject);
             }
