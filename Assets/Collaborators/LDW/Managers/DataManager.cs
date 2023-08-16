@@ -121,10 +121,10 @@ namespace LDW
 
         IEnumerator OverPopUpRoutine()
         {
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(1f);
 
             GameManager.Enemy.StopSpawnEnemy();
-            GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
+            GameManager.UI.ShowPopUpUI<PopUpUI>("GameOver");
 
             yield return null;
         }
