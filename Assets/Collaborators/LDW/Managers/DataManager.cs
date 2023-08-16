@@ -113,6 +113,7 @@ namespace LDW
         {
             yield return new WaitForSeconds(5f);
 
+            GameManager.Enemy.StopSpawnEnemy();
             GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
 
             yield return null;
@@ -122,6 +123,7 @@ namespace LDW
         {
             yield return new WaitForSeconds(5f);
 
+            GameManager.Enemy.StopSpawnEnemy();
             GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
 
             yield return null;
