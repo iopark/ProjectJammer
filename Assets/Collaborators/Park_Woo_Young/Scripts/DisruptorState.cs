@@ -7,8 +7,6 @@ namespace Park_Woo_Young
 {
     public class DisruptorState : MonoBehaviourPunCallbacks, Darik.IHittable, IInteractable
     {
-        
-
         [SerializeField] GameObject hologram;            // 교란기 위의 홀로그램의 회전을 주기 위함
         [SerializeField] GameObject emp;                 // 클리어시 생기는 이펙트
         [SerializeField] new Renderer renderer;
@@ -30,33 +28,29 @@ namespace Park_Woo_Young
         private float smallSwellingRange;                // 업데이트 한번당 확장범위
         private float Range;                             // 업데이트 한번당 수축 범위
         private float EmpRange;                          // 수축된뒤 확장하는 범위
-        
 
         public enum State { Activate, Stop, Success }
-        State state = State.Activate;
-        private void Start()
+        State state = State.Stop;
+
+        public void AwakeDisruptor()
         {
             GameStart();
-        }
-
-        private void SetDisruptor()
-        {
-            GameManager.Data.Disruptor = this.transform;
-            GameManager.Enemy.ChangeTarget(true);
         }
 
         public void GameStart()
         {
             renderer.sharedMaterial = hologram_Blue;
             hologramRotSpeed = maxHologramRotSpeed;
+
+            state = State.Activate;
+
             SetDisruptor();
-
         }
-
-        private void Hit(int damage)
+        
+        private void SetDisruptor()
         {
-            if (PhotonNetwork.IsMasterClient)
-                photonView.RPC("DisruptorOff", RpcTarget.AllViaServer, damage);
+            GameManager.Data.Disruptor = this.transform;
+            GameManager.Enemy.ChangeTarget(true);
         }
 
         private void Update()
@@ -74,6 +68,7 @@ namespace Park_Woo_Young
                     break;
             }
         }
+
 
         public void ActivateUpdate()
         {
@@ -110,23 +105,6 @@ namespace Park_Woo_Young
             }
         }
 
-        [PunRPC]
-        public void GameClear()
-        {
-            if(!PhotonNetwork.IsMasterClient)
-                SuccessEffect();
-
-            GameManager.Data.GameClear();
-        }
-
-
-        [PunRPC]
-        public void ProgressGoesUp()
-        {
-            // time = 0;                   // 시간을 0으로 초기화
-            GameManager.Data.DisruptorProgress++;
-        }
-        // 교란기 재가동
         private void StopDisruptor()
         {
             time = 0;
@@ -140,6 +118,53 @@ namespace Park_Woo_Young
             }
         }
 
+        public void SuccessUpdate()
+        {
+            SuccessEffect();
+        }
+
+        private void Hologram()
+        {
+            if (!disruptorHit)
+            {
+                renderer.sharedMaterial = hologram_Blue;
+            }
+            else
+            {
+                renderer.sharedMaterial = hologram_Red;
+            }
+        }
+        
+        private void Rotate()
+        {
+            hologram.transform.Rotate(Vector3.back, hologramRotSpeed * Time.deltaTime);
+        }
+        
+        public void Interact()
+        {
+            if (disruptorHit)
+            {
+                if (PhotonNetwork.IsMasterClient)
+                    photonView.RPC("DisruptorOn", RpcTarget.AllViaServer);
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        private void Hit(int damage)
+        {
+            if (PhotonNetwork.IsMasterClient)
+                photonView.RPC("DisruptorOff", RpcTarget.AllViaServer, damage);
+        }
+
+        public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
+        {
+            if(!disruptorHit)
+                Hit(damage);
+        }
+    
         private void SuccessEffect()
         {
             smallSwellingTime += Time.deltaTime;
@@ -182,44 +207,11 @@ namespace Park_Woo_Young
             }
         }
 
-        public void SuccessUpdate()
+        [PunRPC]
+        public void ProgressGoesUp()
         {
-            SuccessEffect();
-        }
-
-        private void Rotate()
-        {
-            hologram.transform.Rotate(Vector3.back, hologramRotSpeed * Time.deltaTime);
-        }
-
-        public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
-        {
-            if(!disruptorHit)
-                Hit(damage);
-        }
-
-        public void Interact()
-        {
-            if (disruptorHit)
-            {
-                if (PhotonNetwork.IsMasterClient)
-                    photonView.RPC("DisruptorOn", RpcTarget.AllViaServer);
-            }
-            else
-            {
-                return;
-            }
-        }
-        private void Hologram()
-        {
-            if (!disruptorHit)
-            {
-                renderer.sharedMaterial = hologram_Blue;
-            }
-            else
-            {
-                renderer.sharedMaterial = hologram_Red;
-            }
+            // time = 0;                   // 시간을 0으로 초기화
+            GameManager.Data.DisruptorProgress++;
         }
 
         [PunRPC]
@@ -236,6 +228,14 @@ namespace Park_Woo_Young
             renderer.sharedMaterial = hologram_Red;
         }
 
+        [PunRPC]
+        public void GameClear()
+        {
+            if(!PhotonNetwork.IsMasterClient)
+                SuccessEffect();
+
+            GameManager.Data.GameClear();
+        }
     }
 }
 
