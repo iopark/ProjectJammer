@@ -27,7 +27,7 @@ namespace ildoo
 
         //GameSoundSettings 
         [SerializeField] AudioSource bgmPlayer;
-        [SerializeField] AudioClip bgmClip; 
+        AudioClip bgmClip; 
         
         private void Awake()
         {
@@ -79,7 +79,7 @@ namespace ildoo
             if (!photonView.IsMine)
                 return; 
             GameManager.Data.GameOver += UnLockCursor;
-            bgmPlayer.clip = bgmClip;
+            //bgmPlayer.clip = bgmClip;
             bgmPlayer.Play();
             bgmPlayer.loop = true; 
         }
