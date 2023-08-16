@@ -93,7 +93,7 @@ namespace LDW
             {
                 GameOver?.Invoke();
                 // GameManager.UI.ShowPopUpUI<PopUpUI>("GameOver");
-                StartCoroutine(PopUpRoutine());
+                StartCoroutine(OverPopUpRoutine());
                 ProgressReset();
             }
             else
@@ -105,11 +105,20 @@ namespace LDW
             // Game Clear
             GameOver?.Invoke();
             // GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
-            StartCoroutine(PopUpRoutine());
+            StartCoroutine(ClearPopUpRoutine());
             ProgressReset();
         }
 
-        IEnumerator PopUpRoutine()
+        IEnumerator ClearPopUpRoutine()
+        {
+            yield return new WaitForSeconds(5f);
+
+            GameManager.UI.ShowPopUpUI<PopUpUI>("GameClear");
+
+            yield return null;
+        }
+
+        IEnumerator OverPopUpRoutine()
         {
             yield return new WaitForSeconds(5f);
 
