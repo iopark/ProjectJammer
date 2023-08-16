@@ -12,12 +12,6 @@ namespace Park_Woo_Young
 
         public void OnTriggerEnter(Collider other)
         {
-            photonView.RPC("EmpEnemy", RpcTarget.AllViaServer, other);
-        }
-
-        [PunRPC]
-        public void EmpEnemy(Collider other)
-        {
             if (targetEnemy.Contain(other.gameObject.layer))
             {
                 Darik.IHittable obj = other.gameObject.GetComponent<Darik.IHittable>();
