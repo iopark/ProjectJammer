@@ -1,28 +1,22 @@
 using Darik;
+using ildoo;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace Park_Woo_Young
 {
-    public class Emp : MonoBehaviourPunCallbacks, Darik.IHittable
+    public class Emp : MonoBehaviourPunCallbacks
     {
-
         [SerializeField] LayerMask targetEnemy;
 
-        private void OnTriggerEnter(Collider other)
+        public void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.layer == targetEnemy)
+            if (targetEnemy.Contain(other.gameObject.layer))
             {
-               //gameObject
-            }
-            else
-            {
-                return;
-            }
-        }
-        public void TakeDamage(int damage, Vector3 hitPoint, Vector3 normal)
-        {
+                Darik.IHittable obj = other.gameObject.GetComponent<Darik.IHittable>();
+                obj?.TakeDamage(9999, Vector3.zero, Vector3.zero);
+            }      
         }
     }
 }
