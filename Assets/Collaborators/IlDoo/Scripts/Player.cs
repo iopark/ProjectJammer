@@ -23,13 +23,19 @@ namespace ildoo
 
         //OnDeathSettings 
         PlayerHealth playerHealth;
-        PlayerDeathCam postDeathCam; 
+        PlayerDeathCam postDeathCam;
+
+        //GameSoundSettings 
+        [SerializeField] AudioSource bgmPlayer;
+        [SerializeField] AudioClip bgmClip; 
+        
         private void Awake()
         {
             gameSceneUI = GetComponentInChildren<PlayerGameSceneUI>();
             playerInput = GetComponent<PlayerInput>();
             playerHealth = GetComponent<PlayerHealth>();
             SetPlayerColor();
+            bgmClip = bgmPlayer.clip; 
 
             if (photonView.IsMine)
             {
@@ -70,8 +76,12 @@ namespace ildoo
 
         private void Start()
         {
-            if (photonView.IsMine)
-                GameManager.Data.GameOver += UnLockCursor; 
+            if (!photonView.IsMine)
+                return; 
+            GameManager.Data.GameOver += UnLockCursor;
+            bgmPlayer.clip = bgmClip;
+            bgmPlayer.Play();
+            bgmPlayer.loop = true; 
         }
 
         public void ProceedingDeath()
