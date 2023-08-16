@@ -15,6 +15,7 @@ namespace Darik
         [SerializeField] Park_Woo_Young.DisruptorState disruptor;
         [SerializeField] Transform[] enemySpawnPoints;
         [SerializeField] ildoo.ItemSpawner[] itemSpawnPoints;
+        [SerializeField] private string lobbyScenename;
 
         [SerializeField] TMP_Text infoText;
         [SerializeField] float countDownTimer = 5;
@@ -68,13 +69,13 @@ namespace Darik
         public override void OnDisconnected(DisconnectCause cause)
         {
             Debug.Log($"Disconnected : {cause}");
-            SceneManager.LoadScene("LobbyScene2");
+            SceneManager.LoadScene(lobbyScenename);
         }
 
         public override void OnLeftRoom()
         {
             Debug.Log("LeftRoom");
-            PhotonNetwork.LoadLevel("LobbyScene2");
+            PhotonNetwork.LoadLevel(lobbyScenename);
         }
 
         public override void OnMasterClientSwitched(Player newMasterClient)

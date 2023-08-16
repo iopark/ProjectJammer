@@ -29144,6 +29144,7 @@ MonoBehaviour:
   - {fileID: 1907563291}
   - {fileID: 547511772}
   - {fileID: 1641398438}
+  lobbyScenename: LobbySceneLDW-0816-1620
   infoText: {fileID: 126306919}
   countDownTimer: 5
 --- !u!4 &1838168119
