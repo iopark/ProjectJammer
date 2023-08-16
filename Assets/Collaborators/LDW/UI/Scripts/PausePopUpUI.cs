@@ -25,11 +25,10 @@ namespace LDW
         public void LeaveButton()
         {
             PhotonNetwork.AutomaticallySyncScene = false;
-            // PhotonNetwork.LocalPlayer.SetLoad(false);
+            PhotonNetwork.LocalPlayer.SetLoad(false);
 
             PhotonNetwork.LeaveRoom();
 
-            SceneManager.LoadScene("LobbySceneLDW-0816-1620");
             GameManager.UI.ClosePopUpUI();  // ÆË¾÷ ´Ý±â(GameOverPanel)
         }
     }
