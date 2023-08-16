@@ -304,7 +304,7 @@ namespace Darik
             public override void Update()
             {
                 curTime += Time.deltaTime;
-                if (curTime > 3f)
+                if (curTime > 3f && owner.photonView.IsMine)
                     PhotonNetwork.Destroy(gameObject);
             }
 

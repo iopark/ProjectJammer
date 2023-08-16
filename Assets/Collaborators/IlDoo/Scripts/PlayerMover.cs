@@ -69,7 +69,6 @@ namespace ildoo
                     moveSpeed = 0;
                 moveSpeed = Mathf.Lerp(moveSpeed, 0, 0.5f);
             }
-
             else if (isRunning)
             {
                 delta = Mathf.Abs(moveSpeed - runSpeed);
@@ -77,7 +76,6 @@ namespace ildoo
                     moveSpeed = runSpeed;
                 moveSpeed = Mathf.Lerp(moveSpeed, runSpeed, 0.5f);
             }
-
             else
             {
                 delta = Mathf.Abs(moveSpeed - walkSpeed);
@@ -91,7 +89,6 @@ namespace ildoo
             anim.SetFloat("XSpeed", moveDir.x, 0.1f, Time.deltaTime);
             anim.SetFloat("Speed", moveSpeed);
         }
-
         private void OnMove(InputValue value)
         {
 
@@ -99,9 +96,6 @@ namespace ildoo
 
             moveDir = new Vector3(input.x, 0, input.y);
         }
-
-        
-
         private void RigidJump()
         {
             rigid.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
@@ -114,7 +108,6 @@ namespace ildoo
                 //ySpeed = jumpSpeed;
                 RigidJump(); 
             }
-
         }
         RaycastHit groundHit;
         private bool GroundCheck()
