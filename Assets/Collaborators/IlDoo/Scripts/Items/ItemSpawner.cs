@@ -47,9 +47,9 @@ namespace ildoo
 
             newSpawningPos = transform.position;
             newSpawningPos.y = 0.5f;
-            //GameObject newItem = PhotonNetwork.Instantiate(spawningObj.name, newSpawningPos, Quaternion.identity);
-            //newItem.transform.parent = transform;
-            photonView.RPC("SyncRespawn", RpcTarget.AllViaServer, newSpawningPos);
+            GameObject newItem = PhotonNetwork.Instantiate(spawningObj.name, newSpawningPos, Quaternion.identity);
+            newItem.transform.parent = transform;
+            //photonView.RPC("SyncRespawn", RpcTarget.AllViaServer, newSpawningPos);
         }
         // 생성 동기화 
         [PunRPC]
