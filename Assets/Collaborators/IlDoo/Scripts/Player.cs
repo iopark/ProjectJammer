@@ -70,8 +70,10 @@ namespace ildoo
 
         private void Start()
         {
-            GameManager.Data.GameOver += UnLockCursor; 
+            if (photonView.IsMine)
+                GameManager.Data.GameOver += UnLockCursor; 
         }
+
         public void ProceedingDeath()
         {
             playerInput.enabled = false;
@@ -127,6 +129,8 @@ namespace ildoo
             if (playerInput == null)
                 return;
             playerInput.enabled = false;
+            if (photonView.IsMine)
+                GameManager.Data.GameOver -= UnLockCursor; 
         }
         public void OnPauseAttempt(InputValue value)
         {
