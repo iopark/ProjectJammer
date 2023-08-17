@@ -114,18 +114,5 @@ namespace ildoo
             yield return new WaitForSeconds(3f); 
             gameObject.SetActive(false);
         }
-        #region Debugging 
-        //Debugging purposes
-        public void OnGetHit(InputValue value)
-        {
-            Death(); 
-            gameSceneUI.GameSceneUIUpdate();
-            //TeamHealthManager Update Health 
-        }
-        public void GetDamage(int damage)
-        {
-            TakeDamage(damage, Vector3.zero, Vector3.zero);
-        }
-        #endregion
     }
 }

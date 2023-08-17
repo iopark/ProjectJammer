@@ -29,7 +29,7 @@ namespace ildoo
             dropVector = new Vector3(0, -1f, 0); 
         }
 
-        private void Start()
+        private void OnEnable()
         {
             GameManager.Data.GameOver += UnLockCursor;
         }
