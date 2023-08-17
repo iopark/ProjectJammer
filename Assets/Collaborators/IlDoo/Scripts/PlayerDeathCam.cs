@@ -29,6 +29,16 @@ namespace ildoo
             dropVector = new Vector3(0, -1f, 0); 
         }
 
+        private void OnEnable()
+        {
+            GameManager.Data.GameOver += UnLockCursor;
+        }
+
+        private void OnDisable()
+        {
+            GameManager.Data.GameOver -= UnLockCursor;
+        }
+
         private void LateUpdate()
         {
             if (!playerInput.enabled)
@@ -37,10 +47,12 @@ namespace ildoo
             Move();
             HeightControl();
         }
+
         private void OnLook(InputValue value)
         {
             lookDelta = value.Get<Vector2>();
         }
+
         private void OnMove(InputValue value)
         {
 
@@ -74,6 +86,12 @@ namespace ildoo
         {
             Cursor.lockState = CursorLockMode.Locked;
             playerInput.enabled = true;
+        }
+
+        public void UnLockCursor()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         private void Look()

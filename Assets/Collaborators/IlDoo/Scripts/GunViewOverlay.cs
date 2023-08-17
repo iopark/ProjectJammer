@@ -36,7 +36,6 @@ public class GunViewOverlay : MonoBehaviourPun
         playerShooter.zoomIn += ZoomInAction;
         playerGun.shotFired += ShakeCam;
     }
-
     private void ActivateUponDeath()
     {
         if (photonView.IsMine)
@@ -55,10 +54,6 @@ public class GunViewOverlay : MonoBehaviourPun
 
     //Gun Shake 
     #region Called by the User 
-    public void ChangeToMeleeCamPos()
-    {
-        overlayCam.gameObject.transform.SetParent(MeleeStrikeView);
-    }
 
     Coroutine zoomInRoutine;
     Coroutine zoomOutRoutine; 
@@ -68,12 +63,14 @@ public class GunViewOverlay : MonoBehaviourPun
         {
             if (zoomOutRoutine != null)
                 StopCoroutine(zoomOutRoutine);
+            isZooming = true;
             zoomInRoutine = StartCoroutine(ZoomInAction()); 
         }
         else
         {
             if (zoomInRoutine != null)
                 StopCoroutine(zoomInRoutine);
+            isZooming = false; 
             zoomOutRoutine = StartCoroutine(ZoomOutAction());
         }
     }
@@ -146,7 +143,7 @@ public class GunViewOverlay : MonoBehaviourPun
             yield return null;
         }
         yield return null;
-        SetCamPos();
+        //SetCamPos();
     }
 
     float deltaDist;
