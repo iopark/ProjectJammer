@@ -1,0 +1,19 @@
+{
+    "j_stats" : [
+      {
+        "id": "0",
+        "progress": "0",
+        "InitProgress": "0"
+      },
+      {
+        "id": "1",
+        "progress": "1",
+        "InitProgress": "0"
+      },
+      {
+        "id": "2",
+        "progress": "2",
+        "InitProgress": "0"
+      }
+    ]
+}
