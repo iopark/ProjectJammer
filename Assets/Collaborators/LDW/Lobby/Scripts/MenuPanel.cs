@@ -18,6 +18,12 @@ namespace LDW
             baseRoomPanel.SetActive(true);
         }
 
+        private void OnDisable()
+        {
+            roomNameInputField.text = "";
+            maxPlayerInputField.text = "";
+        }
+
         public void CreateRoomMenu()
         {
             baseRoomPanel.SetActive(false);

@@ -22,6 +22,12 @@ namespace LDW
             reader = GameManager.Data.reader;
         }
 
+        private void OnDisable()
+        {
+            idInputField.text = "";
+            passwordInputField.text = "";
+        }
+
         // Login 버튼 실행 함수
         public void Login()
         {
@@ -41,10 +47,9 @@ namespace LDW
                         string readID = reader["ID"].ToString();
                         string readPass = reader["Password"].ToString();
 
-                        Debug.Log($"ID : {readID}, Password : {readPass}");
-
                         if (pass == readPass)
                         {
+                            Debug.Log($"ID : {readID}, Password : {readPass}");
                             PhotonNetwork.LocalPlayer.NickName = id;
                             PhotonNetwork.ConnectUsingSettings(); // 접속 신청
                             if (!reader.IsClosed)

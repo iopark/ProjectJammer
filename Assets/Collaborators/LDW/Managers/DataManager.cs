@@ -43,7 +43,7 @@ namespace LDW
         {
             try
             {
-                string serverInfo = "Server=15.164.251.21; DataBase=userdata; Uid=root; Pwd=kga4794050; Port=3306; CharSet=utf8; ";
+                string serverInfo = "Server=54.180.139.181; DataBase=userdata; Uid=root; Pwd=1234; Port=3306; CharSet=utf8; ";
                 con = new MySqlConnection(serverInfo);
                 con.Open();
 

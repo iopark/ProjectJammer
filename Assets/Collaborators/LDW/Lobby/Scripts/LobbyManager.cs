@@ -34,6 +34,7 @@ namespace LDW
 
         public override void OnConnectedToMaster()
         {
+            Debug.Log("Connect");
             // 접속됐을 때 행동
             SetActivePanel(Panel.Menu);
         }
@@ -134,6 +135,11 @@ namespace LDW
         public void OnRegisterPanel()
         {
             SetActivePanel(Panel.Register);
+        }
+
+        public void OnRegister()
+        {
+            SetActivePanel(Panel.Login);
         }
 
         public void OnRegisterCancel()

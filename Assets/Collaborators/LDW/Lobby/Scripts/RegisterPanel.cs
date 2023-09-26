@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace LDW
 {
@@ -16,9 +17,17 @@ namespace LDW
 
         private MySqlConnection con;
 
+        public UnityEvent OnRegisterSucceed;
+
         private void Start()
         {
             con = GameManager.Data.con;
+        }
+
+        private void OnDisable()
+        {
+            idInputField.text = "";
+            passwordInputField.text = "";
         }
 
         public void Register()
@@ -34,6 +43,7 @@ namespace LDW
                 if (cmd.ExecuteNonQuery() == 1)
                 {
                     Console.WriteLine("Insert Success");
+                    OnRegisterSucceed?.Invoke();
                 }
                 else
                 {
