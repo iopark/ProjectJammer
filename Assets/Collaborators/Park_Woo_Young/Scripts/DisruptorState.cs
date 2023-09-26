@@ -13,7 +13,7 @@ namespace Park_Woo_Young
         [SerializeField] Material hologram_Blue;         // 활성화시 홀로그램 색상(파랑)
         [SerializeField] Material hologram_Red;          // 멈출시 홀로그램 색상(빨강)
 
-        [SerializeField] int perSecond = 1;              // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
+        [SerializeField] float perSecond = 1;              // 교란기 진행도, 체력 회복에 필요한 시간 !!0으로 설정할시 교란기가 완충이 됨!!
         [SerializeField] float maxHologramRotSpeed = 100;// 홀로그램 최대 회전속도
         [SerializeField] int maxProgress = 100;          // 클리어에 필요한 진행도
 
@@ -31,11 +31,6 @@ namespace Park_Woo_Young
 
         public enum State { Activate, Stop, Success }
         State state = State.Stop;
-
-        public void AwakeDisruptor()
-        {
-            GameStart();
-        }
 
         public void GameStart()
         {
@@ -92,6 +87,8 @@ namespace Park_Woo_Young
                 photonView.RPC("GameClear", RpcTarget.AllViaServer);
 
                 state = State.Success;
+
+                hologramRotSpeed = 500;
                 print("교란기 완전가동");
             }
 
@@ -120,6 +117,8 @@ namespace Park_Woo_Young
 
         public void SuccessUpdate()
         {
+            Rotate();
+            GameManager.Enemy.StopSpawnEnemy();
             SuccessEffect();
         }
 
@@ -164,7 +163,7 @@ namespace Park_Woo_Young
             if(!disruptorHit)
                 Hit(damage);
         }
-    
+
         private void SuccessEffect()
         {
             smallSwellingTime += Time.deltaTime;
@@ -231,8 +230,9 @@ namespace Park_Woo_Young
         [PunRPC]
         public void GameClear()
         {
-            if(!PhotonNetwork.IsMasterClient)
+            if (!PhotonNetwork.IsMasterClient)
                 SuccessEffect();
+
 
             GameManager.Data.GameClear();
         }

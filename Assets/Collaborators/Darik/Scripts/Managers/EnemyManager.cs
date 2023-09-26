@@ -181,5 +181,10 @@ namespace Darik
                 yield return new WaitForSeconds(spawnSniperCoolTime);
             }
         }
+
+        public void StopSpawnEnemy()
+        {
+            StopAllCoroutines();
+        }
     }
 }
